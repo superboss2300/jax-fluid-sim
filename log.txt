@@ -1,0 +1,3001 @@
+Tracing update
+step=0, loss=18.6860, a=1.1227, b=0.9344, c=1.0678
+Training loss: 21.195623
+Testing loss: 18.48542
+step=1, loss=16.7173, a=1.2353, b=0.8706, c=1.1309
+Training loss: 18.884615
+Testing loss: 16.551426
+step=2, loss=15.0074, a=1.3388, b=0.8086, c=1.1896
+Training loss: 16.881594
+Testing loss: 14.871523
+step=3, loss=13.5191, a=1.4337, b=0.7482, c=1.2444
+Training loss: 15.142027
+Testing loss: 13.409127
+step=4, loss=12.2207, a=1.5209, b=0.6894, c=1.2955
+Training loss: 13.628022
+Testing loss: 12.133104
+step=5, loss=11.0851, a=1.6008, b=0.6323, c=1.3432
+Training loss: 12.307337
+Testing loss: 11.016951
+step=6, loss=10.0894, a=1.6741, b=0.5767, c=1.3877
+Training loss: 11.152512
+Testing loss: 10.0381
+step=7, loss=9.2140, a=1.7414, b=0.5227, c=1.4294
+Training loss: 10.140163
+Testing loss: 9.177324
+step=8, loss=8.4423, a=1.8030, b=0.4701, c=1.4684
+Training loss: 9.250361
+Testing loss: 8.418227
+step=9, loss=7.7599, a=1.8595, b=0.4189, c=1.5050
+Training loss: 8.466114
+Testing loss: 7.746831
+step=10, loss=7.1548, a=1.9112, b=0.3691, c=1.5393
+Training loss: 7.772924
+Testing loss: 7.1512003
+step=11, loss=6.6166, a=1.9585, b=0.3207, c=1.5715
+Training loss: 7.1584134
+Testing loss: 6.621145
+step=12, loss=6.1363, a=2.0018, b=0.2736, c=1.6018
+Training loss: 6.612009
+Testing loss: 6.14795
+step=13, loss=5.7063, a=2.0414, b=0.2278, c=1.6303
+Training loss: 6.1246705
+Testing loss: 5.724166
+step=14, loss=5.3203, a=2.0776, b=0.1832, c=1.6571
+Training loss: 5.6886616
+Testing loss: 5.3434105
+step=15, loss=4.9725, a=2.1107, b=0.1398, c=1.6824
+Training loss: 5.297357
+Testing loss: 5.0002117
+step=16, loss=4.6582, a=2.1408, b=0.0976, c=1.7064
+Training loss: 4.9450717
+Testing loss: 4.6898766
+step=17, loss=4.3734, a=2.1683, b=0.0566, c=1.7290
+Training loss: 4.62693
+Testing loss: 4.408372
+step=18, loss=4.1144, a=2.1934, b=0.0167, c=1.7504
+Training loss: 4.338741
+Testing loss: 4.1522264
+step=19, loss=3.8782, a=2.2162, b=-0.0222, c=1.7707
+Training loss: 4.076894
+Testing loss: 3.9184518
+step=20, loss=3.6621, a=2.2369, b=-0.0599, c=1.7900
+Training loss: 3.8382804
+Testing loss: 3.7044678
+step=21, loss=3.4640, a=2.2557, b=-0.0967, c=1.8083
+Training loss: 3.6202157
+Testing loss: 3.5080426
+step=22, loss=3.2818, a=2.2728, b=-0.1324, c=1.8258
+Training loss: 3.420379
+Testing loss: 3.3272467
+step=23, loss=3.1138, a=2.2883, b=-0.1672, c=1.8424
+Training loss: 3.236758
+Testing loss: 3.160403
+step=24, loss=2.9585, a=2.3023, b=-0.2011, c=1.8583
+Training loss: 3.0676084
+Testing loss: 3.0060546
+step=25, loss=2.8146, a=2.3149, b=-0.2340, c=1.8735
+Training loss: 2.9114113
+Testing loss: 2.8629315
+step=26, loss=2.6811, a=2.3263, b=-0.2660, c=1.8880
+Training loss: 2.7668426
+Testing loss: 2.7299252
+step=27, loss=2.5568, a=2.3365, b=-0.2971, c=1.9020
+Training loss: 2.632747
+Testing loss: 2.6060634
+step=28, loss=2.4410, a=2.3456, b=-0.3274, c=1.9154
+Training loss: 2.508111
+Testing loss: 2.4904943
+step=29, loss=2.3329, a=2.3538, b=-0.3569, c=1.9282
+Training loss: 2.392045
+Testing loss: 2.3824663
+step=30, loss=2.2317, a=2.3611, b=-0.3856, c=1.9406
+Training loss: 2.2837665
+Testing loss: 2.2813175
+step=31, loss=2.1369, a=2.3676, b=-0.4135, c=1.9525
+Training loss: 2.1825838
+Testing loss: 2.1864603
+step=32, loss=2.0480, a=2.3733, b=-0.4406, c=1.9641
+Training loss: 2.0878847
+Testing loss: 2.0973742
+step=33, loss=1.9645, a=2.3783, b=-0.4670, c=1.9752
+Training loss: 1.9991249
+Testing loss: 2.0135949
+step=34, loss=1.8859, a=2.3827, b=-0.4927, c=1.9860
+Training loss: 1.9158207
+Testing loss: 1.9347078
+step=35, loss=1.8119, a=2.3865, b=-0.5177, c=1.9964
+Training loss: 1.8375401
+Testing loss: 1.8603413
+step=36, loss=1.7421, a=2.3897, b=-0.5420, c=2.0066
+Training loss: 1.7638944
+Testing loss: 1.7901614
+step=37, loss=1.6763, a=2.3925, b=-0.5656, c=2.0164
+Training loss: 1.694536
+Testing loss: 1.7238666
+step=38, loss=1.6141, a=2.3948, b=-0.5886, c=2.0260
+Training loss: 1.62915
+Testing loss: 1.6611843
+step=39, loss=1.5553, a=2.3967, b=-0.6110, c=2.0353
+Training loss: 1.5674537
+Testing loss: 1.6018679
+step=40, loss=1.4997, a=2.3982, b=-0.6327, c=2.0444
+Training loss: 1.5091888
+Testing loss: 1.5456918
+step=41, loss=1.4470, a=2.3994, b=-0.6539, c=2.0532
+Training loss: 1.4541216
+Testing loss: 1.4924512
+step=42, loss=1.3971, a=2.4002, b=-0.6745, c=2.0619
+Training loss: 1.4020382
+Testing loss: 1.4419583
+step=43, loss=1.3498, a=2.4008, b=-0.6945, c=2.0703
+Training loss: 1.3527437
+Testing loss: 1.3940407
+step=44, loss=1.3050, a=2.4011, b=-0.7140, c=2.0786
+Training loss: 1.3060591
+Testing loss: 1.3485398
+step=45, loss=1.2624, a=2.4011, b=-0.7330, c=2.0867
+Training loss: 1.26182
+Testing loss: 1.3053098
+step=46, loss=1.2219, a=2.4010, b=-0.7514, c=2.0946
+Training loss: 1.2198746
+Testing loss: 1.2642154
+step=47, loss=1.1835, a=2.4006, b=-0.7694, c=2.1024
+Training loss: 1.1800836
+Testing loss: 1.2251318
+step=48, loss=1.1470, a=2.4000, b=-0.7868, c=2.1100
+Training loss: 1.1423173
+Testing loss: 1.1879431
+step=49, loss=1.1123, a=2.3993, b=-0.8038, c=2.1175
+Training loss: 1.1064559
+Testing loss: 1.1525413
+step=50, loss=1.0792, a=2.3984, b=-0.8203, c=2.1249
+Training loss: 1.0723883
+Testing loss: 1.1188264
+step=51, loss=1.0478, a=2.3974, b=-0.8364, c=2.1321
+Training loss: 1.0400106
+Testing loss: 1.086704
+step=52, loss=1.0178, a=2.3962, b=-0.8520, c=2.1393
+Training loss: 1.0092263
+Testing loss: 1.0560871
+step=53, loss=0.9893, a=2.3949, b=-0.8672, c=2.1463
+Training loss: 0.97994554
+Testing loss: 1.0268941
+step=54, loss=0.9621, a=2.3935, b=-0.8820, c=2.1532
+Training loss: 0.9520839
+Testing loss: 0.9990476
+step=55, loss=0.9362, a=2.3921, b=-0.8964, c=2.1600
+Training loss: 0.9255634
+Testing loss: 0.9724765
+step=56, loss=0.9115, a=2.3905, b=-0.9104, c=2.1667
+Training loss: 0.9003096
+Testing loss: 0.94711274
+step=57, loss=0.8879, a=2.3888, b=-0.9240, c=2.1733
+Training loss: 0.8762535
+Testing loss: 0.92289305
+step=58, loss=0.8654, a=2.3871, b=-0.9373, c=2.1799
+Training loss: 0.8533307
+Testing loss: 0.899758
+step=59, loss=0.8440, a=2.3854, b=-0.9502, c=2.1863
+Training loss: 0.83147955
+Testing loss: 0.8776512
+step=60, loss=0.8235, a=2.3835, b=-0.9627, c=2.1927
+Training loss: 0.8106435
+Testing loss: 0.8565196
+step=61, loss=0.8039, a=2.3816, b=-0.9749, c=2.1990
+Training loss: 0.7907683
+Testing loss: 0.83631366
+step=62, loss=0.7852, a=2.3797, b=-0.9868, c=2.2052
+Training loss: 0.77180314
+Testing loss: 0.8169862
+step=63, loss=0.7673, a=2.3777, b=-0.9983, c=2.2113
+Training loss: 0.7537004
+Testing loss: 0.79849297
+step=64, loss=0.7502, a=2.3757, b=-1.0096, c=2.2174
+Training loss: 0.736415
+Testing loss: 0.78079194
+step=65, loss=0.7338, a=2.3737, b=-1.0205, c=2.2234
+Training loss: 0.71990466
+Testing loss: 0.76384324
+step=66, loss=0.7182, a=2.3716, b=-1.0311, c=2.2294
+Training loss: 0.7041289
+Testing loss: 0.7476098
+step=67, loss=0.7032, a=2.3695, b=-1.0414, c=2.2352
+Training loss: 0.68905
+Testing loss: 0.73205596
+step=68, loss=0.6889, a=2.3674, b=-1.0515, c=2.2411
+Training loss: 0.67463255
+Testing loss: 0.7171482
+step=69, loss=0.6751, a=2.3653, b=-1.0613, c=2.2468
+Training loss: 0.6608421
+Testing loss: 0.70285505
+step=70, loss=0.6619, a=2.3631, b=-1.0708, c=2.2525
+Training loss: 0.64764756
+Testing loss: 0.68914634
+step=71, loss=0.6493, a=2.3610, b=-1.0800, c=2.2582
+Training loss: 0.6350183
+Testing loss: 0.6759938
+step=72, loss=0.6372, a=2.3588, b=-1.0891, c=2.2638
+Training loss: 0.622926
+Testing loss: 0.6633705
+step=73, loss=0.6256, a=2.3567, b=-1.0978, c=2.2693
+Training loss: 0.6113436
+Testing loss: 0.6512506
+step=74, loss=0.6145, a=2.3545, b=-1.1063, c=2.2748
+Training loss: 0.60024565
+Testing loss: 0.6396102
+step=75, loss=0.6038, a=2.3523, b=-1.1146, c=2.2802
+Training loss: 0.5896079
+Testing loss: 0.62842655
+step=76, loss=0.5935, a=2.3501, b=-1.1227, c=2.2856
+Training loss: 0.5794077
+Testing loss: 0.61767787
+step=77, loss=0.5837, a=2.3479, b=-1.1305, c=2.2910
+Training loss: 0.5696234
+Testing loss: 0.60734344
+step=78, loss=0.5742, a=2.3457, b=-1.1382, c=2.2962
+Training loss: 0.56023437
+Testing loss: 0.5974039
+step=79, loss=0.5651, a=2.3435, b=-1.1456, c=2.3015
+Training loss: 0.55122143
+Testing loss: 0.5878406
+step=80, loss=0.5563, a=2.3414, b=-1.1528, c=2.3067
+Training loss: 0.5425662
+Testing loss: 0.5786362
+step=81, loss=0.5479, a=2.3392, b=-1.1598, c=2.3119
+Training loss: 0.5342512
+Testing loss: 0.5697738
+step=82, loss=0.5398, a=2.3370, b=-1.1667, c=2.3170
+Training loss: 0.52626
+Testing loss: 0.56123775
+step=83, loss=0.5320, a=2.3348, b=-1.1733, c=2.3220
+Training loss: 0.51857686
+Testing loss: 0.5530129
+step=84, loss=0.5245, a=2.3327, b=-1.1798, c=2.3271
+Training loss: 0.5111874
+Testing loss: 0.5450852
+step=85, loss=0.5172, a=2.3305, b=-1.1861, c=2.3320
+Training loss: 0.50407726
+Testing loss: 0.53744113
+step=86, loss=0.5103, a=2.3284, b=-1.1922, c=2.3370
+Training loss: 0.49723333
+Testing loss: 0.5300677
+step=87, loss=0.5035, a=2.3262, b=-1.1982, c=2.3419
+Training loss: 0.49064296
+Testing loss: 0.5229527
+step=88, loss=0.4970, a=2.3241, b=-1.2039, c=2.3468
+Training loss: 0.4842941
+Testing loss: 0.5160848
+step=89, loss=0.4908, a=2.3220, b=-1.2096, c=2.3516
+Training loss: 0.47817585
+Testing loss: 0.50945276
+step=90, loss=0.4847, a=2.3199, b=-1.2151, c=2.3564
+Training loss: 0.47227696
+Testing loss: 0.5030463
+step=91, loss=0.4789, a=2.3178, b=-1.2204, c=2.3611
+Training loss: 0.46658757
+Testing loss: 0.49685532
+step=92, loss=0.4732, a=2.3157, b=-1.2256, c=2.3658
+Training loss: 0.46109787
+Testing loss: 0.49087054
+step=93, loss=0.4678, a=2.3136, b=-1.2306, c=2.3705
+Training loss: 0.45579883
+Testing loss: 0.48508298
+step=94, loss=0.4625, a=2.3115, b=-1.2355, c=2.3751
+Training loss: 0.4506817
+Testing loss: 0.47948414
+step=95, loss=0.4574, a=2.3095, b=-1.2403, c=2.3797
+Training loss: 0.44573838
+Testing loss: 0.47406587
+step=96, loss=0.4525, a=2.3074, b=-1.2450, c=2.3843
+Training loss: 0.44096085
+Testing loss: 0.4688203
+step=97, loss=0.4477, a=2.3054, b=-1.2495, c=2.3888
+Training loss: 0.4363416
+Testing loss: 0.4637403
+step=98, loss=0.4431, a=2.3034, b=-1.2539, c=2.3933
+Training loss: 0.4318739
+Testing loss: 0.4588188
+step=99, loss=0.4386, a=2.3014, b=-1.2582, c=2.3978
+Training loss: 0.42755082
+Testing loss: 0.4540493
+step=100, loss=0.4343, a=2.2994, b=-1.2623, c=2.4022
+Training loss: 0.42336613
+Testing loss: 0.4494255
+step=101, loss=0.4301, a=2.2974, b=-1.2664, c=2.4066
+Training loss: 0.4193137
+Testing loss: 0.4449412
+step=102, loss=0.4260, a=2.2954, b=-1.2703, c=2.4109
+Training loss: 0.4153879
+Testing loss: 0.4405908
+step=103, loss=0.4221, a=2.2935, b=-1.2741, c=2.4153
+Training loss: 0.41158316
+Testing loss: 0.4363691
+step=104, loss=0.4182, a=2.2915, b=-1.2779, c=2.4195
+Training loss: 0.40789455
+Testing loss: 0.43227047
+step=105, loss=0.4145, a=2.2896, b=-1.2815, c=2.4238
+Training loss: 0.404317
+Testing loss: 0.4282904
+step=106, loss=0.4109, a=2.2877, b=-1.2850, c=2.4280
+Training loss: 0.4008459
+Testing loss: 0.42442393
+step=107, loss=0.4074, a=2.2858, b=-1.2884, c=2.4322
+Training loss: 0.39747664
+Testing loss: 0.42066664
+step=108, loss=0.4040, a=2.2839, b=-1.2918, c=2.4364
+Training loss: 0.39420518
+Testing loss: 0.4170144
+step=109, loss=0.4006, a=2.2820, b=-1.2950, c=2.4405
+Training loss: 0.39102754
+Testing loss: 0.41346294
+step=110, loss=0.3974, a=2.2801, b=-1.2982, c=2.4446
+Training loss: 0.38793978
+Testing loss: 0.41000843
+step=111, loss=0.3943, a=2.2783, b=-1.3012, c=2.4487
+Training loss: 0.3849382
+Testing loss: 0.40664726
+step=112, loss=0.3912, a=2.2764, b=-1.3042, c=2.4527
+Training loss: 0.38201964
+Testing loss: 0.40337598
+step=113, loss=0.3882, a=2.2746, b=-1.3071, c=2.4567
+Training loss: 0.3791806
+Testing loss: 0.4001912
+step=114, loss=0.3854, a=2.2728, b=-1.3100, c=2.4607
+Training loss: 0.376418
+Testing loss: 0.39708954
+step=115, loss=0.3825, a=2.2710, b=-1.3127, c=2.4646
+Training loss: 0.37372887
+Testing loss: 0.39406815
+step=116, loss=0.3798, a=2.2692, b=-1.3154, c=2.4685
+Training loss: 0.3711105
+Testing loss: 0.39112398
+step=117, loss=0.3771, a=2.2674, b=-1.3180, c=2.4724
+Training loss: 0.36855996
+Testing loss: 0.3882543
+step=118, loss=0.3745, a=2.2657, b=-1.3205, c=2.4763
+Training loss: 0.3660749
+Testing loss: 0.38545665
+step=119, loss=0.3720, a=2.2639, b=-1.3230, c=2.4801
+Training loss: 0.36365283
+Testing loss: 0.38272825
+step=120, loss=0.3695, a=2.2622, b=-1.3254, c=2.4839
+Training loss: 0.36129132
+Testing loss: 0.38006666
+step=121, loss=0.3671, a=2.2604, b=-1.3277, c=2.4876
+Training loss: 0.3589883
+Testing loss: 0.37746963
+step=122, loss=0.3647, a=2.2587, b=-1.3300, c=2.4914
+Training loss: 0.35674152
+Testing loss: 0.3749349
+step=123, loss=0.3624, a=2.2570, b=-1.3322, c=2.4951
+Training loss: 0.354549
+Testing loss: 0.37246057
+step=124, loss=0.3601, a=2.2553, b=-1.3343, c=2.4988
+Training loss: 0.35240886
+Testing loss: 0.37004435
+step=125, loss=0.3579, a=2.2537, b=-1.3364, c=2.5024
+Training loss: 0.3503192
+Testing loss: 0.3676844
+step=126, loss=0.3558, a=2.2520, b=-1.3385, c=2.5061
+Training loss: 0.34827825
+Testing loss: 0.36537886
+step=127, loss=0.3537, a=2.2503, b=-1.3404, c=2.5097
+Training loss: 0.34628442
+Testing loss: 0.363126
+step=128, loss=0.3516, a=2.2487, b=-1.3424, c=2.5132
+Training loss: 0.34433612
+Testing loss: 0.36092407
+step=129, loss=0.3496, a=2.2471, b=-1.3442, c=2.5168
+Training loss: 0.34243172
+Testing loss: 0.3587715
+step=130, loss=0.3477, a=2.2455, b=-1.3461, c=2.5203
+Training loss: 0.34056988
+Testing loss: 0.35666662
+step=131, loss=0.3457, a=2.2439, b=-1.3478, c=2.5238
+Training loss: 0.3387491
+Testing loss: 0.35460806
+step=132, loss=0.3439, a=2.2423, b=-1.3495, c=2.5273
+Training loss: 0.3369681
+Testing loss: 0.35259438
+step=133, loss=0.3420, a=2.2407, b=-1.3512, c=2.5307
+Training loss: 0.3352257
+Testing loss: 0.3506241
+step=134, loss=0.3402, a=2.2391, b=-1.3528, c=2.5341
+Training loss: 0.33352056
+Testing loss: 0.34869605
+step=135, loss=0.3385, a=2.2376, b=-1.3544, c=2.5375
+Training loss: 0.33185145
+Testing loss: 0.34680885
+step=136, loss=0.3367, a=2.2360, b=-1.3560, c=2.5409
+Training loss: 0.33021754
+Testing loss: 0.34496132
+step=137, loss=0.3351, a=2.2345, b=-1.3575, c=2.5442
+Training loss: 0.32861745
+Testing loss: 0.34315234
+step=138, loss=0.3334, a=2.2330, b=-1.3589, c=2.5475
+Training loss: 0.3270504
+Testing loss: 0.34138083
+step=139, loss=0.3318, a=2.2314, b=-1.3604, c=2.5508
+Training loss: 0.3255152
+Testing loss: 0.33964556
+step=140, loss=0.3302, a=2.2299, b=-1.3617, c=2.5541
+Training loss: 0.3240111
+Testing loss: 0.3379457
+step=141, loss=0.3286, a=2.2284, b=-1.3631, c=2.5573
+Training loss: 0.32253703
+Testing loss: 0.33628014
+step=142, loss=0.3271, a=2.2270, b=-1.3644, c=2.5605
+Training loss: 0.32109228
+Testing loss: 0.33464783
+step=143, loss=0.3256, a=2.2255, b=-1.3657, c=2.5637
+Training loss: 0.31967598
+Testing loss: 0.33304814
+step=144, loss=0.3242, a=2.2240, b=-1.3669, c=2.5669
+Training loss: 0.3182873
+Testing loss: 0.33147988
+step=145, loss=0.3227, a=2.2226, b=-1.3681, c=2.5700
+Training loss: 0.3169256
+Testing loss: 0.32994246
+step=146, loss=0.3213, a=2.2212, b=-1.3693, c=2.5731
+Training loss: 0.31558982
+Testing loss: 0.32843488
+step=147, loss=0.3199, a=2.2197, b=-1.3704, c=2.5762
+Training loss: 0.31427965
+Testing loss: 0.32695648
+step=148, loss=0.3186, a=2.2183, b=-1.3715, c=2.5793
+Training loss: 0.31299415
+Testing loss: 0.32550636
+step=149, loss=0.3173, a=2.2169, b=-1.3726, c=2.5824
+Training loss: 0.31173286
+Testing loss: 0.324084
+step=150, loss=0.3160, a=2.2155, b=-1.3736, c=2.5854
+Training loss: 0.310495
+Testing loss: 0.32268837
+step=151, loss=0.3147, a=2.2141, b=-1.3747, c=2.5884
+Training loss: 0.30927998
+Testing loss: 0.3213191
+step=152, loss=0.3134, a=2.2128, b=-1.3756, c=2.5914
+Training loss: 0.30808726
+Testing loss: 0.31997538
+step=153, loss=0.3122, a=2.2114, b=-1.3766, c=2.5943
+Training loss: 0.3069164
+Testing loss: 0.31865668
+step=154, loss=0.3110, a=2.2101, b=-1.3775, c=2.5973
+Training loss: 0.30576667
+Testing loss: 0.3173623
+step=155, loss=0.3098, a=2.2087, b=-1.3785, c=2.6002
+Training loss: 0.30463764
+Testing loss: 0.31609172
+step=156, loss=0.3086, a=2.2074, b=-1.3793, c=2.6031
+Training loss: 0.30352885
+Testing loss: 0.31484434
+step=157, loss=0.3075, a=2.2061, b=-1.3802, c=2.6060
+Training loss: 0.30243972
+Testing loss: 0.3136196
+step=158, loss=0.3063, a=2.2048, b=-1.3811, c=2.6088
+Training loss: 0.30136985
+Testing loss: 0.31241688
+step=159, loss=0.3052, a=2.2035, b=-1.3819, c=2.6116
+Training loss: 0.3003188
+Testing loss: 0.31123585
+step=160, loss=0.3041, a=2.2022, b=-1.3827, c=2.6145
+Training loss: 0.29928616
+Testing loss: 0.31007597
+step=161, loss=0.3031, a=2.2009, b=-1.3834, c=2.6172
+Training loss: 0.29827148
+Testing loss: 0.30893666
+step=162, loss=0.3020, a=2.1996, b=-1.3842, c=2.6200
+Training loss: 0.29727432
+Testing loss: 0.30781746
+step=163, loss=0.3010, a=2.1983, b=-1.3849, c=2.6228
+Training loss: 0.29629424
+Testing loss: 0.306718
+step=164, loss=0.3000, a=2.1971, b=-1.3856, c=2.6255
+Training loss: 0.295331
+Testing loss: 0.3056377
+step=165, loss=0.2990, a=2.1958, b=-1.3863, c=2.6282
+Training loss: 0.29438412
+Testing loss: 0.30457622
+step=166, loss=0.2980, a=2.1946, b=-1.3870, c=2.6309
+Training loss: 0.29345334
+Testing loss: 0.3035333
+step=167, loss=0.2970, a=2.1934, b=-1.3877, c=2.6335
+Training loss: 0.29253823
+Testing loss: 0.30250826
+step=168, loss=0.2961, a=2.1922, b=-1.3883, c=2.6362
+Training loss: 0.29163858
+Testing loss: 0.30150092
+step=169, loss=0.2952, a=2.1910, b=-1.3889, c=2.6388
+Training loss: 0.29075387
+Testing loss: 0.3005108
+step=170, loss=0.2943, a=2.1898, b=-1.3895, c=2.6414
+Training loss: 0.289884
+Testing loss: 0.29953766
+step=171, loss=0.2934, a=2.1886, b=-1.3901, c=2.6440
+Training loss: 0.28902858
+Testing loss: 0.29858097
+step=172, loss=0.2925, a=2.1874, b=-1.3907, c=2.6466
+Training loss: 0.2881872
+Testing loss: 0.29764053
+step=173, loss=0.2916, a=2.1862, b=-1.3912, c=2.6491
+Training loss: 0.28735974
+Testing loss: 0.2967159
+step=174, loss=0.2908, a=2.1850, b=-1.3918, c=2.6516
+Training loss: 0.28654584
+Testing loss: 0.2958067
+step=175, loss=0.2899, a=2.1839, b=-1.3923, c=2.6541
+Training loss: 0.2857452
+Testing loss: 0.2949129
+step=176, loss=0.2891, a=2.1827, b=-1.3928, c=2.6566
+Training loss: 0.2849577
+Testing loss: 0.29403386
+step=177, loss=0.2883, a=2.1816, b=-1.3933, c=2.6591
+Training loss: 0.28418294
+Testing loss: 0.29316956
+step=178, loss=0.2875, a=2.1805, b=-1.3938, c=2.6616
+Training loss: 0.28342074
+Testing loss: 0.29231957
+step=179, loss=0.2867, a=2.1794, b=-1.3943, c=2.6640
+Training loss: 0.28267083
+Testing loss: 0.29148352
+step=180, loss=0.2859, a=2.1782, b=-1.3947, c=2.6664
+Training loss: 0.28193304
+Testing loss: 0.2906613
+step=181, loss=0.2851, a=2.1771, b=-1.3952, c=2.6688
+Training loss: 0.28120708
+Testing loss: 0.28985253
+step=182, loss=0.2844, a=2.1760, b=-1.3956, c=2.6712
+Training loss: 0.28049275
+Testing loss: 0.28905705
+step=183, loss=0.2837, a=2.1750, b=-1.3960, c=2.6736
+Training loss: 0.27978984
+Testing loss: 0.28827453
+step=184, loss=0.2829, a=2.1739, b=-1.3964, c=2.6759
+Training loss: 0.27909806
+Testing loss: 0.2875047
+step=185, loss=0.2822, a=2.1728, b=-1.3968, c=2.6782
+Training loss: 0.27841735
+Testing loss: 0.28674737
+step=186, loss=0.2815, a=2.1717, b=-1.3972, c=2.6805
+Training loss: 0.27774736
+Testing loss: 0.28600234
+step=187, loss=0.2808, a=2.1707, b=-1.3976, c=2.6828
+Training loss: 0.27708793
+Testing loss: 0.28526926
+step=188, loss=0.2802, a=2.1696, b=-1.3980, c=2.6851
+Training loss: 0.27643907
+Testing loss: 0.28454807
+step=189, loss=0.2795, a=2.1686, b=-1.3983, c=2.6874
+Training loss: 0.27580035
+Testing loss: 0.2838383
+step=190, loss=0.2788, a=2.1676, b=-1.3987, c=2.6896
+Training loss: 0.27517164
+Testing loss: 0.28314006
+step=191, loss=0.2782, a=2.1665, b=-1.3990, c=2.6918
+Training loss: 0.2745528
+Testing loss: 0.28245288
+step=192, loss=0.2775, a=2.1655, b=-1.3993, c=2.6940
+Training loss: 0.2739436
+Testing loss: 0.2817767
+step=193, loss=0.2769, a=2.1645, b=-1.3997, c=2.6962
+Training loss: 0.27334395
+Testing loss: 0.28111124
+step=194, loss=0.2763, a=2.1635, b=-1.4000, c=2.6984
+Training loss: 0.2727537
+Testing loss: 0.2804563
+step=195, loss=0.2757, a=2.1625, b=-1.4003, c=2.7006
+Training loss: 0.27217254
+Testing loss: 0.27981177
+step=196, loss=0.2751, a=2.1615, b=-1.4006, c=2.7027
+Training loss: 0.27160048
+Testing loss: 0.2791774
+step=197, loss=0.2745, a=2.1606, b=-1.4009, c=2.7048
+Training loss: 0.27103725
+Testing loss: 0.278553
+step=198, loss=0.2739, a=2.1596, b=-1.4011, c=2.7070
+Training loss: 0.27048272
+Testing loss: 0.27793843
+step=199, loss=0.2733, a=2.1586, b=-1.4014, c=2.7091
+Training loss: 0.26993686
+Testing loss: 0.2773336
+step=200, loss=0.2728, a=2.1577, b=-1.4017, c=2.7111
+Training loss: 0.26939937
+Testing loss: 0.27673823
+step=201, loss=0.2722, a=2.1567, b=-1.4019, c=2.7132
+Training loss: 0.26887023
+Testing loss: 0.27615213
+step=202, loss=0.2717, a=2.1558, b=-1.4022, c=2.7152
+Training loss: 0.26834926
+Testing loss: 0.27557522
+step=203, loss=0.2712, a=2.1548, b=-1.4024, c=2.7173
+Training loss: 0.26783624
+Testing loss: 0.27500728
+step=204, loss=0.2706, a=2.1539, b=-1.4027, c=2.7193
+Training loss: 0.26733118
+Testing loss: 0.27444813
+step=205, loss=0.2701, a=2.1530, b=-1.4029, c=2.7213
+Training loss: 0.26683387
+Testing loss: 0.2738978
+step=206, loss=0.2696, a=2.1521, b=-1.4031, c=2.7233
+Training loss: 0.26634413
+Testing loss: 0.27335593
+step=207, loss=0.2691, a=2.1512, b=-1.4033, c=2.7253
+Training loss: 0.265862
+Testing loss: 0.2728224
+step=208, loss=0.2686, a=2.1503, b=-1.4035, c=2.7272
+Training loss: 0.26538718
+Testing loss: 0.2722971
+step=209, loss=0.2681, a=2.1494, b=-1.4037, c=2.7292
+Training loss: 0.26491955
+Testing loss: 0.2717799
+step=210, loss=0.2676, a=2.1485, b=-1.4039, c=2.7311
+Training loss: 0.2644591
+Testing loss: 0.27127066
+step=211, loss=0.2671, a=2.1476, b=-1.4041, c=2.7330
+Training loss: 0.26400566
+Testing loss: 0.27076927
+step=212, loss=0.2667, a=2.1467, b=-1.4043, c=2.7349
+Training loss: 0.2635592
+Testing loss: 0.27027562
+step=213, loss=0.2662, a=2.1459, b=-1.4045, c=2.7368
+Training loss: 0.26311952
+Testing loss: 0.26978955
+step=214, loss=0.2658, a=2.1450, b=-1.4047, c=2.7387
+Training loss: 0.26268652
+Testing loss: 0.26931086
+step=215, loss=0.2653, a=2.1441, b=-1.4049, c=2.7405
+Training loss: 0.26226008
+Testing loss: 0.26883942
+step=216, loss=0.2649, a=2.1433, b=-1.4050, c=2.7424
+Training loss: 0.26184016
+Testing loss: 0.2683753
+step=217, loss=0.2645, a=2.1424, b=-1.4052, c=2.7442
+Training loss: 0.2614266
+Testing loss: 0.26791817
+step=218, loss=0.2640, a=2.1416, b=-1.4054, c=2.7460
+Training loss: 0.26101926
+Testing loss: 0.26746804
+step=219, loss=0.2636, a=2.1408, b=-1.4055, c=2.7478
+Training loss: 0.26061818
+Testing loss: 0.2670248
+step=220, loss=0.2632, a=2.1400, b=-1.4057, c=2.7496
+Training loss: 0.26022315
+Testing loss: 0.26658827
+step=221, loss=0.2628, a=2.1391, b=-1.4058, c=2.7514
+Training loss: 0.2598341
+Testing loss: 0.2661584
+step=222, loss=0.2624, a=2.1383, b=-1.4060, c=2.7532
+Training loss: 0.25945088
+Testing loss: 0.26573497
+step=223, loss=0.2620, a=2.1375, b=-1.4061, c=2.7549
+Training loss: 0.25907356
+Testing loss: 0.265318
+step=224, loss=0.2616, a=2.1367, b=-1.4062, c=2.7566
+Training loss: 0.2587019
+Testing loss: 0.26490733
+step=225, loss=0.2612, a=2.1359, b=-1.4064, c=2.7584
+Training loss: 0.25833583
+Testing loss: 0.26450285
+step=226, loss=0.2608, a=2.1351, b=-1.4065, c=2.7601
+Training loss: 0.2579753
+Testing loss: 0.2641044
+step=227, loss=0.2605, a=2.1344, b=-1.4066, c=2.7618
+Training loss: 0.2576202
+Testing loss: 0.26371205
+step=228, loss=0.2601, a=2.1336, b=-1.4068, c=2.7635
+Training loss: 0.25727046
+Testing loss: 0.26332548
+step=229, loss=0.2597, a=2.1328, b=-1.4069, c=2.7651
+Training loss: 0.25692597
+Testing loss: 0.26294485
+step=230, loss=0.2594, a=2.1320, b=-1.4070, c=2.7668
+Training loss: 0.25658667
+Testing loss: 0.26256987
+step=231, loss=0.2590, a=2.1313, b=-1.4071, c=2.7684
+Training loss: 0.2562525
+Testing loss: 0.26220053
+step=232, loss=0.2587, a=2.1305, b=-1.4072, c=2.7701
+Training loss: 0.25592342
+Testing loss: 0.2618367
+step=233, loss=0.2584, a=2.1298, b=-1.4073, c=2.7717
+Training loss: 0.2555993
+Testing loss: 0.26147833
+step=234, loss=0.2580, a=2.1290, b=-1.4074, c=2.7733
+Training loss: 0.25527996
+Testing loss: 0.2611253
+step=235, loss=0.2577, a=2.1283, b=-1.4075, c=2.7749
+Training loss: 0.25496548
+Testing loss: 0.2607776
+step=236, loss=0.2574, a=2.1276, b=-1.4076, c=2.7765
+Training loss: 0.25465575
+Testing loss: 0.26043507
+step=237, loss=0.2571, a=2.1269, b=-1.4077, c=2.7781
+Training loss: 0.25435054
+Testing loss: 0.26009768
+step=238, loss=0.2567, a=2.1261, b=-1.4078, c=2.7796
+Training loss: 0.25405014
+Testing loss: 0.25976515
+step=239, loss=0.2564, a=2.1254, b=-1.4079, c=2.7812
+Training loss: 0.25375405
+Testing loss: 0.25943777
+step=240, loss=0.2561, a=2.1247, b=-1.4080, c=2.7827
+Training loss: 0.2534625
+Testing loss: 0.25911507
+step=241, loss=0.2558, a=2.1240, b=-1.4081, c=2.7843
+Training loss: 0.2531753
+Testing loss: 0.25879726
+step=242, loss=0.2555, a=2.1233, b=-1.4081, c=2.7858
+Training loss: 0.25289243
+Testing loss: 0.2584842
+step=243, loss=0.2552, a=2.1226, b=-1.4082, c=2.7873
+Training loss: 0.2526138
+Testing loss: 0.2581757
+step=244, loss=0.2550, a=2.1219, b=-1.4083, c=2.7888
+Training loss: 0.25233936
+Testing loss: 0.2578718
+step=245, loss=0.2547, a=2.1212, b=-1.4084, c=2.7903
+Training loss: 0.25206903
+Testing loss: 0.2575724
+step=246, loss=0.2544, a=2.1206, b=-1.4085, c=2.7917
+Training loss: 0.25180274
+Testing loss: 0.25727746
+step=247, loss=0.2541, a=2.1199, b=-1.4085, c=2.7932
+Training loss: 0.25154045
+Testing loss: 0.2569869
+step=248, loss=0.2538, a=2.1192, b=-1.4086, c=2.7946
+Training loss: 0.25128207
+Testing loss: 0.25670058
+step=249, loss=0.2536, a=2.1186, b=-1.4087, c=2.7961
+Training loss: 0.25102764
+Testing loss: 0.2564185
+step=250, loss=0.2533, a=2.1179, b=-1.4087, c=2.7975
+Training loss: 0.25077692
+Testing loss: 0.25614056
+step=251, loss=0.2531, a=2.1173, b=-1.4088, c=2.7989
+Training loss: 0.25053
+Testing loss: 0.2558667
+step=252, loss=0.2528, a=2.1166, b=-1.4089, c=2.8003
+Training loss: 0.25028673
+Testing loss: 0.2555969
+step=253, loss=0.2526, a=2.1160, b=-1.4089, c=2.8017
+Training loss: 0.25004724
+Testing loss: 0.25533104
+step=254, loss=0.2523, a=2.1153, b=-1.4090, c=2.8031
+Training loss: 0.24981113
+Testing loss: 0.2550691
+step=255, loss=0.2521, a=2.1147, b=-1.4090, c=2.8045
+Training loss: 0.24957868
+Testing loss: 0.254811
+step=256, loss=0.2518, a=2.1141, b=-1.4091, c=2.8059
+Training loss: 0.24934973
+Testing loss: 0.2545566
+step=257, loss=0.2516, a=2.1134, b=-1.4092, c=2.8072
+Training loss: 0.24912417
+Testing loss: 0.25430608
+step=258, loss=0.2514, a=2.1128, b=-1.4092, c=2.8086
+Training loss: 0.24890195
+Testing loss: 0.25405908
+step=259, loss=0.2511, a=2.1122, b=-1.4093, c=2.8099
+Training loss: 0.24868308
+Testing loss: 0.25381577
+step=260, loss=0.2509, a=2.1116, b=-1.4093, c=2.8112
+Training loss: 0.2484675
+Testing loss: 0.253576
+step=261, loss=0.2507, a=2.1110, b=-1.4094, c=2.8125
+Training loss: 0.24825509
+Testing loss: 0.25333974
+step=262, loss=0.2505, a=2.1104, b=-1.4094, c=2.8138
+Training loss: 0.24804589
+Testing loss: 0.2531069
+step=263, loss=0.2502, a=2.1098, b=-1.4095, c=2.8151
+Training loss: 0.24783985
+Testing loss: 0.25287747
+step=264, loss=0.2500, a=2.1092, b=-1.4095, c=2.8164
+Training loss: 0.24763685
+Testing loss: 0.25265145
+step=265, loss=0.2498, a=2.1086, b=-1.4095, c=2.8177
+Training loss: 0.24743687
+Testing loss: 0.25242862
+step=266, loss=0.2496, a=2.1080, b=-1.4096, c=2.8190
+Training loss: 0.24723987
+Testing loss: 0.2522091
+step=267, loss=0.2494, a=2.1074, b=-1.4096, c=2.8202
+Training loss: 0.24704587
+Testing loss: 0.2519927
+step=268, loss=0.2492, a=2.1069, b=-1.4097, c=2.8215
+Training loss: 0.24685478
+Testing loss: 0.25177947
+step=269, loss=0.2490, a=2.1063, b=-1.4097, c=2.8227
+Training loss: 0.24666652
+Testing loss: 0.2515694
+step=270, loss=0.2488, a=2.1057, b=-1.4097, c=2.8239
+Training loss: 0.24648103
+Testing loss: 0.2513623
+step=271, loss=0.2486, a=2.1052, b=-1.4098, c=2.8252
+Training loss: 0.24629834
+Testing loss: 0.2511583
+step=272, loss=0.2484, a=2.1046, b=-1.4098, c=2.8264
+Training loss: 0.24611844
+Testing loss: 0.25095722
+step=273, loss=0.2483, a=2.1041, b=-1.4099, c=2.8276
+Training loss: 0.2459411
+Testing loss: 0.25075904
+step=274, loss=0.2481, a=2.1035, b=-1.4099, c=2.8288
+Training loss: 0.24576652
+Testing loss: 0.25056374
+step=275, loss=0.2479, a=2.1030, b=-1.4099, c=2.8300
+Training loss: 0.24559452
+Testing loss: 0.25037128
+step=276, loss=0.2477, a=2.1024, b=-1.4100, c=2.8311
+Training loss: 0.24542506
+Testing loss: 0.25018165
+step=277, loss=0.2475, a=2.1019, b=-1.4100, c=2.8323
+Training loss: 0.24525811
+Testing loss: 0.24999471
+step=278, loss=0.2474, a=2.1014, b=-1.4100, c=2.8335
+Training loss: 0.24509375
+Testing loss: 0.24981035
+step=279, loss=0.2472, a=2.1008, b=-1.4100, c=2.8346
+Training loss: 0.24493177
+Testing loss: 0.24962875
+step=280, loss=0.2470, a=2.1003, b=-1.4101, c=2.8357
+Training loss: 0.2447722
+Testing loss: 0.24944976
+step=281, loss=0.2469, a=2.0998, b=-1.4101, c=2.8369
+Training loss: 0.24461508
+Testing loss: 0.24927333
+step=282, loss=0.2467, a=2.0993, b=-1.4101, c=2.8380
+Training loss: 0.24446027
+Testing loss: 0.2490995
+step=283, loss=0.2465, a=2.0988, b=-1.4102, c=2.8391
+Training loss: 0.24430773
+Testing loss: 0.24892811
+step=284, loss=0.2464, a=2.0982, b=-1.4102, c=2.8402
+Training loss: 0.24415754
+Testing loss: 0.24875921
+step=285, loss=0.2462, a=2.0977, b=-1.4102, c=2.8413
+Training loss: 0.24400952
+Testing loss: 0.24859267
+step=286, loss=0.2461, a=2.0972, b=-1.4102, c=2.8424
+Training loss: 0.24386378
+Testing loss: 0.24842864
+step=287, loss=0.2459, a=2.0967, b=-1.4103, c=2.8435
+Training loss: 0.24372011
+Testing loss: 0.2482669
+step=288, loss=0.2458, a=2.0962, b=-1.4103, c=2.8446
+Training loss: 0.24357866
+Testing loss: 0.24810745
+step=289, loss=0.2456, a=2.0958, b=-1.4103, c=2.8456
+Training loss: 0.24343932
+Testing loss: 0.2479503
+step=290, loss=0.2455, a=2.0953, b=-1.4103, c=2.8467
+Training loss: 0.24330199
+Testing loss: 0.24779548
+step=291, loss=0.2453, a=2.0948, b=-1.4103, c=2.8477
+Training loss: 0.24316682
+Testing loss: 0.24764282
+step=292, loss=0.2452, a=2.0943, b=-1.4104, c=2.8488
+Training loss: 0.24303354
+Testing loss: 0.24749228
+step=293, loss=0.2450, a=2.0938, b=-1.4104, c=2.8498
+Training loss: 0.24290235
+Testing loss: 0.24734405
+step=294, loss=0.2449, a=2.0934, b=-1.4104, c=2.8508
+Training loss: 0.24277309
+Testing loss: 0.24719779
+step=295, loss=0.2448, a=2.0929, b=-1.4104, c=2.8519
+Training loss: 0.24264579
+Testing loss: 0.24705367
+step=296, loss=0.2446, a=2.0924, b=-1.4104, c=2.8529
+Training loss: 0.24252029
+Testing loss: 0.24691154
+step=297, loss=0.2445, a=2.0920, b=-1.4105, c=2.8539
+Training loss: 0.2423967
+Testing loss: 0.24677154
+step=298, loss=0.2444, a=2.0915, b=-1.4105, c=2.8549
+Training loss: 0.24227501
+Testing loss: 0.24663341
+step=299, loss=0.2443, a=2.0910, b=-1.4105, c=2.8559
+Training loss: 0.24215513
+Testing loss: 0.24649733
+step=300, loss=0.2441, a=2.0906, b=-1.4105, c=2.8569
+Training loss: 0.24203698
+Testing loss: 0.24636324
+step=301, loss=0.2440, a=2.0901, b=-1.4105, c=2.8578
+Training loss: 0.24192064
+Testing loss: 0.24623096
+step=302, loss=0.2439, a=2.0897, b=-1.4105, c=2.8588
+Training loss: 0.24180603
+Testing loss: 0.24610057
+step=303, loss=0.2438, a=2.0893, b=-1.4106, c=2.8598
+Training loss: 0.24169308
+Testing loss: 0.24597202
+step=304, loss=0.2436, a=2.0888, b=-1.4106, c=2.8607
+Training loss: 0.24158189
+Testing loss: 0.2458454
+step=305, loss=0.2435, a=2.0884, b=-1.4106, c=2.8616
+Training loss: 0.24147233
+Testing loss: 0.24572042
+step=306, loss=0.2434, a=2.0880, b=-1.4106, c=2.8626
+Training loss: 0.2413644
+Testing loss: 0.24559732
+step=307, loss=0.2433, a=2.0875, b=-1.4106, c=2.8635
+Training loss: 0.24125807
+Testing loss: 0.24547595
+step=308, loss=0.2432, a=2.0871, b=-1.4106, c=2.8644
+Training loss: 0.24115331
+Testing loss: 0.24535637
+step=309, loss=0.2431, a=2.0867, b=-1.4106, c=2.8654
+Training loss: 0.24105015
+Testing loss: 0.24523838
+step=310, loss=0.2430, a=2.0863, b=-1.4107, c=2.8663
+Training loss: 0.24094853
+Testing loss: 0.24512205
+step=311, loss=0.2429, a=2.0858, b=-1.4107, c=2.8672
+Training loss: 0.24084836
+Testing loss: 0.24500735
+step=312, loss=0.2428, a=2.0854, b=-1.4107, c=2.8681
+Training loss: 0.2407498
+Testing loss: 0.2448943
+step=313, loss=0.2427, a=2.0850, b=-1.4107, c=2.8690
+Training loss: 0.24065255
+Testing loss: 0.24478287
+step=314, loss=0.2426, a=2.0846, b=-1.4107, c=2.8698
+Training loss: 0.24055688
+Testing loss: 0.24467291
+step=315, loss=0.2425, a=2.0842, b=-1.4107, c=2.8707
+Training loss: 0.24046263
+Testing loss: 0.24456462
+step=316, loss=0.2424, a=2.0838, b=-1.4107, c=2.8716
+Training loss: 0.24036972
+Testing loss: 0.24445787
+step=317, loss=0.2423, a=2.0834, b=-1.4107, c=2.8725
+Training loss: 0.24027821
+Testing loss: 0.24435255
+step=318, loss=0.2422, a=2.0830, b=-1.4107, c=2.8733
+Training loss: 0.24018814
+Testing loss: 0.24424875
+step=319, loss=0.2421, a=2.0826, b=-1.4108, c=2.8742
+Training loss: 0.24009933
+Testing loss: 0.24414636
+step=320, loss=0.2420, a=2.0822, b=-1.4108, c=2.8750
+Training loss: 0.24001184
+Testing loss: 0.24404547
+step=321, loss=0.2419, a=2.0818, b=-1.4108, c=2.8758
+Training loss: 0.2399257
+Testing loss: 0.24394591
+step=322, loss=0.2418, a=2.0815, b=-1.4108, c=2.8767
+Training loss: 0.23984082
+Testing loss: 0.24384777
+step=323, loss=0.2417, a=2.0811, b=-1.4108, c=2.8775
+Training loss: 0.23975722
+Testing loss: 0.24375108
+step=324, loss=0.2416, a=2.0807, b=-1.4108, c=2.8783
+Training loss: 0.23967482
+Testing loss: 0.24365571
+step=325, loss=0.2415, a=2.0803, b=-1.4108, c=2.8791
+Training loss: 0.23959373
+Testing loss: 0.24356163
+step=326, loss=0.2414, a=2.0800, b=-1.4108, c=2.8799
+Training loss: 0.23951377
+Testing loss: 0.24346879
+step=327, loss=0.2414, a=2.0796, b=-1.4108, c=2.8807
+Training loss: 0.23943502
+Testing loss: 0.24337745
+step=328, loss=0.2413, a=2.0792, b=-1.4108, c=2.8815
+Training loss: 0.2393575
+Testing loss: 0.24328724
+step=329, loss=0.2412, a=2.0789, b=-1.4108, c=2.8823
+Training loss: 0.23928107
+Testing loss: 0.2431984
+step=330, loss=0.2411, a=2.0785, b=-1.4108, c=2.8831
+Training loss: 0.23920576
+Testing loss: 0.24311066
+step=331, loss=0.2410, a=2.0781, b=-1.4109, c=2.8839
+Training loss: 0.23913166
+Testing loss: 0.24302423
+step=332, loss=0.2410, a=2.0778, b=-1.4109, c=2.8847
+Training loss: 0.23905861
+Testing loss: 0.24293904
+step=333, loss=0.2409, a=2.0774, b=-1.4109, c=2.8854
+Training loss: 0.23898669
+Testing loss: 0.24285495
+step=334, loss=0.2408, a=2.0771, b=-1.4109, c=2.8862
+Training loss: 0.2389158
+Testing loss: 0.24277212
+step=335, loss=0.2407, a=2.0767, b=-1.4109, c=2.8869
+Training loss: 0.238846
+Testing loss: 0.24269043
+step=336, loss=0.2406, a=2.0764, b=-1.4109, c=2.8877
+Training loss: 0.23877719
+Testing loss: 0.24260984
+step=337, loss=0.2406, a=2.0761, b=-1.4109, c=2.8884
+Training loss: 0.23870948
+Testing loss: 0.24253032
+step=338, loss=0.2405, a=2.0757, b=-1.4109, c=2.8892
+Training loss: 0.2386427
+Testing loss: 0.24245195
+step=339, loss=0.2404, a=2.0754, b=-1.4109, c=2.8899
+Training loss: 0.23857698
+Testing loss: 0.2423746
+step=340, loss=0.2404, a=2.0750, b=-1.4109, c=2.8906
+Training loss: 0.2385122
+Testing loss: 0.2422985
+step=341, loss=0.2403, a=2.0747, b=-1.4109, c=2.8914
+Training loss: 0.23844838
+Testing loss: 0.2422233
+step=342, loss=0.2402, a=2.0744, b=-1.4109, c=2.8921
+Training loss: 0.23838559
+Testing loss: 0.24214922
+step=343, loss=0.2402, a=2.0741, b=-1.4109, c=2.8928
+Training loss: 0.2383236
+Testing loss: 0.24207608
+step=344, loss=0.2401, a=2.0737, b=-1.4109, c=2.8935
+Training loss: 0.23826261
+Testing loss: 0.24200407
+step=345, loss=0.2400, a=2.0734, b=-1.4109, c=2.8942
+Training loss: 0.23820257
+Testing loss: 0.2419329
+step=346, loss=0.2400, a=2.0731, b=-1.4109, c=2.8949
+Training loss: 0.23814335
+Testing loss: 0.24186274
+step=347, loss=0.2399, a=2.0728, b=-1.4109, c=2.8956
+Training loss: 0.23808503
+Testing loss: 0.24179365
+step=348, loss=0.2398, a=2.0725, b=-1.4110, c=2.8963
+Training loss: 0.23802754
+Testing loss: 0.24172546
+step=349, loss=0.2398, a=2.0721, b=-1.4110, c=2.8969
+Training loss: 0.23797102
+Testing loss: 0.24165817
+step=350, loss=0.2397, a=2.0718, b=-1.4110, c=2.8976
+Training loss: 0.23791528
+Testing loss: 0.24159186
+step=351, loss=0.2397, a=2.0715, b=-1.4110, c=2.8983
+Training loss: 0.23786043
+Testing loss: 0.24152648
+step=352, loss=0.2396, a=2.0712, b=-1.4110, c=2.8989
+Training loss: 0.23780629
+Testing loss: 0.24146198
+step=353, loss=0.2395, a=2.0709, b=-1.4110, c=2.8996
+Training loss: 0.23775305
+Testing loss: 0.2413983
+step=354, loss=0.2395, a=2.0706, b=-1.4110, c=2.9003
+Training loss: 0.23770057
+Testing loss: 0.24133557
+step=355, loss=0.2394, a=2.0703, b=-1.4110, c=2.9009
+Training loss: 0.23764892
+Testing loss: 0.2412737
+step=356, loss=0.2394, a=2.0700, b=-1.4110, c=2.9016
+Training loss: 0.23759796
+Testing loss: 0.24121271
+step=357, loss=0.2393, a=2.0697, b=-1.4110, c=2.9022
+Training loss: 0.2375477
+Testing loss: 0.24115245
+step=358, loss=0.2393, a=2.0694, b=-1.4110, c=2.9028
+Training loss: 0.23749833
+Testing loss: 0.24109311
+step=359, loss=0.2392, a=2.0691, b=-1.4110, c=2.9035
+Training loss: 0.23744965
+Testing loss: 0.24103454
+step=360, loss=0.2392, a=2.0689, b=-1.4110, c=2.9041
+Training loss: 0.23740168
+Testing loss: 0.24097681
+step=361, loss=0.2391, a=2.0686, b=-1.4110, c=2.9047
+Training loss: 0.23735443
+Testing loss: 0.2409198
+step=362, loss=0.2391, a=2.0683, b=-1.4110, c=2.9053
+Training loss: 0.23730788
+Testing loss: 0.24086356
+step=363, loss=0.2390, a=2.0680, b=-1.4110, c=2.9059
+Training loss: 0.23726201
+Testing loss: 0.24080814
+step=364, loss=0.2390, a=2.0677, b=-1.4110, c=2.9065
+Training loss: 0.23721682
+Testing loss: 0.2407534
+step=365, loss=0.2389, a=2.0674, b=-1.4110, c=2.9071
+Training loss: 0.23717234
+Testing loss: 0.24069947
+step=366, loss=0.2389, a=2.0672, b=-1.4110, c=2.9077
+Training loss: 0.23712857
+Testing loss: 0.2406463
+step=367, loss=0.2388, a=2.0669, b=-1.4110, c=2.9083
+Training loss: 0.23708536
+Testing loss: 0.24059387
+step=368, loss=0.2388, a=2.0666, b=-1.4110, c=2.9089
+Training loss: 0.23704287
+Testing loss: 0.24054214
+step=369, loss=0.2387, a=2.0664, b=-1.4110, c=2.9095
+Training loss: 0.23700091
+Testing loss: 0.24049102
+step=370, loss=0.2387, a=2.0661, b=-1.4110, c=2.9101
+Training loss: 0.23695967
+Testing loss: 0.24044067
+step=371, loss=0.2386, a=2.0658, b=-1.4110, c=2.9107
+Training loss: 0.23691899
+Testing loss: 0.240391
+step=372, loss=0.2386, a=2.0656, b=-1.4110, c=2.9112
+Training loss: 0.23687893
+Testing loss: 0.24034198
+step=373, loss=0.2385, a=2.0653, b=-1.4110, c=2.9118
+Training loss: 0.23683952
+Testing loss: 0.2402936
+step=374, loss=0.2385, a=2.0650, b=-1.4110, c=2.9124
+Training loss: 0.23680058
+Testing loss: 0.240246
+step=375, loss=0.2385, a=2.0648, b=-1.4110, c=2.9129
+Training loss: 0.23676232
+Testing loss: 0.24019891
+step=376, loss=0.2384, a=2.0645, b=-1.4110, c=2.9135
+Training loss: 0.2367246
+Testing loss: 0.24015251
+step=377, loss=0.2384, a=2.0643, b=-1.4110, c=2.9140
+Training loss: 0.23668742
+Testing loss: 0.24010673
+step=378, loss=0.2383, a=2.0640, b=-1.4110, c=2.9146
+Training loss: 0.23665082
+Testing loss: 0.2400616
+step=379, loss=0.2383, a=2.0638, b=-1.4110, c=2.9151
+Training loss: 0.23661475
+Testing loss: 0.24001703
+step=380, loss=0.2383, a=2.0635, b=-1.4110, c=2.9157
+Training loss: 0.23657928
+Testing loss: 0.23997302
+step=381, loss=0.2382, a=2.0633, b=-1.4110, c=2.9162
+Training loss: 0.23654431
+Testing loss: 0.23992978
+step=382, loss=0.2382, a=2.0630, b=-1.4110, c=2.9167
+Training loss: 0.23650987
+Testing loss: 0.23988694
+step=383, loss=0.2381, a=2.0628, b=-1.4111, c=2.9173
+Training loss: 0.23647584
+Testing loss: 0.23984477
+step=384, loss=0.2381, a=2.0626, b=-1.4111, c=2.9178
+Training loss: 0.23644245
+Testing loss: 0.23980314
+step=385, loss=0.2381, a=2.0623, b=-1.4111, c=2.9183
+Training loss: 0.23640946
+Testing loss: 0.23976207
+step=386, loss=0.2380, a=2.0621, b=-1.4111, c=2.9188
+Training loss: 0.23637703
+Testing loss: 0.23972157
+step=387, loss=0.2380, a=2.0618, b=-1.4111, c=2.9193
+Training loss: 0.23634508
+Testing loss: 0.23968166
+step=388, loss=0.2380, a=2.0616, b=-1.4111, c=2.9198
+Training loss: 0.23631357
+Testing loss: 0.2396421
+step=389, loss=0.2379, a=2.0614, b=-1.4111, c=2.9203
+Training loss: 0.23628251
+Testing loss: 0.23960325
+step=390, loss=0.2379, a=2.0611, b=-1.4111, c=2.9208
+Training loss: 0.236252
+Testing loss: 0.23956484
+step=391, loss=0.2379, a=2.0609, b=-1.4111, c=2.9213
+Training loss: 0.23622194
+Testing loss: 0.23952697
+step=392, loss=0.2378, a=2.0607, b=-1.4111, c=2.9218
+Training loss: 0.23619227
+Testing loss: 0.23948959
+step=393, loss=0.2378, a=2.0605, b=-1.4111, c=2.9223
+Training loss: 0.23616304
+Testing loss: 0.23945266
+step=394, loss=0.2378, a=2.0602, b=-1.4111, c=2.9228
+Training loss: 0.23613423
+Testing loss: 0.2394163
+step=395, loss=0.2377, a=2.0600, b=-1.4111, c=2.9233
+Training loss: 0.23610589
+Testing loss: 0.23938033
+step=396, loss=0.2377, a=2.0598, b=-1.4111, c=2.9237
+Training loss: 0.23607793
+Testing loss: 0.23934491
+step=397, loss=0.2377, a=2.0596, b=-1.4111, c=2.9242
+Training loss: 0.2360504
+Testing loss: 0.23930992
+step=398, loss=0.2376, a=2.0594, b=-1.4111, c=2.9247
+Training loss: 0.23602329
+Testing loss: 0.23927543
+step=399, loss=0.2376, a=2.0592, b=-1.4111, c=2.9252
+Training loss: 0.2359966
+Testing loss: 0.23924139
+step=400, loss=0.2376, a=2.0589, b=-1.4111, c=2.9256
+Training loss: 0.23597029
+Testing loss: 0.23920788
+step=401, loss=0.2375, a=2.0587, b=-1.4111, c=2.9261
+Training loss: 0.23594439
+Testing loss: 0.23917465
+step=402, loss=0.2375, a=2.0585, b=-1.4111, c=2.9265
+Training loss: 0.2359189
+Testing loss: 0.23914199
+step=403, loss=0.2375, a=2.0583, b=-1.4111, c=2.9270
+Training loss: 0.23589368
+Testing loss: 0.23910978
+step=404, loss=0.2375, a=2.0581, b=-1.4111, c=2.9274
+Training loss: 0.23586892
+Testing loss: 0.23907794
+step=405, loss=0.2374, a=2.0579, b=-1.4111, c=2.9279
+Training loss: 0.23584452
+Testing loss: 0.23904654
+step=406, loss=0.2374, a=2.0577, b=-1.4111, c=2.9283
+Training loss: 0.2358205
+Testing loss: 0.23901552
+step=407, loss=0.2374, a=2.0575, b=-1.4111, c=2.9288
+Training loss: 0.23579685
+Testing loss: 0.2389849
+step=408, loss=0.2373, a=2.0573, b=-1.4111, c=2.9292
+Training loss: 0.23577352
+Testing loss: 0.2389547
+step=409, loss=0.2373, a=2.0571, b=-1.4111, c=2.9296
+Training loss: 0.23575051
+Testing loss: 0.23892492
+step=410, loss=0.2373, a=2.0569, b=-1.4111, c=2.9301
+Training loss: 0.23572794
+Testing loss: 0.23889552
+step=411, loss=0.2373, a=2.0567, b=-1.4111, c=2.9305
+Training loss: 0.23570557
+Testing loss: 0.23886646
+step=412, loss=0.2372, a=2.0565, b=-1.4111, c=2.9309
+Training loss: 0.23568359
+Testing loss: 0.23883788
+step=413, loss=0.2372, a=2.0563, b=-1.4111, c=2.9313
+Training loss: 0.23566198
+Testing loss: 0.23880966
+step=414, loss=0.2372, a=2.0561, b=-1.4111, c=2.9318
+Training loss: 0.23564065
+Testing loss: 0.23878175
+step=415, loss=0.2372, a=2.0559, b=-1.4111, c=2.9322
+Training loss: 0.23561965
+Testing loss: 0.23875423
+step=416, loss=0.2371, a=2.0557, b=-1.4111, c=2.9326
+Training loss: 0.23559898
+Testing loss: 0.2387271
+step=417, loss=0.2371, a=2.0556, b=-1.4111, c=2.9330
+Training loss: 0.23557857
+Testing loss: 0.23870029
+step=418, loss=0.2371, a=2.0554, b=-1.4111, c=2.9334
+Training loss: 0.23555854
+Testing loss: 0.23867384
+step=419, loss=0.2371, a=2.0552, b=-1.4111, c=2.9338
+Training loss: 0.23553874
+Testing loss: 0.23864773
+step=420, loss=0.2371, a=2.0550, b=-1.4111, c=2.9342
+Training loss: 0.23551929
+Testing loss: 0.23862194
+step=421, loss=0.2370, a=2.0548, b=-1.4111, c=2.9346
+Training loss: 0.23550005
+Testing loss: 0.23859653
+step=422, loss=0.2370, a=2.0546, b=-1.4111, c=2.9350
+Training loss: 0.23548119
+Testing loss: 0.23857144
+step=423, loss=0.2370, a=2.0545, b=-1.4111, c=2.9354
+Training loss: 0.23546256
+Testing loss: 0.2385466
+step=424, loss=0.2370, a=2.0543, b=-1.4111, c=2.9358
+Training loss: 0.23544426
+Testing loss: 0.23852214
+step=425, loss=0.2369, a=2.0541, b=-1.4111, c=2.9361
+Training loss: 0.23542616
+Testing loss: 0.23849802
+step=426, loss=0.2369, a=2.0539, b=-1.4111, c=2.9365
+Training loss: 0.23540832
+Testing loss: 0.23847423
+step=427, loss=0.2369, a=2.0537, b=-1.4111, c=2.9369
+Training loss: 0.23539083
+Testing loss: 0.23845074
+step=428, loss=0.2369, a=2.0536, b=-1.4111, c=2.9373
+Training loss: 0.23537353
+Testing loss: 0.2384275
+step=429, loss=0.2369, a=2.0534, b=-1.4111, c=2.9376
+Training loss: 0.23535652
+Testing loss: 0.23840465
+step=430, loss=0.2368, a=2.0532, b=-1.4111, c=2.9380
+Training loss: 0.23533978
+Testing loss: 0.238382
+step=431, loss=0.2368, a=2.0531, b=-1.4111, c=2.9384
+Training loss: 0.23532324
+Testing loss: 0.23835963
+step=432, loss=0.2368, a=2.0529, b=-1.4111, c=2.9388
+Training loss: 0.23530701
+Testing loss: 0.23833759
+step=433, loss=0.2368, a=2.0527, b=-1.4111, c=2.9391
+Training loss: 0.23529097
+Testing loss: 0.23831585
+step=434, loss=0.2368, a=2.0526, b=-1.4111, c=2.9395
+Training loss: 0.2352752
+Testing loss: 0.23829444
+step=435, loss=0.2368, a=2.0524, b=-1.4111, c=2.9398
+Training loss: 0.23525962
+Testing loss: 0.23827319
+step=436, loss=0.2367, a=2.0522, b=-1.4111, c=2.9402
+Training loss: 0.23524429
+Testing loss: 0.23825221
+step=437, loss=0.2367, a=2.0521, b=-1.4111, c=2.9405
+Training loss: 0.23522922
+Testing loss: 0.23823166
+step=438, loss=0.2367, a=2.0519, b=-1.4111, c=2.9409
+Training loss: 0.23521432
+Testing loss: 0.23821124
+step=439, loss=0.2367, a=2.0518, b=-1.4111, c=2.9412
+Training loss: 0.23519969
+Testing loss: 0.23819117
+step=440, loss=0.2367, a=2.0516, b=-1.4111, c=2.9416
+Training loss: 0.23518527
+Testing loss: 0.23817132
+step=441, loss=0.2366, a=2.0514, b=-1.4111, c=2.9419
+Training loss: 0.23517106
+Testing loss: 0.23815176
+step=442, loss=0.2366, a=2.0513, b=-1.4111, c=2.9422
+Training loss: 0.23515709
+Testing loss: 0.23813231
+step=443, loss=0.2366, a=2.0511, b=-1.4111, c=2.9426
+Training loss: 0.2351433
+Testing loss: 0.23811321
+step=444, loss=0.2366, a=2.0510, b=-1.4111, c=2.9429
+Training loss: 0.23512967
+Testing loss: 0.23809434
+step=445, loss=0.2366, a=2.0508, b=-1.4111, c=2.9432
+Training loss: 0.23511629
+Testing loss: 0.23807573
+step=446, loss=0.2366, a=2.0507, b=-1.4111, c=2.9436
+Training loss: 0.23510313
+Testing loss: 0.2380573
+step=447, loss=0.2366, a=2.0505, b=-1.4111, c=2.9439
+Training loss: 0.23509014
+Testing loss: 0.23803912
+step=448, loss=0.2365, a=2.0504, b=-1.4111, c=2.9442
+Training loss: 0.23507734
+Testing loss: 0.23802121
+step=449, loss=0.2365, a=2.0502, b=-1.4111, c=2.9445
+Training loss: 0.23506474
+Testing loss: 0.23800357
+step=450, loss=0.2365, a=2.0501, b=-1.4111, c=2.9449
+Training loss: 0.23505235
+Testing loss: 0.23798603
+step=451, loss=0.2365, a=2.0499, b=-1.4111, c=2.9452
+Training loss: 0.23504013
+Testing loss: 0.23796879
+step=452, loss=0.2365, a=2.0498, b=-1.4111, c=2.9455
+Training loss: 0.23502806
+Testing loss: 0.2379518
+step=453, loss=0.2365, a=2.0497, b=-1.4111, c=2.9458
+Training loss: 0.23501621
+Testing loss: 0.23793496
+step=454, loss=0.2364, a=2.0495, b=-1.4111, c=2.9461
+Training loss: 0.23500453
+Testing loss: 0.23791835
+step=455, loss=0.2364, a=2.0494, b=-1.4111, c=2.9464
+Training loss: 0.23499301
+Testing loss: 0.23790199
+step=456, loss=0.2364, a=2.0492, b=-1.4111, c=2.9467
+Training loss: 0.23498163
+Testing loss: 0.23788585
+step=457, loss=0.2364, a=2.0491, b=-1.4111, c=2.9470
+Training loss: 0.23497047
+Testing loss: 0.23786975
+step=458, loss=0.2364, a=2.0490, b=-1.4111, c=2.9473
+Training loss: 0.23495945
+Testing loss: 0.237854
+step=459, loss=0.2364, a=2.0488, b=-1.4111, c=2.9476
+Training loss: 0.23494868
+Testing loss: 0.23783843
+step=460, loss=0.2364, a=2.0487, b=-1.4111, c=2.9479
+Training loss: 0.23493795
+Testing loss: 0.23782305
+step=461, loss=0.2364, a=2.0485, b=-1.4111, c=2.9482
+Training loss: 0.23492742
+Testing loss: 0.23780783
+step=462, loss=0.2363, a=2.0484, b=-1.4111, c=2.9485
+Training loss: 0.23491703
+Testing loss: 0.23779283
+step=463, loss=0.2363, a=2.0483, b=-1.4111, c=2.9488
+Training loss: 0.23490682
+Testing loss: 0.23777808
+step=464, loss=0.2363, a=2.0481, b=-1.4111, c=2.9491
+Training loss: 0.23489678
+Testing loss: 0.2377634
+step=465, loss=0.2363, a=2.0480, b=-1.4111, c=2.9494
+Training loss: 0.23488687
+Testing loss: 0.23774903
+step=466, loss=0.2363, a=2.0479, b=-1.4111, c=2.9496
+Training loss: 0.23487706
+Testing loss: 0.23773475
+step=467, loss=0.2363, a=2.0478, b=-1.4111, c=2.9499
+Training loss: 0.23486747
+Testing loss: 0.23772062
+step=468, loss=0.2363, a=2.0476, b=-1.4111, c=2.9502
+Training loss: 0.23485799
+Testing loss: 0.23770668
+step=469, loss=0.2363, a=2.0475, b=-1.4111, c=2.9505
+Training loss: 0.2348487
+Testing loss: 0.23769294
+step=470, loss=0.2362, a=2.0474, b=-1.4111, c=2.9507
+Training loss: 0.23483948
+Testing loss: 0.23767935
+step=471, loss=0.2362, a=2.0473, b=-1.4111, c=2.9510
+Training loss: 0.23483045
+Testing loss: 0.23766597
+step=472, loss=0.2362, a=2.0471, b=-1.4111, c=2.9513
+Training loss: 0.2348215
+Testing loss: 0.23765267
+step=473, loss=0.2362, a=2.0470, b=-1.4111, c=2.9516
+Training loss: 0.23481274
+Testing loss: 0.23763965
+step=474, loss=0.2362, a=2.0469, b=-1.4111, c=2.9518
+Training loss: 0.23480408
+Testing loss: 0.23762676
+step=475, loss=0.2362, a=2.0468, b=-1.4111, c=2.9521
+Training loss: 0.2347955
+Testing loss: 0.23761404
+step=476, loss=0.2362, a=2.0466, b=-1.4111, c=2.9524
+Training loss: 0.23478712
+Testing loss: 0.23760146
+step=477, loss=0.2362, a=2.0465, b=-1.4111, c=2.9526
+Training loss: 0.23477882
+Testing loss: 0.23758896
+step=478, loss=0.2362, a=2.0464, b=-1.4111, c=2.9529
+Training loss: 0.23477073
+Testing loss: 0.23757671
+step=479, loss=0.2362, a=2.0463, b=-1.4111, c=2.9531
+Training loss: 0.23476265
+Testing loss: 0.2375646
+step=480, loss=0.2361, a=2.0462, b=-1.4111, c=2.9534
+Training loss: 0.23475477
+Testing loss: 0.2375526
+step=481, loss=0.2361, a=2.0460, b=-1.4111, c=2.9536
+Training loss: 0.234747
+Testing loss: 0.23754081
+step=482, loss=0.2361, a=2.0459, b=-1.4111, c=2.9539
+Training loss: 0.23473927
+Testing loss: 0.23752914
+step=483, loss=0.2361, a=2.0458, b=-1.4111, c=2.9541
+Training loss: 0.23473169
+Testing loss: 0.23751757
+step=484, loss=0.2361, a=2.0457, b=-1.4111, c=2.9544
+Training loss: 0.23472425
+Testing loss: 0.23750618
+step=485, loss=0.2361, a=2.0456, b=-1.4111, c=2.9546
+Training loss: 0.23471694
+Testing loss: 0.23749496
+step=486, loss=0.2361, a=2.0455, b=-1.4111, c=2.9549
+Training loss: 0.23470971
+Testing loss: 0.23748377
+step=487, loss=0.2361, a=2.0454, b=-1.4111, c=2.9551
+Training loss: 0.23470256
+Testing loss: 0.23747285
+step=488, loss=0.2361, a=2.0453, b=-1.4111, c=2.9553
+Training loss: 0.23469554
+Testing loss: 0.23746192
+step=489, loss=0.2361, a=2.0452, b=-1.4111, c=2.9556
+Training loss: 0.23468867
+Testing loss: 0.23745124
+step=490, loss=0.2361, a=2.0450, b=-1.4111, c=2.9558
+Training loss: 0.23468183
+Testing loss: 0.23744062
+step=491, loss=0.2360, a=2.0449, b=-1.4111, c=2.9561
+Training loss: 0.23467515
+Testing loss: 0.23743014
+step=492, loss=0.2360, a=2.0448, b=-1.4111, c=2.9563
+Training loss: 0.23466854
+Testing loss: 0.23741983
+step=493, loss=0.2360, a=2.0447, b=-1.4111, c=2.9565
+Training loss: 0.23466204
+Testing loss: 0.2374096
+step=494, loss=0.2360, a=2.0446, b=-1.4111, c=2.9567
+Training loss: 0.23465562
+Testing loss: 0.23739952
+step=495, loss=0.2360, a=2.0445, b=-1.4111, c=2.9570
+Training loss: 0.23464927
+Testing loss: 0.23738953
+step=496, loss=0.2360, a=2.0444, b=-1.4111, c=2.9572
+Training loss: 0.2346431
+Testing loss: 0.23737971
+step=497, loss=0.2360, a=2.0443, b=-1.4111, c=2.9574
+Training loss: 0.23463689
+Testing loss: 0.23736994
+step=498, loss=0.2360, a=2.0442, b=-1.4111, c=2.9576
+Training loss: 0.23463096
+Testing loss: 0.23736037
+step=499, loss=0.2360, a=2.0441, b=-1.4111, c=2.9579
+Training loss: 0.234625
+Testing loss: 0.23735087
+step=500, loss=0.2360, a=2.0440, b=-1.4111, c=2.9581
+Training loss: 0.23461916
+Testing loss: 0.2373415
+step=501, loss=0.2360, a=2.0439, b=-1.4111, c=2.9583
+Training loss: 0.23461336
+Testing loss: 0.23733222
+step=502, loss=0.2360, a=2.0438, b=-1.4111, c=2.9585
+Training loss: 0.2346077
+Testing loss: 0.23732312
+step=503, loss=0.2359, a=2.0437, b=-1.4111, c=2.9587
+Training loss: 0.23460203
+Testing loss: 0.23731403
+step=504, loss=0.2359, a=2.0436, b=-1.4111, c=2.9589
+Training loss: 0.23459657
+Testing loss: 0.2373051
+step=505, loss=0.2359, a=2.0435, b=-1.4111, c=2.9591
+Training loss: 0.2345911
+Testing loss: 0.23729634
+step=506, loss=0.2359, a=2.0434, b=-1.4111, c=2.9594
+Training loss: 0.23458575
+Testing loss: 0.23728763
+step=507, loss=0.2359, a=2.0433, b=-1.4111, c=2.9596
+Training loss: 0.2345805
+Testing loss: 0.23727904
+step=508, loss=0.2359, a=2.0432, b=-1.4111, c=2.9598
+Training loss: 0.23457529
+Testing loss: 0.23727053
+step=509, loss=0.2359, a=2.0431, b=-1.4111, c=2.9600
+Training loss: 0.23457018
+Testing loss: 0.23726209
+step=510, loss=0.2359, a=2.0430, b=-1.4111, c=2.9602
+Training loss: 0.23456517
+Testing loss: 0.23725374
+step=511, loss=0.2359, a=2.0429, b=-1.4111, c=2.9604
+Training loss: 0.23456019
+Testing loss: 0.2372455
+step=512, loss=0.2359, a=2.0429, b=-1.4111, c=2.9606
+Training loss: 0.23455523
+Testing loss: 0.23723741
+step=513, loss=0.2359, a=2.0428, b=-1.4111, c=2.9608
+Training loss: 0.23455045
+Testing loss: 0.23722938
+step=514, loss=0.2359, a=2.0427, b=-1.4111, c=2.9610
+Training loss: 0.23454575
+Testing loss: 0.23722146
+step=515, loss=0.2359, a=2.0426, b=-1.4111, c=2.9612
+Training loss: 0.234541
+Testing loss: 0.23721364
+step=516, loss=0.2359, a=2.0425, b=-1.4111, c=2.9614
+Training loss: 0.23453642
+Testing loss: 0.237206
+step=517, loss=0.2359, a=2.0424, b=-1.4111, c=2.9616
+Training loss: 0.23453192
+Testing loss: 0.23719837
+step=518, loss=0.2359, a=2.0423, b=-1.4111, c=2.9617
+Training loss: 0.23452738
+Testing loss: 0.23719077
+step=519, loss=0.2358, a=2.0422, b=-1.4111, c=2.9619
+Training loss: 0.234523
+Testing loss: 0.23718333
+step=520, loss=0.2358, a=2.0421, b=-1.4111, c=2.9621
+Training loss: 0.2345187
+Testing loss: 0.23717594
+step=521, loss=0.2358, a=2.0421, b=-1.4111, c=2.9623
+Training loss: 0.2345144
+Testing loss: 0.23716865
+step=522, loss=0.2358, a=2.0420, b=-1.4111, c=2.9625
+Training loss: 0.23451017
+Testing loss: 0.23716144
+step=523, loss=0.2358, a=2.0419, b=-1.4111, c=2.9627
+Training loss: 0.23450604
+Testing loss: 0.23715438
+step=524, loss=0.2358, a=2.0418, b=-1.4111, c=2.9629
+Training loss: 0.23450196
+Testing loss: 0.23714733
+step=525, loss=0.2358, a=2.0417, b=-1.4111, c=2.9630
+Training loss: 0.23449798
+Testing loss: 0.23714039
+step=526, loss=0.2358, a=2.0416, b=-1.4111, c=2.9632
+Training loss: 0.23449397
+Testing loss: 0.23713352
+step=527, loss=0.2358, a=2.0416, b=-1.4111, c=2.9634
+Training loss: 0.23449007
+Testing loss: 0.23712672
+step=528, loss=0.2358, a=2.0415, b=-1.4111, c=2.9636
+Training loss: 0.23448622
+Testing loss: 0.23712002
+step=529, loss=0.2358, a=2.0414, b=-1.4111, c=2.9638
+Training loss: 0.23448241
+Testing loss: 0.23711337
+step=530, loss=0.2358, a=2.0413, b=-1.4111, c=2.9639
+Training loss: 0.23447867
+Testing loss: 0.23710677
+step=531, loss=0.2358, a=2.0412, b=-1.4111, c=2.9641
+Training loss: 0.23447502
+Testing loss: 0.23710035
+step=532, loss=0.2358, a=2.0412, b=-1.4111, c=2.9643
+Training loss: 0.2344714
+Testing loss: 0.23709397
+step=533, loss=0.2358, a=2.0411, b=-1.4111, c=2.9644
+Training loss: 0.23446779
+Testing loss: 0.23708762
+step=534, loss=0.2358, a=2.0410, b=-1.4111, c=2.9646
+Training loss: 0.23446432
+Testing loss: 0.23708141
+step=535, loss=0.2358, a=2.0409, b=-1.4111, c=2.9648
+Training loss: 0.23446079
+Testing loss: 0.23707515
+step=536, loss=0.2358, a=2.0408, b=-1.4111, c=2.9649
+Training loss: 0.2344574
+Testing loss: 0.23706909
+step=537, loss=0.2358, a=2.0408, b=-1.4111, c=2.9651
+Training loss: 0.23445408
+Testing loss: 0.23706302
+step=538, loss=0.2357, a=2.0407, b=-1.4111, c=2.9653
+Training loss: 0.23445076
+Testing loss: 0.23705705
+step=539, loss=0.2357, a=2.0406, b=-1.4111, c=2.9654
+Training loss: 0.23444748
+Testing loss: 0.23705117
+step=540, loss=0.2357, a=2.0405, b=-1.4111, c=2.9656
+Training loss: 0.23444426
+Testing loss: 0.23704533
+step=541, loss=0.2357, a=2.0405, b=-1.4111, c=2.9658
+Training loss: 0.23444109
+Testing loss: 0.2370396
+step=542, loss=0.2357, a=2.0404, b=-1.4111, c=2.9659
+Training loss: 0.23443797
+Testing loss: 0.23703384
+step=543, loss=0.2357, a=2.0403, b=-1.4111, c=2.9661
+Training loss: 0.23443493
+Testing loss: 0.23702817
+step=544, loss=0.2357, a=2.0402, b=-1.4111, c=2.9662
+Training loss: 0.23443191
+Testing loss: 0.23702262
+step=545, loss=0.2357, a=2.0402, b=-1.4111, c=2.9664
+Training loss: 0.23442897
+Testing loss: 0.2370171
+step=546, loss=0.2357, a=2.0401, b=-1.4111, c=2.9666
+Training loss: 0.23442599
+Testing loss: 0.23701167
+step=547, loss=0.2357, a=2.0400, b=-1.4111, c=2.9667
+Training loss: 0.23442312
+Testing loss: 0.23700626
+step=548, loss=0.2357, a=2.0400, b=-1.4111, c=2.9669
+Training loss: 0.23442024
+Testing loss: 0.23700099
+step=549, loss=0.2357, a=2.0399, b=-1.4111, c=2.9670
+Training loss: 0.23441741
+Testing loss: 0.23699571
+step=550, loss=0.2357, a=2.0398, b=-1.4111, c=2.9672
+Training loss: 0.2344147
+Testing loss: 0.2369905
+step=551, loss=0.2357, a=2.0398, b=-1.4111, c=2.9673
+Training loss: 0.23441198
+Testing loss: 0.23698536
+step=552, loss=0.2357, a=2.0397, b=-1.4111, c=2.9675
+Training loss: 0.2344092
+Testing loss: 0.2369803
+step=553, loss=0.2357, a=2.0396, b=-1.4111, c=2.9676
+Training loss: 0.23440664
+Testing loss: 0.23697528
+step=554, loss=0.2357, a=2.0396, b=-1.4111, c=2.9677
+Training loss: 0.23440398
+Testing loss: 0.23697037
+step=555, loss=0.2357, a=2.0395, b=-1.4111, c=2.9679
+Training loss: 0.23440139
+Testing loss: 0.23696539
+step=556, loss=0.2357, a=2.0394, b=-1.4111, c=2.9680
+Training loss: 0.23439892
+Testing loss: 0.23696056
+step=557, loss=0.2357, a=2.0394, b=-1.4111, c=2.9682
+Training loss: 0.23439644
+Testing loss: 0.23695575
+step=558, loss=0.2357, a=2.0393, b=-1.4111, c=2.9683
+Training loss: 0.23439401
+Testing loss: 0.23695105
+step=559, loss=0.2357, a=2.0392, b=-1.4111, c=2.9685
+Training loss: 0.23439157
+Testing loss: 0.23694633
+step=560, loss=0.2357, a=2.0392, b=-1.4111, c=2.9686
+Training loss: 0.2343892
+Testing loss: 0.23694164
+step=561, loss=0.2357, a=2.0391, b=-1.4111, c=2.9687
+Training loss: 0.23438686
+Testing loss: 0.23693708
+step=562, loss=0.2357, a=2.0390, b=-1.4111, c=2.9689
+Training loss: 0.23438454
+Testing loss: 0.23693256
+step=563, loss=0.2356, a=2.0390, b=-1.4111, c=2.9690
+Training loss: 0.23438229
+Testing loss: 0.23692806
+step=564, loss=0.2356, a=2.0389, b=-1.4111, c=2.9691
+Training loss: 0.23438002
+Testing loss: 0.23692364
+step=565, loss=0.2356, a=2.0388, b=-1.4111, c=2.9693
+Training loss: 0.23437782
+Testing loss: 0.23691924
+step=566, loss=0.2356, a=2.0388, b=-1.4111, c=2.9694
+Training loss: 0.23437566
+Testing loss: 0.2369149
+step=567, loss=0.2356, a=2.0387, b=-1.4111, c=2.9695
+Training loss: 0.23437348
+Testing loss: 0.23691063
+step=568, loss=0.2356, a=2.0387, b=-1.4111, c=2.9697
+Training loss: 0.23437141
+Testing loss: 0.2369064
+step=569, loss=0.2356, a=2.0386, b=-1.4111, c=2.9698
+Training loss: 0.23436934
+Testing loss: 0.23690218
+step=570, loss=0.2356, a=2.0385, b=-1.4111, c=2.9699
+Training loss: 0.23436725
+Testing loss: 0.23689799
+step=571, loss=0.2356, a=2.0385, b=-1.4111, c=2.9701
+Training loss: 0.23436521
+Testing loss: 0.23689389
+step=572, loss=0.2356, a=2.0384, b=-1.4111, c=2.9702
+Training loss: 0.23436324
+Testing loss: 0.23688987
+step=573, loss=0.2356, a=2.0384, b=-1.4111, c=2.9703
+Training loss: 0.23436129
+Testing loss: 0.23688583
+step=574, loss=0.2356, a=2.0383, b=-1.4111, c=2.9704
+Training loss: 0.23435938
+Testing loss: 0.23688184
+step=575, loss=0.2356, a=2.0383, b=-1.4111, c=2.9706
+Training loss: 0.23435749
+Testing loss: 0.23687793
+step=576, loss=0.2356, a=2.0382, b=-1.4111, c=2.9707
+Training loss: 0.23435561
+Testing loss: 0.23687404
+step=577, loss=0.2356, a=2.0381, b=-1.4111, c=2.9708
+Training loss: 0.23435381
+Testing loss: 0.23687015
+step=578, loss=0.2356, a=2.0381, b=-1.4111, c=2.9709
+Training loss: 0.23435192
+Testing loss: 0.23686634
+step=579, loss=0.2356, a=2.0380, b=-1.4111, c=2.9711
+Training loss: 0.23435017
+Testing loss: 0.23686263
+step=580, loss=0.2356, a=2.0380, b=-1.4111, c=2.9712
+Training loss: 0.23434843
+Testing loss: 0.23685893
+step=581, loss=0.2356, a=2.0379, b=-1.4111, c=2.9713
+Training loss: 0.23434663
+Testing loss: 0.23685524
+step=582, loss=0.2356, a=2.0379, b=-1.4111, c=2.9714
+Training loss: 0.23434497
+Testing loss: 0.23685162
+step=583, loss=0.2356, a=2.0378, b=-1.4111, c=2.9715
+Training loss: 0.2343433
+Testing loss: 0.23684809
+step=584, loss=0.2356, a=2.0378, b=-1.4111, c=2.9716
+Training loss: 0.23434159
+Testing loss: 0.23684448
+step=585, loss=0.2356, a=2.0377, b=-1.4111, c=2.9718
+Training loss: 0.23433998
+Testing loss: 0.2368409
+step=586, loss=0.2356, a=2.0377, b=-1.4111, c=2.9719
+Training loss: 0.2343384
+Testing loss: 0.23683746
+step=587, loss=0.2356, a=2.0376, b=-1.4111, c=2.9720
+Training loss: 0.23433678
+Testing loss: 0.23683402
+step=588, loss=0.2356, a=2.0375, b=-1.4111, c=2.9721
+Training loss: 0.23433523
+Testing loss: 0.23683059
+step=589, loss=0.2356, a=2.0375, b=-1.4111, c=2.9722
+Training loss: 0.2343337
+Testing loss: 0.2368273
+step=590, loss=0.2356, a=2.0374, b=-1.4111, c=2.9723
+Training loss: 0.23433216
+Testing loss: 0.23682396
+step=591, loss=0.2356, a=2.0374, b=-1.4111, c=2.9724
+Training loss: 0.23433067
+Testing loss: 0.23682064
+step=592, loss=0.2356, a=2.0373, b=-1.4111, c=2.9725
+Training loss: 0.23432922
+Testing loss: 0.23681739
+step=593, loss=0.2356, a=2.0373, b=-1.4111, c=2.9727
+Training loss: 0.23432775
+Testing loss: 0.23681411
+step=594, loss=0.2356, a=2.0372, b=-1.4111, c=2.9728
+Training loss: 0.23432627
+Testing loss: 0.23681098
+step=595, loss=0.2356, a=2.0372, b=-1.4111, c=2.9729
+Training loss: 0.23432492
+Testing loss: 0.2368078
+step=596, loss=0.2356, a=2.0371, b=-1.4111, c=2.9730
+Training loss: 0.23432352
+Testing loss: 0.23680471
+step=597, loss=0.2356, a=2.0371, b=-1.4111, c=2.9731
+Training loss: 0.23432216
+Testing loss: 0.23680158
+step=598, loss=0.2356, a=2.0370, b=-1.4111, c=2.9732
+Training loss: 0.23432082
+Testing loss: 0.23679851
+step=599, loss=0.2356, a=2.0370, b=-1.4111, c=2.9733
+Training loss: 0.23431951
+Testing loss: 0.2367955
+step=600, loss=0.2355, a=2.0370, b=-1.4111, c=2.9734
+Training loss: 0.23431815
+Testing loss: 0.23679252
+step=601, loss=0.2355, a=2.0369, b=-1.4111, c=2.9735
+Training loss: 0.23431689
+Testing loss: 0.23678954
+step=602, loss=0.2355, a=2.0369, b=-1.4111, c=2.9736
+Training loss: 0.23431568
+Testing loss: 0.23678665
+step=603, loss=0.2355, a=2.0368, b=-1.4111, c=2.9737
+Training loss: 0.23431438
+Testing loss: 0.23678367
+step=604, loss=0.2355, a=2.0368, b=-1.4111, c=2.9738
+Training loss: 0.2343132
+Testing loss: 0.23678085
+step=605, loss=0.2355, a=2.0367, b=-1.4111, c=2.9739
+Training loss: 0.23431195
+Testing loss: 0.23677807
+step=606, loss=0.2355, a=2.0367, b=-1.4111, c=2.9740
+Training loss: 0.23431075
+Testing loss: 0.23677523
+step=607, loss=0.2355, a=2.0366, b=-1.4111, c=2.9741
+Training loss: 0.23430958
+Testing loss: 0.23677249
+step=608, loss=0.2355, a=2.0366, b=-1.4111, c=2.9742
+Training loss: 0.23430842
+Testing loss: 0.2367697
+step=609, loss=0.2355, a=2.0365, b=-1.4111, c=2.9743
+Training loss: 0.23430727
+Testing loss: 0.236767
+step=610, loss=0.2355, a=2.0365, b=-1.4111, c=2.9744
+Training loss: 0.23430613
+Testing loss: 0.23676425
+step=611, loss=0.2355, a=2.0365, b=-1.4111, c=2.9745
+Training loss: 0.23430505
+Testing loss: 0.23676166
+step=612, loss=0.2355, a=2.0364, b=-1.4111, c=2.9746
+Training loss: 0.234304
+Testing loss: 0.236759
+step=613, loss=0.2355, a=2.0364, b=-1.4111, c=2.9747
+Training loss: 0.2343029
+Testing loss: 0.23675643
+step=614, loss=0.2355, a=2.0363, b=-1.4111, c=2.9748
+Training loss: 0.2343018
+Testing loss: 0.23675384
+step=615, loss=0.2355, a=2.0363, b=-1.4111, c=2.9749
+Training loss: 0.23430082
+Testing loss: 0.23675129
+step=616, loss=0.2355, a=2.0362, b=-1.4111, c=2.9749
+Training loss: 0.23429976
+Testing loss: 0.23674877
+step=617, loss=0.2355, a=2.0362, b=-1.4111, c=2.9750
+Training loss: 0.23429877
+Testing loss: 0.23674625
+step=618, loss=0.2355, a=2.0362, b=-1.4111, c=2.9751
+Training loss: 0.2342978
+Testing loss: 0.23674381
+step=619, loss=0.2355, a=2.0361, b=-1.4111, c=2.9752
+Training loss: 0.2342968
+Testing loss: 0.23674138
+step=620, loss=0.2355, a=2.0361, b=-1.4111, c=2.9753
+Training loss: 0.23429587
+Testing loss: 0.23673896
+step=621, loss=0.2355, a=2.0360, b=-1.4111, c=2.9754
+Training loss: 0.23429477
+Testing loss: 0.23673657
+step=622, loss=0.2355, a=2.0360, b=-1.4111, c=2.9755
+Training loss: 0.23429391
+Testing loss: 0.23673418
+step=623, loss=0.2355, a=2.0360, b=-1.4111, c=2.9756
+Training loss: 0.23429295
+Testing loss: 0.23673181
+step=624, loss=0.2355, a=2.0359, b=-1.4111, c=2.9757
+Training loss: 0.23429209
+Testing loss: 0.23672952
+step=625, loss=0.2355, a=2.0359, b=-1.4111, c=2.9757
+Training loss: 0.23429118
+Testing loss: 0.23672721
+step=626, loss=0.2355, a=2.0358, b=-1.4111, c=2.9758
+Training loss: 0.23429032
+Testing loss: 0.23672493
+step=627, loss=0.2355, a=2.0358, b=-1.4111, c=2.9759
+Training loss: 0.23428941
+Testing loss: 0.23672263
+step=628, loss=0.2355, a=2.0358, b=-1.4111, c=2.9760
+Training loss: 0.23428857
+Testing loss: 0.23672046
+step=629, loss=0.2355, a=2.0357, b=-1.4111, c=2.9761
+Training loss: 0.23428771
+Testing loss: 0.23671827
+step=630, loss=0.2355, a=2.0357, b=-1.4111, c=2.9762
+Training loss: 0.2342869
+Testing loss: 0.23671606
+step=631, loss=0.2355, a=2.0356, b=-1.4111, c=2.9762
+Training loss: 0.23428608
+Testing loss: 0.2367139
+step=632, loss=0.2355, a=2.0356, b=-1.4111, c=2.9763
+Training loss: 0.2342853
+Testing loss: 0.23671177
+step=633, loss=0.2355, a=2.0356, b=-1.4111, c=2.9764
+Training loss: 0.23428448
+Testing loss: 0.23670962
+step=634, loss=0.2355, a=2.0355, b=-1.4111, c=2.9765
+Training loss: 0.23428373
+Testing loss: 0.23670758
+step=635, loss=0.2355, a=2.0355, b=-1.4111, c=2.9766
+Training loss: 0.23428296
+Testing loss: 0.23670551
+step=636, loss=0.2355, a=2.0355, b=-1.4111, c=2.9766
+Training loss: 0.23428217
+Testing loss: 0.23670341
+step=637, loss=0.2355, a=2.0354, b=-1.4111, c=2.9767
+Training loss: 0.23428144
+Testing loss: 0.23670143
+step=638, loss=0.2355, a=2.0354, b=-1.4111, c=2.9768
+Training loss: 0.2342807
+Testing loss: 0.2366994
+step=639, loss=0.2355, a=2.0354, b=-1.4111, c=2.9769
+Training loss: 0.23427998
+Testing loss: 0.23669738
+step=640, loss=0.2355, a=2.0353, b=-1.4111, c=2.9769
+Training loss: 0.23427925
+Testing loss: 0.23669542
+step=641, loss=0.2355, a=2.0353, b=-1.4111, c=2.9770
+Training loss: 0.23427856
+Testing loss: 0.23669353
+step=642, loss=0.2355, a=2.0352, b=-1.4111, c=2.9771
+Training loss: 0.23427781
+Testing loss: 0.23669156
+step=643, loss=0.2355, a=2.0352, b=-1.4111, c=2.9772
+Training loss: 0.23427717
+Testing loss: 0.23668966
+step=644, loss=0.2355, a=2.0352, b=-1.4111, c=2.9772
+Training loss: 0.23427646
+Testing loss: 0.23668773
+step=645, loss=0.2355, a=2.0351, b=-1.4111, c=2.9773
+Training loss: 0.23427585
+Testing loss: 0.2366859
+step=646, loss=0.2355, a=2.0351, b=-1.4111, c=2.9774
+Training loss: 0.23427518
+Testing loss: 0.23668407
+step=647, loss=0.2355, a=2.0351, b=-1.4111, c=2.9775
+Training loss: 0.23427454
+Testing loss: 0.2366822
+step=648, loss=0.2355, a=2.0350, b=-1.4111, c=2.9775
+Training loss: 0.23427385
+Testing loss: 0.23668043
+step=649, loss=0.2355, a=2.0350, b=-1.4111, c=2.9776
+Training loss: 0.23427327
+Testing loss: 0.2366786
+step=650, loss=0.2355, a=2.0350, b=-1.4111, c=2.9777
+Training loss: 0.23427263
+Testing loss: 0.23667674
+step=651, loss=0.2355, a=2.0349, b=-1.4111, c=2.9778
+Training loss: 0.23427203
+Testing loss: 0.23667505
+step=652, loss=0.2355, a=2.0349, b=-1.4111, c=2.9778
+Training loss: 0.23427145
+Testing loss: 0.23667328
+step=653, loss=0.2355, a=2.0349, b=-1.4111, c=2.9779
+Training loss: 0.23427087
+Testing loss: 0.23667152
+step=654, loss=0.2355, a=2.0349, b=-1.4111, c=2.9780
+Training loss: 0.23427027
+Testing loss: 0.23666982
+step=655, loss=0.2355, a=2.0348, b=-1.4111, c=2.9780
+Training loss: 0.23426971
+Testing loss: 0.23666812
+step=656, loss=0.2355, a=2.0348, b=-1.4111, c=2.9781
+Training loss: 0.23426917
+Testing loss: 0.23666644
+step=657, loss=0.2355, a=2.0348, b=-1.4111, c=2.9782
+Training loss: 0.23426862
+Testing loss: 0.23666473
+step=658, loss=0.2355, a=2.0347, b=-1.4111, c=2.9782
+Training loss: 0.23426804
+Testing loss: 0.2366631
+step=659, loss=0.2355, a=2.0347, b=-1.4111, c=2.9783
+Training loss: 0.2342675
+Testing loss: 0.23666152
+step=660, loss=0.2355, a=2.0347, b=-1.4111, c=2.9784
+Training loss: 0.23426694
+Testing loss: 0.2366599
+step=661, loss=0.2355, a=2.0346, b=-1.4111, c=2.9784
+Training loss: 0.23426645
+Testing loss: 0.2366583
+step=662, loss=0.2355, a=2.0346, b=-1.4111, c=2.9785
+Training loss: 0.23426595
+Testing loss: 0.23665671
+step=663, loss=0.2355, a=2.0346, b=-1.4111, c=2.9786
+Training loss: 0.2342654
+Testing loss: 0.23665513
+step=664, loss=0.2355, a=2.0345, b=-1.4111, c=2.9786
+Training loss: 0.23426494
+Testing loss: 0.23665363
+step=665, loss=0.2355, a=2.0345, b=-1.4111, c=2.9787
+Training loss: 0.2342644
+Testing loss: 0.2366521
+step=666, loss=0.2355, a=2.0345, b=-1.4111, c=2.9787
+Training loss: 0.23426396
+Testing loss: 0.23665062
+step=667, loss=0.2355, a=2.0345, b=-1.4111, c=2.9788
+Training loss: 0.2342635
+Testing loss: 0.23664913
+step=668, loss=0.2354, a=2.0344, b=-1.4111, c=2.9789
+Training loss: 0.23426297
+Testing loss: 0.23664764
+step=669, loss=0.2354, a=2.0344, b=-1.4111, c=2.9789
+Training loss: 0.2342625
+Testing loss: 0.23664618
+step=670, loss=0.2354, a=2.0344, b=-1.4111, c=2.9790
+Training loss: 0.23426206
+Testing loss: 0.23664467
+step=671, loss=0.2354, a=2.0343, b=-1.4111, c=2.9791
+Training loss: 0.23426165
+Testing loss: 0.23664325
+step=672, loss=0.2354, a=2.0343, b=-1.4111, c=2.9791
+Training loss: 0.23426118
+Testing loss: 0.23664181
+step=673, loss=0.2354, a=2.0343, b=-1.4111, c=2.9792
+Training loss: 0.23426074
+Testing loss: 0.2366404
+step=674, loss=0.2354, a=2.0343, b=-1.4111, c=2.9792
+Training loss: 0.23426034
+Testing loss: 0.23663895
+step=675, loss=0.2354, a=2.0342, b=-1.4111, c=2.9793
+Training loss: 0.23425992
+Testing loss: 0.23663764
+step=676, loss=0.2354, a=2.0342, b=-1.4111, c=2.9793
+Training loss: 0.2342595
+Testing loss: 0.23663625
+step=677, loss=0.2354, a=2.0342, b=-1.4111, c=2.9794
+Training loss: 0.2342591
+Testing loss: 0.23663484
+step=678, loss=0.2354, a=2.0342, b=-1.4111, c=2.9795
+Training loss: 0.23425867
+Testing loss: 0.23663345
+step=679, loss=0.2354, a=2.0341, b=-1.4111, c=2.9795
+Training loss: 0.23425826
+Testing loss: 0.23663218
+step=680, loss=0.2354, a=2.0341, b=-1.4111, c=2.9796
+Training loss: 0.2342579
+Testing loss: 0.23663087
+step=681, loss=0.2354, a=2.0341, b=-1.4111, c=2.9796
+Training loss: 0.23425749
+Testing loss: 0.23662959
+step=682, loss=0.2354, a=2.0341, b=-1.4111, c=2.9797
+Training loss: 0.2342571
+Testing loss: 0.23662826
+step=683, loss=0.2354, a=2.0340, b=-1.4111, c=2.9797
+Training loss: 0.23425676
+Testing loss: 0.23662692
+step=684, loss=0.2354, a=2.0340, b=-1.4111, c=2.9798
+Training loss: 0.23425636
+Testing loss: 0.23662564
+step=685, loss=0.2354, a=2.0340, b=-1.4111, c=2.9799
+Training loss: 0.23425598
+Testing loss: 0.2366244
+step=686, loss=0.2354, a=2.0340, b=-1.4111, c=2.9799
+Training loss: 0.23425563
+Testing loss: 0.23662323
+step=687, loss=0.2354, a=2.0339, b=-1.4111, c=2.9800
+Training loss: 0.2342553
+Testing loss: 0.23662196
+step=688, loss=0.2354, a=2.0339, b=-1.4111, c=2.9800
+Training loss: 0.23425497
+Testing loss: 0.23662071
+step=689, loss=0.2354, a=2.0339, b=-1.4111, c=2.9801
+Training loss: 0.23425461
+Testing loss: 0.23661949
+step=690, loss=0.2354, a=2.0339, b=-1.4111, c=2.9801
+Training loss: 0.23425427
+Testing loss: 0.23661831
+step=691, loss=0.2354, a=2.0338, b=-1.4111, c=2.9802
+Training loss: 0.23425393
+Testing loss: 0.23661706
+step=692, loss=0.2354, a=2.0338, b=-1.4111, c=2.9802
+Training loss: 0.2342536
+Testing loss: 0.2366159
+step=693, loss=0.2354, a=2.0338, b=-1.4111, c=2.9803
+Training loss: 0.2342533
+Testing loss: 0.23661475
+step=694, loss=0.2354, a=2.0338, b=-1.4111, c=2.9803
+Training loss: 0.23425293
+Testing loss: 0.23661362
+step=695, loss=0.2354, a=2.0337, b=-1.4111, c=2.9804
+Training loss: 0.23425266
+Testing loss: 0.23661242
+step=696, loss=0.2354, a=2.0337, b=-1.4111, c=2.9804
+Training loss: 0.23425233
+Testing loss: 0.23661129
+step=697, loss=0.2354, a=2.0337, b=-1.4111, c=2.9805
+Training loss: 0.23425202
+Testing loss: 0.23661016
+step=698, loss=0.2354, a=2.0337, b=-1.4111, c=2.9805
+Training loss: 0.23425175
+Testing loss: 0.23660906
+step=699, loss=0.2354, a=2.0336, b=-1.4111, c=2.9806
+Training loss: 0.23425141
+Testing loss: 0.23660792
+step=700, loss=0.2354, a=2.0336, b=-1.4111, c=2.9806
+Training loss: 0.23425116
+Testing loss: 0.23660684
+step=701, loss=0.2354, a=2.0336, b=-1.4111, c=2.9807
+Training loss: 0.2342509
+Testing loss: 0.23660578
+step=702, loss=0.2354, a=2.0336, b=-1.4111, c=2.9807
+Training loss: 0.23425062
+Testing loss: 0.23660469
+step=703, loss=0.2354, a=2.0336, b=-1.4111, c=2.9808
+Training loss: 0.23425028
+Testing loss: 0.23660366
+step=704, loss=0.2354, a=2.0335, b=-1.4111, c=2.9808
+Training loss: 0.23425002
+Testing loss: 0.2366026
+step=705, loss=0.2354, a=2.0335, b=-1.4111, c=2.9809
+Training loss: 0.23424983
+Testing loss: 0.23660153
+step=706, loss=0.2354, a=2.0335, b=-1.4111, c=2.9809
+Training loss: 0.23424949
+Testing loss: 0.23660044
+step=707, loss=0.2354, a=2.0335, b=-1.4111, c=2.9810
+Training loss: 0.23424925
+Testing loss: 0.23659949
+step=708, loss=0.2354, a=2.0335, b=-1.4111, c=2.9810
+Training loss: 0.234249
+Testing loss: 0.23659843
+step=709, loss=0.2354, a=2.0334, b=-1.4111, c=2.9810
+Training loss: 0.23424873
+Testing loss: 0.23659742
+step=710, loss=0.2354, a=2.0334, b=-1.4111, c=2.9811
+Training loss: 0.23424847
+Testing loss: 0.23659645
+step=711, loss=0.2354, a=2.0334, b=-1.4111, c=2.9811
+Training loss: 0.23424824
+Testing loss: 0.23659542
+step=712, loss=0.2354, a=2.0334, b=-1.4111, c=2.9812
+Training loss: 0.23424798
+Testing loss: 0.23659442
+step=713, loss=0.2354, a=2.0333, b=-1.4111, c=2.9812
+Training loss: 0.23424771
+Testing loss: 0.23659348
+step=714, loss=0.2354, a=2.0333, b=-1.4111, c=2.9813
+Training loss: 0.23424752
+Testing loss: 0.2365925
+step=715, loss=0.2354, a=2.0333, b=-1.4111, c=2.9813
+Training loss: 0.2342473
+Testing loss: 0.23659152
+step=716, loss=0.2354, a=2.0333, b=-1.4111, c=2.9814
+Training loss: 0.23424701
+Testing loss: 0.23659062
+step=717, loss=0.2354, a=2.0333, b=-1.4111, c=2.9814
+Training loss: 0.23424686
+Testing loss: 0.23658973
+step=718, loss=0.2354, a=2.0332, b=-1.4111, c=2.9814
+Training loss: 0.23424658
+Testing loss: 0.23658878
+step=719, loss=0.2354, a=2.0332, b=-1.4111, c=2.9815
+Training loss: 0.23424637
+Testing loss: 0.2365879
+step=720, loss=0.2354, a=2.0332, b=-1.4111, c=2.9815
+Training loss: 0.23424616
+Testing loss: 0.23658694
+step=721, loss=0.2354, a=2.0332, b=-1.4111, c=2.9816
+Training loss: 0.23424594
+Testing loss: 0.23658606
+step=722, loss=0.2354, a=2.0332, b=-1.4111, c=2.9816
+Training loss: 0.23424579
+Testing loss: 0.23658514
+step=723, loss=0.2354, a=2.0332, b=-1.4111, c=2.9817
+Training loss: 0.23424555
+Testing loss: 0.23658429
+step=724, loss=0.2354, a=2.0331, b=-1.4111, c=2.9817
+Training loss: 0.23424533
+Testing loss: 0.23658341
+step=725, loss=0.2354, a=2.0331, b=-1.4111, c=2.9817
+Training loss: 0.23424515
+Testing loss: 0.23658264
+step=726, loss=0.2354, a=2.0331, b=-1.4111, c=2.9818
+Training loss: 0.23424496
+Testing loss: 0.23658176
+step=727, loss=0.2354, a=2.0331, b=-1.4111, c=2.9818
+Training loss: 0.23424473
+Testing loss: 0.2365809
+step=728, loss=0.2354, a=2.0331, b=-1.4111, c=2.9819
+Training loss: 0.23424456
+Testing loss: 0.23658004
+step=729, loss=0.2354, a=2.0330, b=-1.4111, c=2.9819
+Training loss: 0.23424438
+Testing loss: 0.23657921
+step=730, loss=0.2354, a=2.0330, b=-1.4111, c=2.9819
+Training loss: 0.23424418
+Testing loss: 0.2365784
+step=731, loss=0.2354, a=2.0330, b=-1.4111, c=2.9820
+Training loss: 0.23424396
+Testing loss: 0.23657748
+step=732, loss=0.2354, a=2.0330, b=-1.4111, c=2.9820
+Training loss: 0.23424384
+Testing loss: 0.23657677
+step=733, loss=0.2354, a=2.0330, b=-1.4111, c=2.9820
+Training loss: 0.23424363
+Testing loss: 0.2365759
+step=734, loss=0.2354, a=2.0330, b=-1.4111, c=2.9821
+Training loss: 0.23424345
+Testing loss: 0.23657513
+step=735, loss=0.2354, a=2.0329, b=-1.4111, c=2.9821
+Training loss: 0.23424332
+Testing loss: 0.23657435
+step=736, loss=0.2354, a=2.0329, b=-1.4111, c=2.9822
+Training loss: 0.23424312
+Testing loss: 0.23657353
+step=737, loss=0.2354, a=2.0329, b=-1.4111, c=2.9822
+Training loss: 0.234243
+Testing loss: 0.23657283
+step=738, loss=0.2354, a=2.0329, b=-1.4111, c=2.9822
+Training loss: 0.2342428
+Testing loss: 0.236572
+step=739, loss=0.2354, a=2.0329, b=-1.4111, c=2.9823
+Training loss: 0.23424265
+Testing loss: 0.23657124
+step=740, loss=0.2354, a=2.0329, b=-1.4111, c=2.9823
+Training loss: 0.23424248
+Testing loss: 0.23657046
+step=741, loss=0.2354, a=2.0328, b=-1.4111, c=2.9823
+Training loss: 0.23424233
+Testing loss: 0.23656975
+step=742, loss=0.2354, a=2.0328, b=-1.4111, c=2.9824
+Training loss: 0.23424214
+Testing loss: 0.23656897
+step=743, loss=0.2354, a=2.0328, b=-1.4111, c=2.9824
+Training loss: 0.23424204
+Testing loss: 0.23656821
+step=744, loss=0.2354, a=2.0328, b=-1.4111, c=2.9824
+Training loss: 0.23424184
+Testing loss: 0.23656747
+step=745, loss=0.2354, a=2.0328, b=-1.4111, c=2.9825
+Training loss: 0.23424172
+Testing loss: 0.23656678
+step=746, loss=0.2354, a=2.0328, b=-1.4111, c=2.9825
+Training loss: 0.23424156
+Testing loss: 0.23656611
+step=747, loss=0.2354, a=2.0327, b=-1.4111, c=2.9825
+Training loss: 0.23424144
+Testing loss: 0.2365654
+step=748, loss=0.2354, a=2.0327, b=-1.4111, c=2.9826
+Training loss: 0.23424129
+Testing loss: 0.23656471
+step=749, loss=0.2354, a=2.0327, b=-1.4111, c=2.9826
+Training loss: 0.23424113
+Testing loss: 0.23656397
+step=750, loss=0.2354, a=2.0327, b=-1.4111, c=2.9826
+Training loss: 0.23424102
+Testing loss: 0.2365633
+step=751, loss=0.2354, a=2.0327, b=-1.4111, c=2.9827
+Training loss: 0.23424086
+Testing loss: 0.23656261
+step=752, loss=0.2354, a=2.0327, b=-1.4111, c=2.9827
+Training loss: 0.23424073
+Testing loss: 0.23656188
+step=753, loss=0.2354, a=2.0326, b=-1.4111, c=2.9827
+Training loss: 0.23424059
+Testing loss: 0.23656118
+step=754, loss=0.2354, a=2.0326, b=-1.4111, c=2.9828
+Training loss: 0.2342405
+Testing loss: 0.23656051
+step=755, loss=0.2354, a=2.0326, b=-1.4111, c=2.9828
+Training loss: 0.23424031
+Testing loss: 0.23655982
+step=756, loss=0.2354, a=2.0326, b=-1.4111, c=2.9828
+Training loss: 0.23424025
+Testing loss: 0.2365592
+step=757, loss=0.2354, a=2.0326, b=-1.4111, c=2.9829
+Training loss: 0.23424007
+Testing loss: 0.23655857
+step=758, loss=0.2354, a=2.0326, b=-1.4111, c=2.9829
+Training loss: 0.23423994
+Testing loss: 0.23655789
+step=759, loss=0.2354, a=2.0326, b=-1.4111, c=2.9829
+Training loss: 0.23423983
+Testing loss: 0.23655728
+step=760, loss=0.2354, a=2.0325, b=-1.4111, c=2.9830
+Training loss: 0.23423973
+Testing loss: 0.23655663
+step=761, loss=0.2354, a=2.0325, b=-1.4111, c=2.9830
+Training loss: 0.23423964
+Testing loss: 0.23655605
+step=762, loss=0.2354, a=2.0325, b=-1.4111, c=2.9830
+Training loss: 0.23423952
+Testing loss: 0.2365554
+step=763, loss=0.2354, a=2.0325, b=-1.4111, c=2.9831
+Training loss: 0.2342394
+Testing loss: 0.23655479
+step=764, loss=0.2354, a=2.0325, b=-1.4111, c=2.9831
+Training loss: 0.23423932
+Testing loss: 0.23655422
+step=765, loss=0.2354, a=2.0325, b=-1.4111, c=2.9831
+Training loss: 0.23423915
+Testing loss: 0.23655356
+step=766, loss=0.2354, a=2.0325, b=-1.4111, c=2.9831
+Training loss: 0.23423903
+Testing loss: 0.236553
+step=767, loss=0.2354, a=2.0324, b=-1.4111, c=2.9832
+Training loss: 0.23423903
+Testing loss: 0.2365524
+step=768, loss=0.2354, a=2.0324, b=-1.4111, c=2.9832
+Training loss: 0.2342389
+Testing loss: 0.23655187
+step=769, loss=0.2354, a=2.0324, b=-1.4111, c=2.9832
+Training loss: 0.23423874
+Testing loss: 0.23655124
+step=770, loss=0.2354, a=2.0324, b=-1.4111, c=2.9833
+Training loss: 0.23423865
+Testing loss: 0.2365507
+step=771, loss=0.2354, a=2.0324, b=-1.4111, c=2.9833
+Training loss: 0.23423854
+Testing loss: 0.23655014
+step=772, loss=0.2354, a=2.0324, b=-1.4111, c=2.9833
+Training loss: 0.2342385
+Testing loss: 0.23654956
+step=773, loss=0.2354, a=2.0324, b=-1.4111, c=2.9834
+Training loss: 0.23423833
+Testing loss: 0.23654898
+step=774, loss=0.2354, a=2.0324, b=-1.4111, c=2.9834
+Training loss: 0.23423827
+Testing loss: 0.23654844
+step=775, loss=0.2354, a=2.0323, b=-1.4111, c=2.9834
+Training loss: 0.23423816
+Testing loss: 0.23654789
+step=776, loss=0.2354, a=2.0323, b=-1.4111, c=2.9834
+Training loss: 0.23423809
+Testing loss: 0.2365474
+step=777, loss=0.2354, a=2.0323, b=-1.4111, c=2.9835
+Training loss: 0.23423795
+Testing loss: 0.2365468
+step=778, loss=0.2354, a=2.0323, b=-1.4111, c=2.9835
+Training loss: 0.23423788
+Testing loss: 0.23654632
+step=779, loss=0.2354, a=2.0323, b=-1.4111, c=2.9835
+Training loss: 0.23423782
+Testing loss: 0.23654579
+step=780, loss=0.2354, a=2.0323, b=-1.4111, c=2.9835
+Training loss: 0.2342377
+Testing loss: 0.23654518
+step=781, loss=0.2354, a=2.0323, b=-1.4111, c=2.9836
+Training loss: 0.23423764
+Testing loss: 0.23654468
+step=782, loss=0.2354, a=2.0323, b=-1.4111, c=2.9836
+Training loss: 0.23423752
+Testing loss: 0.23654416
+step=783, loss=0.2354, a=2.0322, b=-1.4111, c=2.9836
+Training loss: 0.23423745
+Testing loss: 0.23654369
+step=784, loss=0.2354, a=2.0322, b=-1.4111, c=2.9836
+Training loss: 0.2342374
+Testing loss: 0.23654315
+step=785, loss=0.2354, a=2.0322, b=-1.4111, c=2.9837
+Training loss: 0.23423728
+Testing loss: 0.23654264
+step=786, loss=0.2354, a=2.0322, b=-1.4111, c=2.9837
+Training loss: 0.23423725
+Testing loss: 0.23654212
+step=787, loss=0.2354, a=2.0322, b=-1.4111, c=2.9837
+Training loss: 0.2342371
+Testing loss: 0.23654167
+step=788, loss=0.2354, a=2.0322, b=-1.4111, c=2.9837
+Training loss: 0.2342371
+Testing loss: 0.2365411
+step=789, loss=0.2354, a=2.0322, b=-1.4111, c=2.9838
+Training loss: 0.234237
+Testing loss: 0.23654066
+step=790, loss=0.2354, a=2.0322, b=-1.4111, c=2.9838
+Training loss: 0.23423696
+Testing loss: 0.23654014
+step=791, loss=0.2354, a=2.0322, b=-1.4111, c=2.9838
+Training loss: 0.23423682
+Testing loss: 0.2365397
+step=792, loss=0.2354, a=2.0321, b=-1.4111, c=2.9838
+Training loss: 0.23423684
+Testing loss: 0.23653923
+step=793, loss=0.2354, a=2.0321, b=-1.4111, c=2.9839
+Training loss: 0.23423672
+Testing loss: 0.23653877
+step=794, loss=0.2354, a=2.0321, b=-1.4111, c=2.9839
+Training loss: 0.23423664
+Testing loss: 0.23653829
+step=795, loss=0.2354, a=2.0321, b=-1.4111, c=2.9839
+Training loss: 0.23423661
+Testing loss: 0.23653781
+step=796, loss=0.2354, a=2.0321, b=-1.4111, c=2.9839
+Training loss: 0.23423651
+Testing loss: 0.23653735
+step=797, loss=0.2354, a=2.0321, b=-1.4111, c=2.9840
+Training loss: 0.23423643
+Testing loss: 0.23653692
+step=798, loss=0.2354, a=2.0321, b=-1.4111, c=2.9840
+Training loss: 0.23423633
+Testing loss: 0.23653644
+step=799, loss=0.2354, a=2.0321, b=-1.4111, c=2.9840
+Training loss: 0.23423631
+Testing loss: 0.23653603
+step=800, loss=0.2354, a=2.0321, b=-1.4111, c=2.9840
+Training loss: 0.23423618
+Testing loss: 0.23653556
+step=801, loss=0.2354, a=2.0320, b=-1.4111, c=2.9841
+Training loss: 0.23423614
+Testing loss: 0.23653515
+step=802, loss=0.2354, a=2.0320, b=-1.4111, c=2.9841
+Training loss: 0.23423608
+Testing loss: 0.23653468
+step=803, loss=0.2354, a=2.0320, b=-1.4111, c=2.9841
+Training loss: 0.23423602
+Testing loss: 0.23653427
+step=804, loss=0.2354, a=2.0320, b=-1.4111, c=2.9841
+Training loss: 0.23423597
+Testing loss: 0.2365338
+step=805, loss=0.2354, a=2.0320, b=-1.4111, c=2.9841
+Training loss: 0.2342359
+Testing loss: 0.23653339
+step=806, loss=0.2354, a=2.0320, b=-1.4111, c=2.9842
+Training loss: 0.23423582
+Testing loss: 0.236533
+step=807, loss=0.2354, a=2.0320, b=-1.4111, c=2.9842
+Training loss: 0.23423582
+Testing loss: 0.23653258
+step=808, loss=0.2354, a=2.0320, b=-1.4111, c=2.9842
+Training loss: 0.23423578
+Testing loss: 0.23653214
+step=809, loss=0.2354, a=2.0320, b=-1.4111, c=2.9842
+Training loss: 0.2342357
+Testing loss: 0.23653181
+step=810, loss=0.2354, a=2.0320, b=-1.4111, c=2.9843
+Training loss: 0.23423564
+Testing loss: 0.23653133
+step=811, loss=0.2354, a=2.0319, b=-1.4111, c=2.9843
+Training loss: 0.23423558
+Testing loss: 0.23653091
+step=812, loss=0.2354, a=2.0319, b=-1.4111, c=2.9843
+Training loss: 0.23423554
+Testing loss: 0.23653048
+step=813, loss=0.2354, a=2.0319, b=-1.4111, c=2.9843
+Training loss: 0.23423551
+Testing loss: 0.23653011
+step=814, loss=0.2354, a=2.0319, b=-1.4111, c=2.9843
+Training loss: 0.23423538
+Testing loss: 0.2365297
+step=815, loss=0.2354, a=2.0319, b=-1.4111, c=2.9844
+Training loss: 0.23423536
+Testing loss: 0.23652923
+step=816, loss=0.2354, a=2.0319, b=-1.4111, c=2.9844
+Training loss: 0.23423533
+Testing loss: 0.23652898
+step=817, loss=0.2354, a=2.0319, b=-1.4111, c=2.9844
+Training loss: 0.23423529
+Testing loss: 0.23652855
+step=818, loss=0.2354, a=2.0319, b=-1.4111, c=2.9844
+Training loss: 0.23423521
+Testing loss: 0.23652813
+step=819, loss=0.2354, a=2.0319, b=-1.4111, c=2.9844
+Training loss: 0.23423512
+Testing loss: 0.23652786
+step=820, loss=0.2354, a=2.0319, b=-1.4111, c=2.9845
+Training loss: 0.23423514
+Testing loss: 0.23652741
+step=821, loss=0.2354, a=2.0318, b=-1.4111, c=2.9845
+Training loss: 0.23423506
+Testing loss: 0.23652706
+step=822, loss=0.2354, a=2.0318, b=-1.4111, c=2.9845
+Training loss: 0.23423502
+Testing loss: 0.23652667
+step=823, loss=0.2354, a=2.0318, b=-1.4111, c=2.9845
+Training loss: 0.23423499
+Testing loss: 0.23652633
+step=824, loss=0.2354, a=2.0318, b=-1.4111, c=2.9845
+Training loss: 0.23423491
+Testing loss: 0.23652595
+step=825, loss=0.2354, a=2.0318, b=-1.4111, c=2.9846
+Training loss: 0.23423487
+Testing loss: 0.23652557
+step=826, loss=0.2354, a=2.0318, b=-1.4111, c=2.9846
+Training loss: 0.23423484
+Testing loss: 0.23652527
+step=827, loss=0.2354, a=2.0318, b=-1.4111, c=2.9846
+Training loss: 0.23423481
+Testing loss: 0.23652488
+step=828, loss=0.2354, a=2.0318, b=-1.4111, c=2.9846
+Training loss: 0.2342348
+Testing loss: 0.23652458
+step=829, loss=0.2354, a=2.0318, b=-1.4111, c=2.9846
+Training loss: 0.23423465
+Testing loss: 0.23652418
+step=830, loss=0.2354, a=2.0318, b=-1.4111, c=2.9847
+Training loss: 0.23423466
+Testing loss: 0.23652387
+step=831, loss=0.2354, a=2.0318, b=-1.4111, c=2.9847
+Training loss: 0.23423469
+Testing loss: 0.23652357
+step=832, loss=0.2354, a=2.0318, b=-1.4111, c=2.9847
+Training loss: 0.23423457
+Testing loss: 0.23652317
+step=833, loss=0.2354, a=2.0317, b=-1.4111, c=2.9847
+Training loss: 0.23423457
+Testing loss: 0.23652285
+step=834, loss=0.2354, a=2.0317, b=-1.4111, c=2.9847
+Training loss: 0.23423453
+Testing loss: 0.23652248
+step=835, loss=0.2354, a=2.0317, b=-1.4111, c=2.9847
+Training loss: 0.23423445
+Testing loss: 0.23652221
+step=836, loss=0.2354, a=2.0317, b=-1.4111, c=2.9848
+Training loss: 0.23423448
+Testing loss: 0.23652187
+step=837, loss=0.2354, a=2.0317, b=-1.4111, c=2.9848
+Training loss: 0.23423442
+Testing loss: 0.23652148
+step=838, loss=0.2354, a=2.0317, b=-1.4111, c=2.9848
+Training loss: 0.23423435
+Testing loss: 0.23652121
+step=839, loss=0.2354, a=2.0317, b=-1.4111, c=2.9848
+Training loss: 0.23423438
+Testing loss: 0.2365209
+step=840, loss=0.2354, a=2.0317, b=-1.4111, c=2.9848
+Training loss: 0.23423429
+Testing loss: 0.23652053
+step=841, loss=0.2354, a=2.0317, b=-1.4111, c=2.9848
+Training loss: 0.23423423
+Testing loss: 0.23652025
+step=842, loss=0.2354, a=2.0317, b=-1.4111, c=2.9849
+Training loss: 0.23423421
+Testing loss: 0.23651992
+step=843, loss=0.2354, a=2.0317, b=-1.4111, c=2.9849
+Training loss: 0.2342342
+Testing loss: 0.23651968
+step=844, loss=0.2354, a=2.0317, b=-1.4111, c=2.9849
+Training loss: 0.23423414
+Testing loss: 0.2365193
+step=845, loss=0.2354, a=2.0317, b=-1.4111, c=2.9849
+Training loss: 0.23423411
+Testing loss: 0.236519
+step=846, loss=0.2354, a=2.0316, b=-1.4111, c=2.9849
+Training loss: 0.23423411
+Testing loss: 0.23651868
+step=847, loss=0.2354, a=2.0316, b=-1.4111, c=2.9849
+Training loss: 0.23423408
+Testing loss: 0.23651841
+step=848, loss=0.2354, a=2.0316, b=-1.4111, c=2.9850
+Training loss: 0.23423399
+Testing loss: 0.23651814
+step=849, loss=0.2354, a=2.0316, b=-1.4111, c=2.9850
+Training loss: 0.234234
+Testing loss: 0.23651783
+step=850, loss=0.2354, a=2.0316, b=-1.4111, c=2.9850
+Training loss: 0.23423396
+Testing loss: 0.23651747
+step=851, loss=0.2354, a=2.0316, b=-1.4111, c=2.9850
+Training loss: 0.23423395
+Testing loss: 0.23651724
+step=852, loss=0.2354, a=2.0316, b=-1.4111, c=2.9850
+Training loss: 0.23423393
+Testing loss: 0.23651695
+step=853, loss=0.2354, a=2.0316, b=-1.4111, c=2.9850
+Training loss: 0.23423386
+Testing loss: 0.23651661
+step=854, loss=0.2354, a=2.0316, b=-1.4111, c=2.9851
+Training loss: 0.23423386
+Testing loss: 0.23651634
+step=855, loss=0.2354, a=2.0316, b=-1.4111, c=2.9851
+Training loss: 0.23423383
+Testing loss: 0.23651604
+step=856, loss=0.2354, a=2.0316, b=-1.4111, c=2.9851
+Training loss: 0.23423378
+Testing loss: 0.2365158
+step=857, loss=0.2354, a=2.0316, b=-1.4111, c=2.9851
+Training loss: 0.23423375
+Testing loss: 0.23651549
+step=858, loss=0.2354, a=2.0316, b=-1.4111, c=2.9851
+Training loss: 0.23423374
+Testing loss: 0.2365152
+step=859, loss=0.2354, a=2.0316, b=-1.4111, c=2.9851
+Training loss: 0.23423374
+Testing loss: 0.236515
+step=860, loss=0.2354, a=2.0315, b=-1.4111, c=2.9851
+Training loss: 0.23423366
+Testing loss: 0.2365147
+step=861, loss=0.2354, a=2.0315, b=-1.4111, c=2.9852
+Training loss: 0.23423365
+Testing loss: 0.23651443
+step=862, loss=0.2354, a=2.0315, b=-1.4111, c=2.9852
+Training loss: 0.23423366
+Testing loss: 0.23651424
+step=863, loss=0.2354, a=2.0315, b=-1.4111, c=2.9852
+Training loss: 0.23423363
+Testing loss: 0.2365139
+step=864, loss=0.2354, a=2.0315, b=-1.4111, c=2.9852
+Training loss: 0.23423363
+Testing loss: 0.2365137
+step=865, loss=0.2354, a=2.0315, b=-1.4111, c=2.9852
+Training loss: 0.23423351
+Testing loss: 0.2365134
+step=866, loss=0.2354, a=2.0315, b=-1.4111, c=2.9852
+Training loss: 0.23423351
+Testing loss: 0.23651317
+step=867, loss=0.2354, a=2.0315, b=-1.4111, c=2.9852
+Training loss: 0.23423347
+Testing loss: 0.23651288
+step=868, loss=0.2354, a=2.0315, b=-1.4111, c=2.9853
+Training loss: 0.23423351
+Testing loss: 0.23651263
+step=869, loss=0.2354, a=2.0315, b=-1.4111, c=2.9853
+Training loss: 0.23423347
+Testing loss: 0.23651241
+step=870, loss=0.2354, a=2.0315, b=-1.4111, c=2.9853
+Training loss: 0.23423344
+Testing loss: 0.23651214
+step=871, loss=0.2354, a=2.0315, b=-1.4111, c=2.9853
+Training loss: 0.2342334
+Testing loss: 0.236512
+step=872, loss=0.2354, a=2.0315, b=-1.4111, c=2.9853
+Training loss: 0.23423338
+Testing loss: 0.2365117
+step=873, loss=0.2354, a=2.0315, b=-1.4111, c=2.9853
+Training loss: 0.23423335
+Testing loss: 0.23651141
+step=874, loss=0.2354, a=2.0315, b=-1.4111, c=2.9853
+Training loss: 0.23423336
+Testing loss: 0.23651119
+step=875, loss=0.2354, a=2.0315, b=-1.4111, c=2.9853
+Training loss: 0.23423336
+Testing loss: 0.23651098
+step=876, loss=0.2354, a=2.0314, b=-1.4111, c=2.9854
+Training loss: 0.23423332
+Testing loss: 0.23651072
+step=877, loss=0.2354, a=2.0314, b=-1.4111, c=2.9854
+Training loss: 0.23423329
+Testing loss: 0.23651046
+step=878, loss=0.2354, a=2.0314, b=-1.4111, c=2.9854
+Training loss: 0.23423326
+Testing loss: 0.23651023
+step=879, loss=0.2354, a=2.0314, b=-1.4111, c=2.9854
+Training loss: 0.23423325
+Testing loss: 0.23650998
+step=880, loss=0.2354, a=2.0314, b=-1.4111, c=2.9854
+Training loss: 0.23423323
+Testing loss: 0.2365098
+step=881, loss=0.2354, a=2.0314, b=-1.4111, c=2.9854
+Training loss: 0.23423322
+Testing loss: 0.23650955
+step=882, loss=0.2354, a=2.0314, b=-1.4111, c=2.9854
+Training loss: 0.23423319
+Testing loss: 0.23650934
+step=883, loss=0.2354, a=2.0314, b=-1.4111, c=2.9855
+Training loss: 0.23423317
+Testing loss: 0.23650907
+step=884, loss=0.2354, a=2.0314, b=-1.4111, c=2.9855
+Training loss: 0.23423314
+Testing loss: 0.23650882
+step=885, loss=0.2354, a=2.0314, b=-1.4111, c=2.9855
+Training loss: 0.23423314
+Testing loss: 0.23650867
+step=886, loss=0.2354, a=2.0314, b=-1.4111, c=2.9855
+Training loss: 0.23423314
+Testing loss: 0.23650847
+step=887, loss=0.2354, a=2.0314, b=-1.4111, c=2.9855
+Training loss: 0.23423311
+Testing loss: 0.2365083
+step=888, loss=0.2354, a=2.0314, b=-1.4111, c=2.9855
+Training loss: 0.23423308
+Testing loss: 0.2365081
+step=889, loss=0.2354, a=2.0314, b=-1.4111, c=2.9855
+Training loss: 0.23423307
+Testing loss: 0.23650783
+step=890, loss=0.2354, a=2.0314, b=-1.4111, c=2.9855
+Training loss: 0.23423302
+Testing loss: 0.23650756
+step=891, loss=0.2354, a=2.0314, b=-1.4111, c=2.9855
+Training loss: 0.23423302
+Testing loss: 0.23650737
+step=892, loss=0.2354, a=2.0314, b=-1.4111, c=2.9856
+Training loss: 0.23423304
+Testing loss: 0.23650718
+step=893, loss=0.2354, a=2.0313, b=-1.4111, c=2.9856
+Training loss: 0.23423298
+Testing loss: 0.23650698
+step=894, loss=0.2354, a=2.0313, b=-1.4111, c=2.9856
+Training loss: 0.23423298
+Testing loss: 0.23650676
+step=895, loss=0.2354, a=2.0313, b=-1.4111, c=2.9856
+Training loss: 0.23423298
+Testing loss: 0.23650657
+step=896, loss=0.2354, a=2.0313, b=-1.4111, c=2.9856
+Training loss: 0.23423296
+Testing loss: 0.23650639
+step=897, loss=0.2354, a=2.0313, b=-1.4111, c=2.9856
+Training loss: 0.23423287
+Testing loss: 0.2365062
+step=898, loss=0.2354, a=2.0313, b=-1.4111, c=2.9856
+Training loss: 0.23423295
+Testing loss: 0.236506
+step=899, loss=0.2354, a=2.0313, b=-1.4111, c=2.9856
+Training loss: 0.2342329
+Testing loss: 0.23650585
+step=900, loss=0.2354, a=2.0313, b=-1.4111, c=2.9856
+Training loss: 0.23423295
+Testing loss: 0.23650558
+step=901, loss=0.2354, a=2.0313, b=-1.4111, c=2.9857
+Training loss: 0.23423287
+Testing loss: 0.23650537
+step=902, loss=0.2354, a=2.0313, b=-1.4111, c=2.9857
+Training loss: 0.2342329
+Testing loss: 0.23650518
+step=903, loss=0.2354, a=2.0313, b=-1.4111, c=2.9857
+Training loss: 0.23423283
+Testing loss: 0.23650497
+step=904, loss=0.2354, a=2.0313, b=-1.4111, c=2.9857
+Training loss: 0.23423283
+Testing loss: 0.2365048
+step=905, loss=0.2354, a=2.0313, b=-1.4111, c=2.9857
+Training loss: 0.23423287
+Testing loss: 0.23650463
+step=906, loss=0.2354, a=2.0313, b=-1.4111, c=2.9857
+Training loss: 0.23423283
+Testing loss: 0.23650444
+step=907, loss=0.2354, a=2.0313, b=-1.4111, c=2.9857
+Training loss: 0.2342328
+Testing loss: 0.23650435
+step=908, loss=0.2354, a=2.0313, b=-1.4111, c=2.9857
+Training loss: 0.23423278
+Testing loss: 0.23650412
+step=909, loss=0.2354, a=2.0313, b=-1.4111, c=2.9857
+Training loss: 0.23423275
+Testing loss: 0.2365039
+step=910, loss=0.2354, a=2.0313, b=-1.4111, c=2.9858
+Training loss: 0.23423275
+Testing loss: 0.2365037
+step=911, loss=0.2354, a=2.0313, b=-1.4111, c=2.9858
+Training loss: 0.23423272
+Testing loss: 0.23650357
+step=912, loss=0.2354, a=2.0313, b=-1.4111, c=2.9858
+Training loss: 0.23423272
+Testing loss: 0.23650339
+step=913, loss=0.2354, a=2.0313, b=-1.4111, c=2.9858
+Training loss: 0.23423272
+Testing loss: 0.23650323
+step=914, loss=0.2354, a=2.0312, b=-1.4111, c=2.9858
+Training loss: 0.23423268
+Testing loss: 0.23650302
+step=915, loss=0.2354, a=2.0312, b=-1.4111, c=2.9858
+Training loss: 0.23423272
+Testing loss: 0.23650287
+step=916, loss=0.2354, a=2.0312, b=-1.4111, c=2.9858
+Training loss: 0.23423272
+Testing loss: 0.23650268
+step=917, loss=0.2354, a=2.0312, b=-1.4111, c=2.9858
+Training loss: 0.23423268
+Testing loss: 0.23650248
+step=918, loss=0.2354, a=2.0312, b=-1.4111, c=2.9858
+Training loss: 0.23423272
+Testing loss: 0.23650233
+step=919, loss=0.2354, a=2.0312, b=-1.4111, c=2.9858
+Training loss: 0.2342327
+Testing loss: 0.23650222
+step=920, loss=0.2354, a=2.0312, b=-1.4111, c=2.9858
+Training loss: 0.23423268
+Testing loss: 0.23650207
+step=921, loss=0.2354, a=2.0312, b=-1.4111, c=2.9859
+Training loss: 0.23423262
+Testing loss: 0.2365018
+step=922, loss=0.2354, a=2.0312, b=-1.4111, c=2.9859
+Training loss: 0.23423266
+Testing loss: 0.23650165
+step=923, loss=0.2354, a=2.0312, b=-1.4111, c=2.9859
+Training loss: 0.2342326
+Testing loss: 0.23650153
+step=924, loss=0.2354, a=2.0312, b=-1.4111, c=2.9859
+Training loss: 0.2342326
+Testing loss: 0.23650137
+step=925, loss=0.2354, a=2.0312, b=-1.4111, c=2.9859
+Training loss: 0.23423259
+Testing loss: 0.23650123
+step=926, loss=0.2354, a=2.0312, b=-1.4111, c=2.9859
+Training loss: 0.2342326
+Testing loss: 0.23650108
+step=927, loss=0.2354, a=2.0312, b=-1.4111, c=2.9859
+Training loss: 0.23423254
+Testing loss: 0.23650095
+step=928, loss=0.2354, a=2.0312, b=-1.4111, c=2.9859
+Training loss: 0.23423259
+Testing loss: 0.23650077
+step=929, loss=0.2354, a=2.0312, b=-1.4111, c=2.9859
+Training loss: 0.23423253
+Testing loss: 0.23650062
+step=930, loss=0.2354, a=2.0312, b=-1.4111, c=2.9859
+Training loss: 0.23423254
+Testing loss: 0.23650047
+step=931, loss=0.2354, a=2.0312, b=-1.4111, c=2.9859
+Training loss: 0.23423257
+Testing loss: 0.23650031
+step=932, loss=0.2354, a=2.0312, b=-1.4111, c=2.9860
+Training loss: 0.23423253
+Testing loss: 0.23650013
+step=933, loss=0.2354, a=2.0312, b=-1.4111, c=2.9860
+Training loss: 0.23423252
+Testing loss: 0.23650001
+step=934, loss=0.2354, a=2.0312, b=-1.4111, c=2.9860
+Training loss: 0.23423253
+Testing loss: 0.23649983
+step=935, loss=0.2354, a=2.0312, b=-1.4111, c=2.9860
+Training loss: 0.23423254
+Testing loss: 0.23649971
+step=936, loss=0.2354, a=2.0312, b=-1.4111, c=2.9860
+Training loss: 0.23423252
+Testing loss: 0.23649961
+step=937, loss=0.2354, a=2.0312, b=-1.4111, c=2.9860
+Training loss: 0.23423253
+Testing loss: 0.23649938
+step=938, loss=0.2354, a=2.0311, b=-1.4111, c=2.9860
+Training loss: 0.2342325
+Testing loss: 0.23649926
+step=939, loss=0.2354, a=2.0311, b=-1.4111, c=2.9860
+Training loss: 0.23423247
+Testing loss: 0.2364991
+step=940, loss=0.2354, a=2.0311, b=-1.4111, c=2.9860
+Training loss: 0.2342325
+Testing loss: 0.23649897
+step=941, loss=0.2354, a=2.0311, b=-1.4111, c=2.9860
+Training loss: 0.23423247
+Testing loss: 0.2364988
+step=942, loss=0.2354, a=2.0311, b=-1.4111, c=2.9860
+Training loss: 0.23423247
+Testing loss: 0.23649867
+step=943, loss=0.2354, a=2.0311, b=-1.4111, c=2.9860
+Training loss: 0.23423241
+Testing loss: 0.23649856
+step=944, loss=0.2354, a=2.0311, b=-1.4111, c=2.9861
+Training loss: 0.23423241
+Testing loss: 0.2364984
+step=945, loss=0.2354, a=2.0311, b=-1.4111, c=2.9861
+Training loss: 0.23423246
+Testing loss: 0.23649831
+step=946, loss=0.2354, a=2.0311, b=-1.4111, c=2.9861
+Training loss: 0.23423237
+Testing loss: 0.23649815
+step=947, loss=0.2354, a=2.0311, b=-1.4111, c=2.9861
+Training loss: 0.23423244
+Testing loss: 0.23649797
+step=948, loss=0.2354, a=2.0311, b=-1.4111, c=2.9861
+Training loss: 0.23423237
+Testing loss: 0.23649783
+step=949, loss=0.2354, a=2.0311, b=-1.4111, c=2.9861
+Training loss: 0.23423241
+Testing loss: 0.23649772
+step=950, loss=0.2354, a=2.0311, b=-1.4111, c=2.9861
+Training loss: 0.23423241
+Testing loss: 0.23649764
+step=951, loss=0.2354, a=2.0311, b=-1.4111, c=2.9861
+Training loss: 0.2342324
+Testing loss: 0.23649748
+step=952, loss=0.2354, a=2.0311, b=-1.4111, c=2.9861
+Training loss: 0.23423241
+Testing loss: 0.23649742
+step=953, loss=0.2354, a=2.0311, b=-1.4111, c=2.9861
+Training loss: 0.23423241
+Testing loss: 0.2364973
+step=954, loss=0.2354, a=2.0311, b=-1.4111, c=2.9861
+Training loss: 0.23423238
+Testing loss: 0.23649715
+step=955, loss=0.2354, a=2.0311, b=-1.4111, c=2.9861
+Training loss: 0.23423238
+Testing loss: 0.23649697
+step=956, loss=0.2354, a=2.0311, b=-1.4111, c=2.9861
+Training loss: 0.23423237
+Testing loss: 0.23649688
+step=957, loss=0.2354, a=2.0311, b=-1.4111, c=2.9861
+Training loss: 0.23423237
+Testing loss: 0.23649676
+step=958, loss=0.2354, a=2.0311, b=-1.4111, c=2.9862
+Training loss: 0.23423238
+Testing loss: 0.23649655
+step=959, loss=0.2354, a=2.0311, b=-1.4111, c=2.9862
+Training loss: 0.23423238
+Testing loss: 0.23649646
+step=960, loss=0.2354, a=2.0311, b=-1.4111, c=2.9862
+Training loss: 0.23423232
+Testing loss: 0.23649639
+step=961, loss=0.2354, a=2.0311, b=-1.4111, c=2.9862
+Training loss: 0.23423234
+Testing loss: 0.23649631
+step=962, loss=0.2354, a=2.0311, b=-1.4111, c=2.9862
+Training loss: 0.23423232
+Testing loss: 0.23649615
+step=963, loss=0.2354, a=2.0311, b=-1.4111, c=2.9862
+Training loss: 0.23423234
+Testing loss: 0.23649608
+step=964, loss=0.2354, a=2.0311, b=-1.4111, c=2.9862
+Training loss: 0.23423229
+Testing loss: 0.2364959
+step=965, loss=0.2354, a=2.0311, b=-1.4111, c=2.9862
+Training loss: 0.2342323
+Testing loss: 0.23649581
+step=966, loss=0.2354, a=2.0311, b=-1.4111, c=2.9862
+Training loss: 0.23423234
+Testing loss: 0.23649567
+step=967, loss=0.2354, a=2.0311, b=-1.4111, c=2.9862
+Training loss: 0.23423232
+Testing loss: 0.23649554
+step=968, loss=0.2354, a=2.0310, b=-1.4111, c=2.9862
+Training loss: 0.23423226
+Testing loss: 0.23649544
+step=969, loss=0.2354, a=2.0310, b=-1.4111, c=2.9862
+Training loss: 0.23423229
+Testing loss: 0.23649536
+step=970, loss=0.2354, a=2.0310, b=-1.4111, c=2.9862
+Training loss: 0.23423226
+Testing loss: 0.23649524
+step=971, loss=0.2354, a=2.0310, b=-1.4111, c=2.9862
+Training loss: 0.23423226
+Testing loss: 0.23649517
+step=972, loss=0.2354, a=2.0310, b=-1.4111, c=2.9862
+Training loss: 0.23423229
+Testing loss: 0.23649506
+step=973, loss=0.2354, a=2.0310, b=-1.4111, c=2.9863
+Training loss: 0.23423226
+Testing loss: 0.23649497
+step=974, loss=0.2354, a=2.0310, b=-1.4111, c=2.9863
+Training loss: 0.23423226
+Testing loss: 0.23649485
+step=975, loss=0.2354, a=2.0310, b=-1.4111, c=2.9863
+Training loss: 0.23423226
+Testing loss: 0.23649472
+step=976, loss=0.2354, a=2.0310, b=-1.4111, c=2.9863
+Training loss: 0.23423225
+Testing loss: 0.23649459
+step=977, loss=0.2354, a=2.0310, b=-1.4111, c=2.9863
+Training loss: 0.23423226
+Testing loss: 0.23649448
+step=978, loss=0.2354, a=2.0310, b=-1.4111, c=2.9863
+Training loss: 0.23423225
+Testing loss: 0.23649427
+step=979, loss=0.2354, a=2.0310, b=-1.4111, c=2.9863
+Training loss: 0.23423223
+Testing loss: 0.23649424
+step=980, loss=0.2354, a=2.0310, b=-1.4111, c=2.9863
+Training loss: 0.23423223
+Testing loss: 0.23649414
+step=981, loss=0.2354, a=2.0310, b=-1.4111, c=2.9863
+Training loss: 0.2342322
+Testing loss: 0.23649406
+step=982, loss=0.2354, a=2.0310, b=-1.4111, c=2.9863
+Training loss: 0.23423223
+Testing loss: 0.23649395
+step=983, loss=0.2354, a=2.0310, b=-1.4111, c=2.9863
+Training loss: 0.23423225
+Testing loss: 0.23649389
+step=984, loss=0.2354, a=2.0310, b=-1.4111, c=2.9863
+Training loss: 0.23423223
+Testing loss: 0.23649375
+step=985, loss=0.2354, a=2.0310, b=-1.4111, c=2.9863
+Training loss: 0.23423219
+Testing loss: 0.23649366
+step=986, loss=0.2354, a=2.0310, b=-1.4111, c=2.9863
+Training loss: 0.23423223
+Testing loss: 0.23649362
+step=987, loss=0.2354, a=2.0310, b=-1.4111, c=2.9863
+Training loss: 0.2342322
+Testing loss: 0.23649353
+step=988, loss=0.2354, a=2.0310, b=-1.4111, c=2.9863
+Training loss: 0.23423219
+Testing loss: 0.23649341
+step=989, loss=0.2354, a=2.0310, b=-1.4111, c=2.9863
+Training loss: 0.23423219
+Testing loss: 0.23649324
+step=990, loss=0.2354, a=2.0310, b=-1.4111, c=2.9864
+Training loss: 0.23423219
+Testing loss: 0.2364932
+step=991, loss=0.2354, a=2.0310, b=-1.4111, c=2.9864
+Training loss: 0.23423219
+Testing loss: 0.23649307
+step=992, loss=0.2354, a=2.0310, b=-1.4111, c=2.9864
+Training loss: 0.23423223
+Testing loss: 0.23649299
+step=993, loss=0.2354, a=2.0310, b=-1.4111, c=2.9864
+Training loss: 0.23423219
+Testing loss: 0.23649295
+step=994, loss=0.2354, a=2.0310, b=-1.4111, c=2.9864
+Training loss: 0.23423219
+Testing loss: 0.23649284
+step=995, loss=0.2354, a=2.0310, b=-1.4111, c=2.9864
+Training loss: 0.23423219
+Testing loss: 0.23649277
+step=996, loss=0.2354, a=2.0310, b=-1.4111, c=2.9864
+Training loss: 0.23423216
+Testing loss: 0.23649268
+step=997, loss=0.2354, a=2.0310, b=-1.4111, c=2.9864
+Training loss: 0.23423219
+Testing loss: 0.23649257
+step=998, loss=0.2354, a=2.0310, b=-1.4111, c=2.9864
+Training loss: 0.23423213
+Testing loss: 0.2364925
+step=999, loss=0.2354, a=2.0310, b=-1.4111, c=2.9864
+Training loss: 0.23423211
+Testing loss: 0.23649243

@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 jax = {extras = ["cuda13"], version = "*"}
 matplotlib = "*"
+datoviz = "*"
 
 [dev-packages]
 
