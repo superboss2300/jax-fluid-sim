@@ -9,6 +9,8 @@ number_of_cells = 200
 number_of_steps = 200
 dx = 1.0 / number_of_cells
 x = (jnp.arange(number_of_cells) + 0.5) * dx
+owner = jnp.arange(0, number_of_cells - 1)
+neighbor = jnp.arange(1, number_of_cells)
 
 density = jnp.where(x < 0.5, 1.0, 0.125)
 velocity = jnp.zeros_like(x)
@@ -19,6 +21,33 @@ cfl = 0.5
 # dt = cfl * dx / jnp.max(jnp.abs(U))
 gravity = 9.81
 gamma = 1.4
+
+cell_volume = jnp.full(
+    (number_of_cells,),
+    dx,
+)
+
+internal_face_normal = jnp.ones(
+    number_of_cells - 1
+)
+
+boundary_owner = jnp.array([
+    0,
+    number_of_cells - 1,
+])
+
+boundary_normal = jnp.array([
+    -1.0,
+    1.0,
+])
+
+boundary_area = jnp.array([
+    1.0,
+    1.0,
+])
+
+left_boundary_area = 1.0
+right_boundary_area = 1.0
 
 
 def physical_flux(u):
@@ -53,12 +82,10 @@ def inverse(U):
     velocity = momentum/density
     pressure = jnp.multiply((gamma - 1), (E - (1/2)*(momentum**2/density)))
     W_new = jnp.stack([density, velocity, pressure], axis=1)
-    print("W_new shape: ", W_new.shape)
     return W_new
 
-def faces_flux(u):
-    U_L = jnp.concatenate([u[:1], u], axis=0)
-    U_R = jnp.concatenate([u, u[-1:]], axis=0) 
+
+def rusanov_flux(U_L, U_R, normal):
     F_L = physical_flux(U_L)
     F_R = physical_flux(U_R)
     W_L = inverse(U_L)
@@ -71,16 +98,69 @@ def faces_flux(u):
     velocity_R = W_R[:, 1]
     pressure_R = W_R[:, 2]
 
-    print('ul: ', U_L, ' ur: ', U_R, ' fl: ', F_L, ' fr: ', F_R )
 
-    aL = jnp.sqrt((gamma*pressure_L)/density_L)
-    aR = jnp.sqrt((gamma*pressure_R)/density_R)
-    alpha = jnp.maximum(jnp.abs(velocity_L)+aL, jnp.abs(velocity_R) + aR)
-    alpha = jnp.expand_dims(alpha, axis=-1) 
-    print('alpha: ', alpha.shape)
-    F = 0.5 * (jnp.add(F_L, F_R)) - 0.5 * alpha * (jnp.subtract(U_R, U_L))
-    print("Face_flux shape: ", F.shape)
-    return F
+    sound_speed_L = jnp.sqrt(
+        gamma * pressure_L / density_L
+    )
+
+    sound_speed_R = jnp.sqrt(
+        gamma * pressure_R / density_R
+    )
+
+    normal_velocity_L = velocity_L * normal
+    normal_velocity_R = velocity_R * normal
+
+    alpha = jnp.maximum(
+        jnp.abs(normal_velocity_L) + sound_speed_L,
+        jnp.abs(normal_velocity_R) + sound_speed_R,
+    )
+
+    normal_flux_L = normal[:, None] * F_L
+    normal_flux_R = normal[:, None] * F_R
+
+    return (
+        0.5 * (normal_flux_L + normal_flux_R)
+        - 0.5 * alpha[:, None] * (U_R - U_L)
+    )
+
+
+def connectivity_residiual(u):
+    U_L = u[owner]
+    U_R = u[neighbor]
+    internal_flux = rusanov_flux(
+        U_L,
+        U_R,
+        internal_face_normal,
+    )
+    internal_face_area = jnp.ones(
+        number_of_cells - 1
+    )
+    integrated_flux = (
+        internal_face_area[:, None]
+        * internal_flux
+    )
+    residual = jnp.zeros_like(u)
+    residual = residual.at[owner].add(
+        internal_flux
+    )
+    residual = residual.at[neighbor].add(
+        -internal_flux
+    )
+    boundary_state = u[boundary_owner]
+
+    boundary_flux = rusanov_flux(
+        boundary_state,
+        boundary_state,
+        boundary_normal,
+    )
+    integrated_boundary_flux = (
+        boundary_area[:, None]
+        * boundary_flux
+    )
+    residual = residual.at[boundary_owner].add(
+        integrated_boundary_flux
+    )
+    return residual
 
 
 def compute_dt(u, dx):
@@ -94,11 +174,14 @@ def compute_dt(u, dx):
     return dt
 
 def update(u, dt):
-    F = faces_flux(u)
-    left_flux = F[:-1]
-    right_flux = F[1:]
-    unew = u - (dt/dx) * (right_flux - left_flux)
-    return unew
+    residual = connectivity_residiual(u)
+    U_new = (
+        u
+        - dt
+        * residual
+        / cell_volume[:, None]
+    )
+    return U_new
 
 def simulate(U_initial):
 
