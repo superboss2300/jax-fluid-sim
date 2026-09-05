@@ -6,10 +6,15 @@ name = "pypi"
 [packages]
 jax = {extras = ["cuda13"], version = "*"}
 matplotlib = "*"
-datoviz = "*"
+gmsh = "*"
+meshio = "*"
+datoviz = "==0.4.0rc2"
 
 [dev-packages]
 
 [requires]
 python_version = "3.14"
 python_full_version = "3.14.7"
+
+[pipenv]
+allow_prereleases = true
