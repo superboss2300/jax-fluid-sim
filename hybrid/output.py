@@ -4,6 +4,7 @@ from pathlib import Path
 
 import meshio
 import numpy as np
+from scipy.interpolate import griddata
 
 
 def shock_colormap():
@@ -48,21 +49,27 @@ def _field_limits(values, minimum_relative_span):
     return low, high
 
 
+_P1_SUBCELLS = {
+    "tetra": ("tetra", np.asarray([[0, 1, 2, 3]], dtype=np.int32)),
+    "wedge": ("wedge", np.asarray([[0, 1, 2, 3, 4, 5]], dtype=np.int32)),
+    "hexahedron": ("hexahedron", np.asarray([[0, 1, 2, 3, 4, 5, 6, 7]], dtype=np.int32)),
+}
+
 _P2_SUBCELLS = {
     "tetra": (
         "tetra",
         np.asarray([
-            [0,4,5,6], [4,1,7,8], [5,7,2,9], [6,8,9,3],
-            [4,5,6,8], [4,7,5,8], [5,6,8,9], [5,8,7,9],
+            [0, 4, 5, 6], [4, 1, 7, 8], [5, 7, 2, 9], [6, 8, 9, 3],
+            [4, 5, 6, 8], [4, 7, 5, 8], [5, 6, 8, 9], [5, 8, 7, 9],
         ], dtype=np.int32),
     ),
     "wedge": (
         "wedge",
         np.asarray([
-            [0,3,5,12,15,17], [3,1,4,15,13,16],
-            [5,4,2,17,16,14], [3,4,5,15,16,17],
-            [12,15,17,6,9,11], [15,13,16,9,7,10],
-            [17,16,14,11,10,8], [15,16,17,9,10,11],
+            [0, 3, 5, 12, 15, 17], [3, 1, 4, 15, 13, 16],
+            [5, 4, 2, 17, 16, 14], [3, 4, 5, 15, 16, 17],
+            [12, 15, 17, 6, 9, 11], [15, 13, 16, 9, 7, 10],
+            [17, 16, 14, 11, 10, 8], [15, 16, 17, 9, 10, 11],
         ], dtype=np.int32),
     ),
 }
@@ -79,25 +86,87 @@ def _hex_p2_subcells():
                 y0, y1 = slot[jy], slot[jy + 1]
                 z0, z1 = slot[kz], slot[kz + 1]
                 cells.append([
-                    index(x0,y0,z0), index(x1,y0,z0),
-                    index(x1,y1,z0), index(x0,y1,z0),
-                    index(x0,y0,z1), index(x1,y0,z1),
-                    index(x1,y1,z1), index(x0,y1,z1),
+                    index(x0, y0, z0), index(x1, y0, z0),
+                    index(x1, y1, z0), index(x0, y1, z0),
+                    index(x0, y0, z1), index(x1, y0, z1),
+                    index(x1, y1, z1), index(x0, y1, z1),
                 ])
     return "hexahedron", np.asarray(cells, dtype=np.int32)
 
 
 _P2_SUBCELLS["hexahedron"] = _hex_p2_subcells()
 
+# P=3 subcells (27 subcells per element)
+_TETRA_P3_SUBCELLS = np.asarray([
+    [10, 11, 16, 19], [14, 7, 2, 11], [14, 15, 18, 19], [13, 12, 17, 19],
+    [5, 10, 12, 1], [9, 13, 15, 3], [8, 17, 16, 19], [8, 18, 19, 16],
+    [8, 4, 16, 17], [8, 4, 0, 16], [8, 6, 18, 16], [8, 6, 16, 0],
+    [14, 18, 16, 19], [14, 6, 11, 16], [14, 11, 19, 16], [14, 6, 16, 18],
+    [14, 7, 11, 6], [5, 17, 19, 16], [5, 10, 19, 12], [5, 12, 19, 17],
+    [5, 4, 17, 16], [5, 10, 16, 19], [9, 18, 19, 17], [9, 13, 17, 19],
+    [9, 15, 19, 18], [9, 8, 18, 17], [9, 13, 19, 15],
+], dtype=np.int32)
+
+_WEDGE_P3_SUBCELLS = np.asarray([
+    [0, 3, 8, 20, 23, 28], [4, 1, 5, 24, 21, 25], [7, 6, 2, 27, 26, 22],
+    [3, 4, 9, 23, 24, 29], [5, 6, 9, 25, 26, 29], [8, 9, 7, 28, 29, 27],
+    [3, 9, 8, 23, 29, 28], [4, 5, 9, 24, 25, 29], [6, 7, 9, 26, 27, 29],
+    [20, 23, 28, 30, 33, 38], [24, 21, 25, 34, 31, 35], [27, 26, 22, 37, 36, 32],
+    [23, 24, 29, 33, 34, 39], [25, 26, 29, 35, 36, 39], [28, 29, 27, 38, 39, 37],
+    [23, 29, 28, 33, 39, 38], [24, 25, 29, 34, 35, 39], [26, 27, 29, 36, 37, 39],
+    [30, 33, 38, 10, 13, 18], [34, 31, 35, 14, 11, 15], [37, 36, 32, 17, 16, 12],
+    [33, 34, 39, 13, 14, 19], [35, 36, 39, 15, 16, 19], [38, 39, 37, 18, 19, 17],
+    [33, 39, 38, 13, 19, 18], [34, 35, 39, 14, 15, 19], [36, 37, 39, 16, 17, 19],
+], dtype=np.int32)
+
+
+def _hex_p3_subcells():
+    slot = (0, 2, 3, 1)  # internal Q3 line order [0, 1, 1/3, 2/3] -> spatial (0, 1/3, 2/3, 1)
+    index = lambda ix, iy, iz: iz * 16 + iy * 4 + ix
+    cells = []
+    for kz in range(3):
+        for jy in range(3):
+            for ix in range(3):
+                x0, x1 = slot[ix], slot[ix + 1]
+                y0, y1 = slot[jy], slot[jy + 1]
+                z0, z1 = slot[kz], slot[kz + 1]
+                cells.append([
+                    index(x0, y0, z0), index(x1, y0, z0),
+                    index(x1, y1, z0), index(x0, y1, z0),
+                    index(x0, y0, z1), index(x1, y0, z1),
+                    index(x1, y1, z1), index(x0, y1, z1),
+                ])
+    return "hexahedron", np.asarray(cells, dtype=np.int32)
+
+
+_P3_SUBCELLS = {
+    "tetra": ("tetra", _TETRA_P3_SUBCELLS),
+    "wedge": ("wedge", _WEDGE_P3_SUBCELLS),
+    "hexahedron": _hex_p3_subcells(),
+}
+
+
+def get_element_subcells(element_type, polynomial_degree):
+    """Return (vtk_cell_type, subcell_indices) for a given element and degree."""
+    if polynomial_degree == 1:
+        return _P1_SUBCELLS[element_type]
+    elif polynomial_degree == 2:
+        return _P2_SUBCELLS[element_type]
+    elif polynomial_degree == 3:
+        return _P3_SUBCELLS[element_type]
+    raise ValueError(
+        f"Unsupported polynomial degree {polynomial_degree} for element {element_type!r}"
+    )
+
 
 _LINEAR_CELL_EDGES = {
-    "tetra": ((0,1),(0,2),(0,3),(1,2),(1,3),(2,3)),
+    "tetra": ((0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3)),
     "wedge": (
-        (0,1),(1,2),(2,0),(3,4),(4,5),(5,3),(0,3),(1,4),(2,5),
+        (0, 1), (1, 2), (2, 0), (3, 4), (4, 5), (5, 3), (0, 3), (1, 4), (2, 5),
     ),
     "hexahedron": (
-        (0,1),(1,2),(2,3),(3,0),(4,5),(5,6),(6,7),(7,4),
-        (0,4),(1,5),(2,6),(3,7),
+        (0, 1), (1, 2), (2, 3), (3, 0), (4, 5), (5, 6), (6, 7), (7, 4),
+        (0, 4), (1, 5), (2, 6), (3, 7),
     ),
 }
 
@@ -117,11 +186,9 @@ def _midplane_triangles(operator, states, plane_z=0.0):
         primitive = np.asarray(
             operator.solver.conserved_to_primitive(states[element_type])
         )
-        if operator.solver.polynomial_degree == 2:
-            output_type, subcells = _P2_SUBCELLS[element_type]
-        else:
-            output_type = element_type
-            subcells = np.arange(coordinates.shape[1], dtype=np.int32)[None, :]
+        output_type, subcells = get_element_subcells(
+            element_type, operator.solver.polynomial_degree
+        )
         edges = _LINEAR_CELL_EDGES[output_type]
 
         parent_crosses = (
@@ -159,7 +226,7 @@ def _midplane_triangles(operator, states, plane_z=0.0):
                 xy = np.asarray([item[0] for item in polygon])
                 primitive_values = np.asarray([item[1] for item in polygon])
                 center = np.mean(xy, axis=0)
-                order = np.argsort(np.arctan2(xy[:,1]-center[1], xy[:,0]-center[0]))
+                order = np.argsort(np.arctan2(xy[:, 1] - center[1], xy[:, 0] - center[0]))
                 xy = xy[order]
                 primitive_values = primitive_values[order]
                 offset = len(vertices)
@@ -178,11 +245,13 @@ def _midplane_triangles(operator, states, plane_z=0.0):
 
 
 def write_tessellated_vtu(path, operator, states):
-    """Write each P2 parent as eight linear visualization subcells."""
+    """Write each P1/P2/P3 parent element as conforming linear visualization subcells."""
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     points, primitives, cells = [], [], []
     point_offset = 0
+    p_degree = operator.solver.polynomial_degree
+
     for block in operator.mesh.element_blocks:
         element_type = block.element_type
         coordinates = np.asarray(
@@ -192,11 +261,9 @@ def write_tessellated_vtu(path, operator, states):
         points.append(coordinates.reshape(-1, 3))
         primitives.append(W.reshape(-1, W.shape[-1]))
         nodes_per_element = coordinates.shape[1]
-        if operator.solver.polynomial_degree == 2:
-            output_type, local_subcells = _P2_SUBCELLS[element_type]
-        else:
-            output_type = element_type
-            local_subcells = np.arange(nodes_per_element, dtype=np.int32)[None, :]
+
+        output_type, local_subcells = get_element_subcells(element_type, p_degree)
+
         element_offsets = (
             point_offset
             + np.arange(len(coordinates), dtype=np.int32) * nodes_per_element
@@ -210,21 +277,75 @@ def write_tessellated_vtu(path, operator, states):
     points = np.concatenate(points, axis=0)
     W = np.concatenate(primitives, axis=0)
     sound_speed = np.sqrt(
-        np.maximum(operator.solver.gamma * W[:, 4] / W[:, 0], 0.0)
+        np.maximum(operator.solver.gamma * W[:, 4] / np.maximum(W[:, 0], 1.0e-12), 0.0)
     )
     speed = np.linalg.norm(W[:, 1:4], axis=-1)
     point_data = {
-        "density": W[:, 0], "velocity": W[:, 1:4], "pressure": W[:, 4],
-        "speed": speed, "mach": speed / np.maximum(sound_speed, 1.0e-30),
+        "density": W[:, 0],
+        "velocity": W[:, 1:4],
+        "pressure": W[:, 4],
+        "speed": speed,
+        "mach": speed / np.maximum(sound_speed, 1.0e-30),
     }
     meshio.write(path, meshio.Mesh(points, cells, point_data=point_data))
     return path
 
 
+def _resample_to_cartesian_grid(
+    unique_xy, unique_fields, extent, resolution, sphere_radius=0.5, sphere_center=(0.0, 0.0)
+):
+    """Resample unstructured slice data onto a uniform grid with boundary inpainting."""
+    xmin, xmax, ymin, ymax = extent
+    nx, ny = resolution
+    gx = np.linspace(xmin, xmax, nx)
+    gy = np.linspace(ymin, ymax, ny)
+    GX, GY = np.meshgrid(gx, gy)
+
+    r_sq = (GX - sphere_center[0]) ** 2 + (GY - sphere_center[1]) ** 2
+    sphere_mask = r_sq < (sphere_radius + 1.0e-4) ** 2
+
+    num_vars = unique_fields.shape[-1]
+    resampled = np.zeros((ny, nx, num_vars), dtype=float)
+    for v in range(num_vars):
+        # 1. High-quality linear interpolation inside mesh convex hull
+        val = griddata(unique_xy, unique_fields[:, v], (GX, GY), method="linear")
+
+        # 2. Inpaint boundary gap pixels (between mesh boundary chords and physical circle)
+        nan_fluid = np.isnan(val) & ~sphere_mask
+        if np.any(nan_fluid):
+            val_near = griddata(
+                unique_xy, unique_fields[:, v], (GX[nan_fluid], GY[nan_fluid]), method="nearest"
+            )
+            val[nan_fluid] = val_near
+
+        val[sphere_mask] = np.nan
+        resampled[:, :, v] = val
+
+    return gx, gy, GX, GY, resampled, sphere_mask
+
+
+def compute_schlieren(grid_rho, dx, dy, sphere_mask, noise_floor=0.02, contrast=15.0):
+    """Compute physical, noise-gated numerical Schlieren log10(1 + k*|grad rho|/rho_ref)."""
+    med_rho = max(abs(float(np.nanmedian(grid_rho))), 1.0)
+    rho_clean = np.nan_to_num(grid_rho, nan=med_rho)
+    grad_y, grad_x = np.gradient(rho_clean, dy, dx)
+    grad_mag = np.sqrt(grad_x**2 + grad_y**2)
+    grad_mag[sphere_mask] = np.nan
+
+    valid = grad_mag[~sphere_mask]
+    finite_valid = valid[np.isfinite(valid)]
+    max_g = float(np.max(finite_valid)) if len(finite_valid) else 0.0
+
+    if max_g < noise_floor:
+        # Uniform or early startup: zero out so colormap doesn't stretch micro noise
+        return np.zeros_like(grad_mag)
+
+    return np.log10(1.0 + contrast * grad_mag / med_rho)
+
+
 def save_midplane_heatmap(path, operator, states, title="Hybrid P2 DG", resolution=(900, 450)):
     """Render an exact, continuous z=0 cut resampled to a Cartesian pixel grid."""
     import matplotlib.pyplot as plt
-    from scipy.interpolate import griddata
 
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -242,18 +363,9 @@ def save_midplane_heatmap(path, operator, states, title="Hybrid P2 DG", resoluti
     ymin, ymax = float(np.min(unique_xy[:, 1])), float(np.max(unique_xy[:, 1]))
     extent = (xmin, xmax, ymin, ymax)
 
-    # Resample onto a uniform Cartesian grid to eliminate triangular facet artifacts
-    nx, ny = resolution
-    gx = np.linspace(xmin, xmax, nx)
-    gy = np.linspace(ymin, ymax, ny)
-    GX, GY = np.meshgrid(gx, gy)
-    sphere_mask = (GX**2 + GY**2) < (0.5 + 1.0e-4)**2
-
-    grid_W = np.zeros((ny, nx, 5))
-    for v in range(5):
-        val = griddata(unique_xy, unique_W[:, v], (GX, GY), method="linear")
-        val[sphere_mask] = np.nan
-        grid_W[:, :, v] = val
+    gx, gy, GX, GY, grid_W, sphere_mask = _resample_to_cartesian_grid(
+        unique_xy, unique_W, extent, resolution
+    )
 
     speed = np.linalg.norm(grid_W[:, :, 1:4], axis=-1)
     sound = np.sqrt(
@@ -265,17 +377,9 @@ def save_midplane_heatmap(path, operator, states, title="Hybrid P2 DG", resoluti
     )
     mach = speed / np.maximum(sound, 1.0e-30)
 
-    # Compute continuous Schlieren gradient on the Cartesian grid
-    dy = gy[1] - gy[0]
-    dx = gx[1] - gx[0]
-    grad_y, grad_x = np.gradient(np.nan_to_num(grid_W[:, :, 0], nan=1.0), dy, dx)
-    grad_mag = np.sqrt(grad_x**2 + grad_y**2)
-    grad_mag[sphere_mask] = np.nan
-    density_span = np.nanmax(grid_W[:, :, 0]) - np.nanmin(grid_W[:, :, 0])
-    if density_span < 1.0e-5 * max(abs(float(np.nanmedian(grid_W[:, :, 0]))), 1.0):
-        schlieren = np.zeros_like(grad_mag)
-    else:
-        schlieren = np.log10(1.0 + grad_mag)
+    dx = float(gx[1] - gx[0])
+    dy = float(gy[1] - gy[0])
+    schlieren = compute_schlieren(grid_W[:, :, 0], dx, dy, sphere_mask)
 
     fields = [grid_W[:, :, 0], grid_W[:, :, 4], mach, schlieren]
     names = (
@@ -298,7 +402,14 @@ def save_midplane_heatmap(path, operator, states, title="Hybrid P2 DG", resoluti
             minimum_spans = (0.02, 0.05, 0.02)
             vmin, vmax = _field_limits(valid_field, minimum_spans[field_index])
         else:
-            vmin, vmax = (0.0, 1.0) if not np.any(np.isfinite(valid_field)) else _robust_limits(valid_field)
+            finite = valid_field[np.isfinite(valid_field)]
+            if len(finite) and np.max(finite) > 0.0:
+                vmin = float(np.percentile(finite, 2))
+                vmax = float(np.percentile(finite, 99.5))
+                if vmax <= vmin:
+                    vmax = vmin + 1.0
+            else:
+                vmin, vmax = 0.0, 1.0
 
         shown = axis.imshow(
             np.ma.masked_invalid(field),
@@ -336,6 +447,123 @@ def save_midplane_heatmap(path, operator, states, title="Hybrid P2 DG", resoluti
     figure.suptitle(title, color="white")
     figure.savefig(path, dpi=180)
     plt.close(figure)
+    return path
+
+
+def save_cinematic_schlieren(
+    path,
+    operator,
+    states,
+    resolution=(1920, 1080),
+    title="Compressible Flow Past Sphere",
+    sim_time=None,
+    step=None,
+    mach=None,
+    reynolds=None,
+    plane_z=0.0,
+    sphere_radius=0.5,
+    sphere_center=(0.0, 0.0),
+):
+    """Render a full-bleed 1080p cinematic numerical Schlieren image."""
+    import matplotlib.pyplot as plt
+
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+
+    xy, _, W = _midplane_triangles(operator, states, plane_z=plane_z)
+
+    # Deduplicate coincident slice points and average coincident DG traces
+    rounded = np.round(xy, decimals=5)
+    unique_xy, inverse = np.unique(rounded, axis=0, return_inverse=True)
+    counts = np.bincount(inverse)
+    unique_rho = np.bincount(inverse, weights=W[:, 0]) / counts
+
+    xmin, xmax = float(np.min(unique_xy[:, 0])), float(np.max(unique_xy[:, 0]))
+    ymin, ymax = float(np.min(unique_xy[:, 1])), float(np.max(unique_xy[:, 1]))
+    extent = (xmin, xmax, ymin, ymax)
+
+    gx, gy, GX, GY, resampled, sphere_mask = _resample_to_cartesian_grid(
+        unique_xy, unique_rho[:, None], extent, resolution, sphere_radius, sphere_center
+    )
+    grid_rho = resampled[:, :, 0]
+
+    dx = float(gx[1] - gx[0])
+    dy = float(gy[1] - gy[0])
+    schlieren = compute_schlieren(grid_rho, dx, dy, sphere_mask)
+
+    # Color limits
+    valid = schlieren[~sphere_mask]
+    finite_valid = valid[np.isfinite(valid)]
+    if len(finite_valid) and np.max(finite_valid) > 0.0:
+        s_min = float(np.percentile(finite_valid, 2))
+        s_max = float(np.percentile(finite_valid, 99.5))
+        if s_max <= s_min:
+            s_max = s_min + 1.0
+    else:
+        s_min, s_max = 0.0, 1.0
+
+    fig = plt.figure(figsize=(16, 9), facecolor="#01051f", dpi=120)
+    ax = fig.add_axes([0, 0, 1, 1], facecolor="#01051f")
+
+    color_map = shock_colormap()
+    ax.imshow(
+        np.ma.masked_invalid(schlieren),
+        origin="lower",
+        extent=extent,
+        cmap=color_map,
+        interpolation="bilinear",
+        vmin=s_min,
+        vmax=s_max,
+        aspect="auto",
+    )
+
+    # Draw physical obstacle body with glowing boundary
+    sphere = plt.Circle(
+        sphere_center,
+        sphere_radius,
+        facecolor="#000000",
+        edgecolor="#20d49a",
+        linewidth=2.0,
+        zorder=10,
+    )
+    ax.add_patch(sphere)
+
+    ax.set_xlim(xmin, xmax)
+    ax.set_ylim(ymin, ymax)
+    ax.set_aspect("equal")
+    ax.axis("off")
+
+    # Cinematic HUD typography
+    p_degree = operator.solver.polynomial_degree
+    flow_desc = f"Mach {mach:.1f} " if mach is not None else ""
+    hdr_title = (
+        title
+        if title != "Compressible Flow Past Sphere"
+        else f"{flow_desc}Compressible Flow Past Sphere (P={p_degree} DG/FV)"
+    )
+    ax.text(
+        0.03, 0.95, hdr_title,
+        color="white", fontsize=18, fontweight="bold",
+        transform=ax.transAxes, zorder=20,
+    )
+
+    info_parts = []
+    if sim_time is not None:
+        info_parts.append(f"t = {sim_time:.5f} s")
+    if step is not None:
+        info_parts.append(f"Step {step}")
+    if reynolds is not None:
+        info_parts.append(f"Re = {int(reynolds):,}")
+    info_parts.append("Numerical Schlieren")
+    hud_text = " | ".join(info_parts)
+    ax.text(
+        0.03, 0.91, hud_text,
+        color="#00a9cf", fontsize=13,
+        transform=ax.transAxes, zorder=20,
+    )
+
+    fig.savefig(path, facecolor="#01051f", edgecolor="none", dpi=120)
+    plt.close(fig)
     return path
 
 

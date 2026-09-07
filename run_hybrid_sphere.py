@@ -20,6 +20,7 @@ from hybrid import (
     HybridPositivityLimiter,
     HybridSSPRK3,
     HybridTroubledCellSensor,
+    save_cinematic_schlieren,
     save_midplane_heatmap,
     write_tessellated_vtu,
 )
@@ -245,14 +246,26 @@ def run(args):
         write_pvd(output / "sphere_animation.pvd", frames)
     save_restart(output / "final_state.npz", states, current_time, step)
     image = save_midplane_heatmap(
-        output / "sphere_final.png", operator, states,
-        title=f"Hybrid P2 DG sphere, Mach {args.mach}, t={current_time:.6f}",
+        output / "sphere_final.png",
+        operator,
+        states,
+        title=f"Hybrid P{operator.solver.polynomial_degree} DG sphere, Mach {args.mach}, t={current_time:.6f}",
+    )
+    cinematic_image = save_cinematic_schlieren(
+        output / "sphere_cinematic.png",
+        operator,
+        states,
+        sim_time=current_time,
+        step=step,
+        mach=args.mach,
+        reynolds=args.reynolds,
     )
     if args.vtk:
         write_pvd(output / "sphere_animation.pvd", frames)
     print(f"Completed {step} steps at t={current_time:.8f}")
     print(f"Saved state: {output / 'final_state.npz'}")
     print(f"Saved heatmap: {image}")
+    print(f"Saved cinematic Schlieren: {cinematic_image}")
     if args.vtk:
         print(f"Open {output / 'sphere_animation.pvd'} in ParaView")
 

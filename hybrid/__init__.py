@@ -11,7 +11,12 @@ from .limiter import (
 )
 from .mesh import HybridMesh
 from .navier_stokes import HybridNavierStokesOperator
-from .output import save_midplane_heatmap, write_pvd, write_tessellated_vtu
+from .output import (
+    save_cinematic_schlieren,
+    save_midplane_heatmap,
+    write_pvd,
+    write_tessellated_vtu,
+)
 from .solver import HybridCompressibleSolver
 from .spatial import HybridEulerOperator
 from .subcell import (
@@ -45,6 +50,7 @@ __all__ = [
     "dg_to_subcells",
     "make_reference_subcells",
     "subcells_to_dg",
+    "save_cinematic_schlieren",
     "save_midplane_heatmap",
     "write_tessellated_vtu",
     "write_pvd",
