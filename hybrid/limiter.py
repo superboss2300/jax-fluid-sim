@@ -135,7 +135,7 @@ class HybridTroubledCellSensor:
         self.solver = operator.solver
         self.threshold = float(threshold)
         self.p1_projectors = {}
-        if self.solver.polynomial_degree == 2:
+        if self.solver.polynomial_degree >= 2:
             for element_type, reference in operator.geometry.reference_elements.items():
                 p1_values = p1_basis(element_type, reference.nodes)
                 self.p1_projectors[element_type] = (
