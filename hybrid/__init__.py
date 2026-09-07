@@ -24,6 +24,7 @@ from .subcell import (
 )
 from .state import CompressibleStateLayout
 from .time_integration import HybridSSPRK3
+from . import chemistry
 
 __all__ = [
     "CompressibleStateLayout",
@@ -49,4 +50,5 @@ __all__ = [
     "write_pvd",
     "ReferenceElement",
     "make_reference_element",
+    "chemistry",
 ]
