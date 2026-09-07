@@ -31,7 +31,9 @@ from .subcell import (
 from .state import CompressibleStateLayout
 from .time_integration import HybridSSPRK3
 from .chemistry import ReactingFlowCoupler
+from .gui import GPUMidplaneRasterizer, LiveGUIController
 from . import chemistry
+from . import gui
 
 __all__ = [
     "CompressibleStateLayout",
@@ -60,5 +62,8 @@ __all__ = [
     "ReferenceElement",
     "make_reference_element",
     "ReactingFlowCoupler",
+    "GPUMidplaneRasterizer",
+    "LiveGUIController",
     "chemistry",
+    "gui",
 ]

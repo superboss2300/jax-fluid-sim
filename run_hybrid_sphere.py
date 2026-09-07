@@ -26,6 +26,7 @@ from hybrid import (
     write_tessellated_vtu,
 )
 from hybrid.chemistry import Air11ParkMechanism, AIR11_SPECIES, ReactingFlowCoupler
+from hybrid.gui import LiveGUIController
 from hybrid.output import write_pvd
 
 
@@ -176,6 +177,17 @@ def run(args):
         f"flux={args.inviscid_flux} subcell_FV={args.subcell_fv} "
         f"soft_start={args.soft_start} chemistry={args.chemistry}"
     )
+    if args.gui:
+        gui_res = tuple(args.gui_resolution)
+        gui_controller = LiveGUIController(
+            operator,
+            resolution=gui_res,
+            update_interval=args.gui_interval,
+            title=f"JAX-Fluid-Sim: Mach {args.mach} (P={args.polynomial_degree})",
+        )
+    else:
+        gui_controller = None
+
     print("Compiling on the first step...", flush=True)
 
     frames = []
@@ -224,6 +236,15 @@ def run(args):
             consecutive_rejections = 0
             retry_scale = min(1.0, 1.25 * retry_scale)
             minimum_dt_value = min(minimum_dt_value, dt)
+            if gui_controller is not None:
+                gui_controller.update(
+                    states,
+                    sim_time=current_time,
+                    step=step,
+                    mach=args.mach,
+                    dt=dt,
+                    chem_diags=" | Air-11 Reacting" if args.chemistry != "none" else "",
+                )
             if output_time - current_time <= (
                 32.0 * np.finfo(np.float32).eps * max(abs(output_time), 1.0e-12)
             ):
@@ -327,6 +348,8 @@ def run(args):
         print(f"Saved reacting heatmap: {reacting_image}")
     if args.vtk:
         write_pvd(output / "sphere_animation.pvd", frames)
+    if gui_controller is not None:
+        gui_controller.close()
     print(f"Completed {step} steps at t={current_time:.8f}")
     print(f"Saved state: {output / 'final_state.npz'}")
     print(f"Saved heatmap: {image}")
@@ -350,6 +373,25 @@ def main():
         choices=("none", "air11"),
         default="none",
         help="Thermochemistry model: 'none' (ideal gas) or 'air11' (Park 11-species reacting air).",
+    )
+    parser.add_argument(
+        "--gui",
+        action="store_true",
+        help="Enable zero-overhead live GPU desktop monitor window.",
+    )
+    parser.add_argument(
+        "--gui-interval",
+        type=int,
+        default=5,
+        help="Live GUI frame update interval in solver steps (default: 5).",
+    )
+    parser.add_argument(
+        "--gui-resolution",
+        type=int,
+        nargs=2,
+        default=(800, 450),
+        metavar=("WIDTH", "HEIGHT"),
+        help="Live GUI display resolution (default: 800 450).",
     )
     parser.add_argument("--target-time", type=float, default=0.002)
     parser.add_argument("--mach", type=float, default=2.0)
