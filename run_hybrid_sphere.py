@@ -22,8 +22,10 @@ from hybrid import (
     HybridTroubledCellSensor,
     save_cinematic_schlieren,
     save_midplane_heatmap,
+    save_reacting_heatmap,
     write_tessellated_vtu,
 )
+from hybrid.chemistry import Air11ParkMechanism, AIR11_SPECIES, ReactingFlowCoupler
 from hybrid.output import write_pvd
 
 
@@ -55,6 +57,12 @@ def assert_physical_state(states, solver, context):
                 f"{context}: {name} is nonphysical "
                 f"(rho_min={density_min}, p_min={pressure_min})"
             )
+        if solver.layout.species_names:
+            species_min = float(jnp.min(state[..., solver.layout.species]))
+            if species_min < -1.0e-4:
+                raise FloatingPointError(
+                    f"{context}: {name} has negative species density: {species_min}"
+                )
 
 
 def run(args):
@@ -71,8 +79,20 @@ def run(args):
     velocity = args.mach * sound_speed
     viscosity = density * velocity / args.reynolds
 
+    if args.chemistry == "air11":
+        species_names = tuple(s.name for s in AIR11_SPECIES)
+        coupler = ReactingFlowCoupler(Air11ParkMechanism())
+        mass_fractions = np.zeros(len(species_names), dtype=float)
+        mass_fractions[9] = 0.767   # N2
+        mass_fractions[10] = 0.233  # O2
+    else:
+        species_names = ()
+        coupler = None
+        mass_fractions = None
+
     solver = HybridCompressibleSolver(
         args.mesh,
+        species_names=species_names,
         gamma=gamma,
         polynomial_degree=args.polynomial_degree,
         inviscid_flux=args.inviscid_flux,
@@ -80,7 +100,10 @@ def run(args):
         use_wale=args.wale,
     )
     operator = HybridNavierStokesOperator(solver)
-    farfield = jnp.asarray([density, velocity, 0.0, 0.0, pressure])
+    if mass_fractions is not None:
+        farfield = jnp.asarray([density, velocity, 0.0, 0.0, pressure, *mass_fractions])
+    else:
+        farfield = jnp.asarray([density, velocity, 0.0, 0.0, pressure])
     boundary = FarfieldWallBoundary(solver, farfield)
     if args.soft_start is None:
         args.soft_start = (args.mach >= 3.0)
@@ -95,7 +118,10 @@ def run(args):
         print(f"Resuming {args.resume} from t={current_time:.8f}, step={step}")
     else:
         states = solver.uniform_state_blocks(
-            density, jnp.asarray([velocity, 0.0, 0.0]), pressure
+            density,
+            jnp.asarray([velocity, 0.0, 0.0]),
+            pressure,
+            mass_fractions=mass_fractions,
         )
         current_time = 0.0
         step = 0
@@ -132,6 +158,14 @@ def run(args):
     compiled_step = lambda state, dt: integrator.checked_step(
         state, dt, boundary
     )
+    if coupler is not None:
+        compiled_react = {
+            name: jax.jit(coupler.react_block)
+            for name in states
+        }
+    else:
+        compiled_react = None
+
     counts = ", ".join(
         f"{block.element_type}={len(block.connectivity)}"
         for block in solver.mesh.element_blocks
@@ -140,7 +174,7 @@ def run(args):
         f"mesh={args.mesh} p={args.polynomial_degree} {counts} Mach={args.mach} "
         f"Re_D={args.reynolds:g} mu={viscosity:.6e} WALE={args.wale} "
         f"flux={args.inviscid_flux} subcell_FV={args.subcell_fv} "
-        f"soft_start={args.soft_start}"
+        f"soft_start={args.soft_start} chemistry={args.chemistry}"
     )
     print("Compiling on the first step...", flush=True)
 
@@ -178,7 +212,13 @@ def run(args):
             (valid, attempted_rho, attempted_pressure)
         )
         if bool(valid_value):
-            states = candidate
+            if compiled_react is not None:
+                states = {
+                    name: compiled_react[name](candidate[name], dt)
+                    for name in candidate
+                }
+            else:
+                states = candidate
             current_time += dt
             step += 1
             consecutive_rejections = 0
@@ -220,12 +260,22 @@ def run(args):
             troubled = sum(int(jnp.sum(value)) for value in flags.values())
             elapsed = time.perf_counter() - start
             eta = elapsed * (1.0-run_fraction) / max(run_fraction, 1.0e-12)
+            if coupler is not None:
+                idx_O = solver.layout.index("O")
+                idx_N = solver.layout.index("N")
+                idx_NO = solver.layout.index("NO")
+                YO_max = max(float(jnp.max(value[..., idx_O])) for value in W.values())
+                YN_max = max(float(jnp.max(value[..., idx_N])) for value in W.values())
+                YNO_max = max(float(jnp.max(value[..., idx_NO])) for value in W.values())
+                chem_diag = f" Y_O={YO_max:.2e} Y_N={YN_max:.2e} Y_NO={YNO_max:.2e}"
+            else:
+                chem_diag = ""
             print(
                 f"progress={100*fraction:6.2f}% time={current_time:.6f} "
                 f"steps={step} rho=[{rho_min:.6g},{rho_max:.6g}] "
                 f"p=[{p_min:.6g},{p_max:.6g}] troubled={troubled} "
                 f"rejected={total_rejections} dt_min={minimum_dt_value:.3e} "
-                f"elapsed={elapsed:.1f}s eta={eta:.1f}s"
+                f"elapsed={elapsed:.1f}s eta={eta:.1f}s{chem_diag}"
                 , flush=True
             )
             save_restart(
@@ -267,6 +317,14 @@ def run(args):
         mach=args.mach,
         reynolds=args.reynolds,
     )
+    if coupler is not None:
+        reacting_image = save_reacting_heatmap(
+            output / "sphere_reacting.png",
+            operator,
+            states,
+            title=f"Air-11 Reacting Hypersonic Flow past Sphere, Mach {args.mach}, t={current_time:.6f}",
+        )
+        print(f"Saved reacting heatmap: {reacting_image}")
     if args.vtk:
         write_pvd(output / "sphere_animation.pvd", frames)
     print(f"Completed {step} steps at t={current_time:.8f}")
@@ -286,6 +344,12 @@ def main():
         default=2,
         choices=(1, 2, 3),
         help="Polynomial approximation degree (default: 2)",
+    )
+    parser.add_argument(
+        "--chemistry",
+        choices=("none", "air11"),
+        default="none",
+        help="Thermochemistry model: 'none' (ideal gas) or 'air11' (Park 11-species reacting air).",
     )
     parser.add_argument("--target-time", type=float, default=0.002)
     parser.add_argument("--mach", type=float, default=2.0)

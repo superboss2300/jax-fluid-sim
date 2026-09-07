@@ -5,6 +5,7 @@ from .mechanism import Species, Reaction, ReactionMechanism
 from .air11_park import Air11ParkMechanism, AIR11_SPECIES, AIR11_REACTIONS
 from .relaxation import LandauTellerRelaxation
 from .integrator import PointImplicitIntegrator
+from .coupling import ReactingFlowCoupler
 
 __all__ = [
     "NASAPolynomial",
@@ -19,5 +20,6 @@ __all__ = [
     "AIR11_REACTIONS",
     "LandauTellerRelaxation",
     "PointImplicitIntegrator",
+    "ReactingFlowCoupler",
 ]
 

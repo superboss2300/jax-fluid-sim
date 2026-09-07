@@ -287,6 +287,10 @@ def write_tessellated_vtu(path, operator, states):
         "speed": speed,
         "mach": speed / np.maximum(sound_speed, 1.0e-30),
     }
+    if operator.solver.layout.species_names:
+        for s_idx, s_name in enumerate(operator.solver.layout.species_names):
+            clean_name = s_name.replace("+", "_plus").replace("-", "_minus")
+            point_data[f"Y_{clean_name}"] = W[:, 5 + s_idx]
     meshio.write(path, meshio.Mesh(points, cells, point_data=point_data))
     return path
 
@@ -581,3 +585,115 @@ def write_pvd(path, frames):
         '  <Collection>\n' + datasets + '\n  </Collection>\n</VTKFile>\n'
     )
     return path
+
+
+def save_reacting_heatmap(
+    path,
+    operator,
+    states,
+    title="Air-11 Reacting Hypersonic Flow",
+    resolution=(900, 450),
+    plane_z=0.0,
+    sphere_radius=0.5,
+    sphere_center=(0.0, 0.0),
+):
+    """Render a 4-panel diagnostic plot of T, Y_O, Y_NO, and Y_N at midplane."""
+    import matplotlib.pyplot as plt
+
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    xy, _, W = _midplane_triangles(operator, states, plane_z=plane_z)
+
+    rounded = np.round(xy, decimals=5)
+    unique_xy, inverse = np.unique(rounded, axis=0, return_inverse=True)
+    counts = np.bincount(inverse)
+    unique_W = np.zeros((len(unique_xy), W.shape[1]), dtype=W.dtype)
+    for var in range(W.shape[1]):
+        unique_W[:, var] = np.bincount(inverse, weights=W[:, var]) / counts
+
+    xmin, xmax = float(np.min(unique_xy[:, 0])), float(np.max(unique_xy[:, 0]))
+    ymin, ymax = float(np.min(unique_xy[:, 1])), float(np.max(unique_xy[:, 1]))
+    extent = (xmin, xmax, ymin, ymax)
+
+    gx, gy, GX, GY, grid_W, sphere_mask = _resample_to_cartesian_grid(
+        unique_xy, unique_W, extent, resolution, sphere_radius, sphere_center
+    )
+
+    rho = grid_W[:, :, 0]
+    p = grid_W[:, :, 4]
+    R_air = 287.05
+    T = p / np.maximum(rho * R_air, 1.0e-6)
+
+    layout = operator.solver.layout
+    idx_O = layout.index("O") if "O" in layout.species_names else None
+    idx_NO = layout.index("NO") if "NO" in layout.species_names else None
+    idx_N = layout.index("N") if "N" in layout.species_names else None
+
+    Y_O = grid_W[:, :, idx_O] if idx_O is not None else np.zeros_like(T)
+    Y_NO = grid_W[:, :, idx_NO] if idx_NO is not None else np.zeros_like(T)
+    Y_N = grid_W[:, :, idx_N] if idx_N is not None else np.zeros_like(T)
+
+    fields = [T, Y_O, Y_NO, Y_N]
+    names = (
+        "Temperature T [K]",
+        "Atomic Oxygen Mass Fraction $Y_O$",
+        "Nitric Oxide Mass Fraction $Y_{NO}$",
+        "Atomic Nitrogen Mass Fraction $Y_N$",
+    )
+
+    figure, axes = plt.subplots(
+        2, 2, figsize=(15, 9), constrained_layout=True,
+        facecolor="#01051f",
+    )
+    fire_cmap = plt.get_cmap("inferno").copy()
+    fire_cmap.set_bad("#01051f")
+    color_map = shock_colormap()
+
+    for field_index, (axis, name) in enumerate(zip(axes.flat, names)):
+        field = fields[field_index]
+        valid_field = field[~sphere_mask]
+        finite = valid_field[np.isfinite(valid_field)]
+        if len(finite) and np.max(finite) > np.min(finite):
+            vmin = float(np.min(finite))
+            vmax = float(np.max(finite))
+        else:
+            vmin, vmax = 0.0, 1.0
+
+        cmap = fire_cmap if field_index == 0 else color_map
+        shown = axis.imshow(
+            np.ma.masked_invalid(field),
+            origin="lower",
+            extent=extent,
+            cmap=cmap,
+            interpolation="bilinear",
+            vmin=vmin,
+            vmax=vmax,
+        )
+        sphere = plt.Circle(
+            sphere_center, sphere_radius,
+            facecolor="#01051f",
+            edgecolor="#ff2915" if field_index == 0 else "#4cc9f0",
+            linewidth=1.5,
+            zorder=5,
+        )
+        axis.add_patch(sphere)
+
+        axis.set_xlim(xmin, xmax)
+        axis.set_ylim(ymin, ymax)
+        axis.set_aspect("equal")
+        axis.set_facecolor("#01051f")
+        axis.set_title(name, color="white", fontsize=12)
+        axis.set_xlabel("x", color="white")
+        axis.set_ylabel("y", color="white")
+        axis.tick_params(colors="white")
+        for spine in axis.spines.values():
+            spine.set_color("#4cc9f0")
+        colorbar = figure.colorbar(shown, ax=axis, shrink=0.84)
+        colorbar.ax.tick_params(colors="white")
+        colorbar.outline.set_edgecolor("#4cc9f0")
+
+    figure.suptitle(title, color="white", fontsize=15)
+    figure.savefig(path, dpi=180)
+    plt.close(figure)
+    return path
+

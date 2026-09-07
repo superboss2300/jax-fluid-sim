@@ -582,6 +582,9 @@ class HybridSubcellFV:
         U_right = U_right.at[..., 4].set(
             jnp.maximum(U_right[..., 4], e_kin_R + 1.0e-12)
         )
+        if U.shape[-1] > 5:
+            U_left = U_left.at[..., 5:].set(jnp.maximum(U_left[..., 5:], 0.0))
+            U_right = U_right.at[..., 5:].set(jnp.maximum(U_right[..., 5:], 0.0))
 
         return U_left, U_right
 
