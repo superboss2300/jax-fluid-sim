@@ -130,7 +130,7 @@ class HybridPositivityLimiter:
 class HybridTroubledCellSensor:
     """Persson-like P2 high-mode sensor using density and pressure."""
 
-    def __init__(self, operator, threshold=2.0e-2):
+    def __init__(self, operator, threshold=5.0e-2):
         self.operator = operator
         self.solver = operator.solver
         self.threshold = float(threshold)
@@ -152,17 +152,9 @@ class HybridTroubledCellSensor:
             precision=jax.lax.Precision.HIGHEST,
         )
         high_energy = jnp.sum((monitored - low)**2, axis=1)
-        total_energy = jnp.sum(
-            (monitored - jnp.mean(monitored, axis=1, keepdims=True))**2,
-            axis=1,
-        )
         scale_energy = jnp.sum(monitored**2, axis=1)
-        resolved_variation = total_energy > 1.0e-20 * scale_energy
-        ratio = jnp.where(
-            resolved_variation,
-            high_energy / (total_energy + 1.0e-30),
-            0.0,
-        )
+        # Normalized Persson modal shock indicator: high-mode energy relative to total element state
+        ratio = high_energy / jnp.maximum(scale_energy, 1.0e-12)
         return jnp.max(ratio, axis=-1)
 
     def __call__(self, states):
@@ -184,7 +176,7 @@ class HybridModalShockLimiter:
     def __init__(
         self,
         operator,
-        threshold=2.0e-2,
+        threshold=5.0e-2,
         positivity=None,
         p0_fallback_factor=100.0,
         p0_relative_floor=0.2,
@@ -262,7 +254,7 @@ class HybridMOODSubcellLimiter:
     recomputation.
     """
 
-    def __init__(self, operator, threshold=2.0e-2, positivity=None, reconstruction="weno"):
+    def __init__(self, operator, threshold=5.0e-2, positivity=None, reconstruction="weno"):
         self.operator = operator
         self.sensor = HybridTroubledCellSensor(operator, threshold)
         self.positivity = (
