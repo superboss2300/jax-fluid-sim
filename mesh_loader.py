@@ -1,4 +1,4 @@
-"""Load a tetrahedral Gmsh mesh and build finite-volume connectivity."""
+"""Load linear or quadratic tetrahedral Gmsh meshes and build connectivity."""
 
 from pathlib import Path
 
@@ -7,7 +7,7 @@ import numpy as np
 
 
 class MeshLoader:
-    """Preprocess a tagged tetrahedral mesh for a cell-centered FV solver."""
+    """Preprocess tagged tetrahedral topology and high-order geometry."""
 
     def __init__(self, mesh_path):
         self.mesh_path = Path(mesh_path)
@@ -19,9 +19,14 @@ class MeshLoader:
             for name, data in mesh.field_data.items()
         }
 
-        self.tetrahedra, self.boundary_triangles, gmsh_boundary_tags = (
-            self._extract_cells(mesh)
-        )
+        (
+            self.tetrahedra,
+            self.boundary_triangles,
+            gmsh_boundary_tags,
+            self.tetrahedra_geometry,
+            self.boundary_triangles_geometry,
+            self.geometry_order,
+        ) = self._extract_cells(mesh)
 
         self.number_of_cells = len(self.tetrahedra)
         self.cell_centers, self.cell_volumes = self._compute_cell_geometry()
@@ -33,6 +38,37 @@ class MeshLoader:
             self.boundary_face_nodes,
             self.boundary_owner,
         ) = self._build_face_connectivity()
+
+        self.internal_owner_face_geometry_nodes = np.asarray(
+            [
+                self._cell_face_geometry_nodes(cell, nodes)
+                for cell, nodes in zip(
+                    self.internal_owner,
+                    self.internal_face_nodes,
+                )
+            ],
+            dtype=np.int32,
+        )
+        self.internal_neighbor_face_geometry_nodes = np.asarray(
+            [
+                self._cell_face_geometry_nodes(cell, nodes)
+                for cell, nodes in zip(
+                    self.internal_neighbor,
+                    self.internal_face_nodes,
+                )
+            ],
+            dtype=np.int32,
+        )
+        self.boundary_face_geometry_nodes = np.asarray(
+            [
+                self._cell_face_geometry_nodes(cell, nodes)
+                for cell, nodes in zip(
+                    self.boundary_owner,
+                    self.boundary_face_nodes,
+                )
+            ],
+            dtype=np.int32,
+        )
 
         self.boundary_tags = self._match_boundary_tags(gmsh_boundary_tags)
 
@@ -53,6 +89,8 @@ class MeshLoader:
         # owner and neighbor reconstruction points must be stored separately.
         self.internal_owner_face_centers = self.internal_face_centers.copy()
         self.internal_neighbor_face_centers = self.internal_face_centers.copy()
+        self.internal_owner_face_nodes = self.internal_face_nodes.copy()
+        self.internal_neighbor_face_nodes = self.internal_face_nodes.copy()
         self.internal_face_displacements = (
             self.cell_centers[self.internal_neighbor]
             - self.cell_centers[self.internal_owner]
@@ -84,6 +122,10 @@ class MeshLoader:
         periodic_neighbor = []
         periodic_owner_centers = []
         periodic_neighbor_centers = []
+        periodic_owner_nodes = []
+        periodic_neighbor_nodes = []
+        periodic_owner_geometry_nodes = []
+        periodic_neighbor_geometry_nodes = []
         periodic_displacements = []
         periodic_areas = []
         periodic_normals = []
@@ -156,6 +198,59 @@ class MeshLoader:
                 periodic_neighbor_centers.append(
                     self.boundary_face_centers[plus_index]
                 )
+
+                minus_nodes = self.boundary_face_nodes[minus_index]
+                plus_nodes = self.boundary_face_nodes[plus_index]
+                ordered_plus_nodes = []
+                available_plus_nodes = list(int(node) for node in plus_nodes)
+                for minus_node in minus_nodes:
+                    translated_point = self.points[int(minus_node)] + translation
+                    distances = np.linalg.norm(
+                        self.points[available_plus_nodes] - translated_point,
+                        axis=1,
+                    )
+                    closest = int(np.argmin(distances))
+                    if distances[closest] > tolerance:
+                        raise ValueError(
+                            "Could not match periodic face vertices within "
+                            f"tolerance; distance was {distances[closest]}"
+                        )
+                    ordered_plus_nodes.append(available_plus_nodes.pop(closest))
+
+                periodic_owner_nodes.append(minus_nodes)
+                periodic_neighbor_nodes.append(ordered_plus_nodes)
+
+                minus_geometry_nodes = self.boundary_face_geometry_nodes[
+                    minus_index
+                ]
+                plus_geometry_nodes = self.boundary_face_geometry_nodes[
+                    plus_index
+                ]
+                ordered_plus_geometry_nodes = []
+                available_plus_geometry_nodes = list(
+                    int(node) for node in plus_geometry_nodes
+                )
+                for minus_node in minus_geometry_nodes:
+                    translated_point = self.points[int(minus_node)] + translation
+                    distances = np.linalg.norm(
+                        self.points[available_plus_geometry_nodes]
+                        - translated_point,
+                        axis=1,
+                    )
+                    closest = int(np.argmin(distances))
+                    if distances[closest] > tolerance:
+                        raise ValueError(
+                            "Could not match periodic high-order face nodes; "
+                            f"distance was {distances[closest]}"
+                        )
+                    ordered_plus_geometry_nodes.append(
+                        available_plus_geometry_nodes.pop(closest)
+                    )
+
+                periodic_owner_geometry_nodes.append(minus_geometry_nodes)
+                periodic_neighbor_geometry_nodes.append(
+                    ordered_plus_geometry_nodes
+                )
                 periodic_displacements.append(displacement)
                 periodic_areas.append(0.5 * (minus_area + plus_area))
                 periodic_normals.append(normal)
@@ -192,6 +287,34 @@ class MeshLoader:
                 ],
                 axis=0,
             )
+            self.internal_owner_face_nodes = np.concatenate(
+                [
+                    self.internal_owner_face_nodes,
+                    np.asarray(periodic_owner_nodes, dtype=np.int32),
+                ],
+                axis=0,
+            )
+            self.internal_neighbor_face_nodes = np.concatenate(
+                [
+                    self.internal_neighbor_face_nodes,
+                    np.asarray(periodic_neighbor_nodes, dtype=np.int32),
+                ],
+                axis=0,
+            )
+            self.internal_owner_face_geometry_nodes = np.concatenate(
+                [
+                    self.internal_owner_face_geometry_nodes,
+                    np.asarray(periodic_owner_geometry_nodes, dtype=np.int32),
+                ],
+                axis=0,
+            )
+            self.internal_neighbor_face_geometry_nodes = np.concatenate(
+                [
+                    self.internal_neighbor_face_geometry_nodes,
+                    np.asarray(periodic_neighbor_geometry_nodes, dtype=np.int32),
+                ],
+                axis=0,
+            )
             self.internal_face_displacements = np.concatenate(
                 [
                     self.internal_face_displacements,
@@ -210,6 +333,9 @@ class MeshLoader:
 
         keep_boundary = ~remove_boundary
         self.boundary_face_nodes = self.boundary_face_nodes[keep_boundary]
+        self.boundary_face_geometry_nodes = (
+            self.boundary_face_geometry_nodes[keep_boundary]
+        )
         self.boundary_owner = self.boundary_owner[keep_boundary]
         self.boundary_tags = self.boundary_tags[keep_boundary]
         self.boundary_face_centers = self.boundary_face_centers[keep_boundary]
@@ -228,7 +354,9 @@ class MeshLoader:
 
     def _extract_cells(self, mesh):
         tetra_blocks = []
+        tetra10_blocks = []
         triangle_blocks = []
+        triangle6_blocks = []
         triangle_tag_blocks = []
 
         try:
@@ -239,15 +367,56 @@ class MeshLoader:
         for cell_block, physical_tags in zip(mesh.cells, physical_data):
             if cell_block.type == "tetra":
                 tetra_blocks.append(cell_block.data)
+            elif cell_block.type == "tetra10":
+                tetra10_blocks.append(cell_block.data)
             elif cell_block.type == "triangle":
                 triangle_blocks.append(cell_block.data)
                 triangle_tag_blocks.append(physical_tags)
+            elif cell_block.type == "triangle6":
+                triangle6_blocks.append(cell_block.data)
+                triangle_tag_blocks.append(physical_tags)
 
-        tetrahedra = self._concatenate_blocks(tetra_blocks, "tetrahedron")
-        boundary_triangles = self._concatenate_blocks(
-            triangle_blocks,
-            "boundary triangle",
-        )
+        if tetra10_blocks:
+            if tetra_blocks:
+                raise ValueError(
+                    "Mixed tetra/tetra10 meshes are not currently supported"
+                )
+            tetrahedra_geometry_gmsh = self._concatenate_blocks(
+                tetra10_blocks,
+                "quadratic tetrahedron",
+            )
+            # Gmsh/meshio: vertices, then edges 01, 12, 20, 03, 13, 23.
+            # Solver geometry: vertices, then edges 01, 02, 03, 12, 13, 23.
+            tetrahedra_geometry = tetrahedra_geometry_gmsh[:, [
+                0, 1, 2, 3, 4, 6, 7, 5, 8, 9
+            ]]
+            tetrahedra = tetrahedra_geometry[:, :4]
+            geometry_order = 2
+        else:
+            tetrahedra = self._concatenate_blocks(
+                tetra_blocks,
+                "tetrahedron",
+            )
+            tetrahedra_geometry = tetrahedra
+            geometry_order = 1
+
+        if triangle6_blocks:
+            if triangle_blocks:
+                raise ValueError(
+                    "Mixed triangle/triangle6 boundaries are not currently supported"
+                )
+            boundary_triangles_geometry = self._concatenate_blocks(
+                triangle6_blocks,
+                "quadratic boundary triangle",
+            )
+            boundary_triangles = boundary_triangles_geometry[:, :3]
+        else:
+            boundary_triangles = self._concatenate_blocks(
+                triangle_blocks,
+                "boundary triangle",
+            )
+            boundary_triangles_geometry = boundary_triangles
+
         boundary_tags = self._concatenate_blocks(
             triangle_tag_blocks,
             "boundary triangle tag",
@@ -257,6 +426,37 @@ class MeshLoader:
             np.asarray(tetrahedra, dtype=np.int32),
             np.asarray(boundary_triangles, dtype=np.int32),
             np.asarray(boundary_tags, dtype=np.int32),
+            np.asarray(tetrahedra_geometry, dtype=np.int32),
+            np.asarray(boundary_triangles_geometry, dtype=np.int32),
+            geometry_order,
+        )
+
+    def _cell_face_geometry_nodes(self, cell_id, face_vertices):
+        """Return face nodes as vertices a,b,c then edges ab,bc,ca."""
+        face_vertices = tuple(int(node) for node in face_vertices)
+        if self.geometry_order == 1:
+            return np.asarray(face_vertices, dtype=np.int32)
+
+        geometry_nodes = self.tetrahedra_geometry[int(cell_id)]
+        corners = geometry_nodes[:4]
+        edge_pairs = ((0, 1), (0, 2), (0, 3), (1, 2), (1, 3), (2, 3))
+        edge_lookup = {
+            tuple(sorted((int(corners[i]), int(corners[j])))): int(
+                geometry_nodes[4 + edge_index]
+            )
+            for edge_index, (i, j) in enumerate(edge_pairs)
+        }
+        a, b, c = face_vertices
+        return np.asarray(
+            [
+                a,
+                b,
+                c,
+                edge_lookup[tuple(sorted((a, b)))],
+                edge_lookup[tuple(sorted((b, c)))],
+                edge_lookup[tuple(sorted((c, a)))],
+            ],
+            dtype=np.int32,
         )
 
     def _compute_cell_geometry(self):
@@ -446,12 +646,27 @@ class MeshLoader:
             "internal_face_displacements": jnp.asarray(
                 self.internal_face_displacements
             ),
+            "internal_owner_face_nodes": jnp.asarray(
+                self.internal_owner_face_nodes
+            ),
+            "internal_neighbor_face_nodes": jnp.asarray(
+                self.internal_neighbor_face_nodes
+            ),
+            "internal_owner_face_geometry_nodes": jnp.asarray(
+                self.internal_owner_face_geometry_nodes
+            ),
+            "internal_neighbor_face_geometry_nodes": jnp.asarray(
+                self.internal_neighbor_face_geometry_nodes
+            ),
             "internal_face_areas": jnp.asarray(self.internal_face_areas),
             "internal_face_normals": jnp.asarray(self.internal_face_normals),
             "boundary_owner": jnp.asarray(self.boundary_owner),
             "boundary_face_centers": jnp.asarray(self.boundary_face_centers),
             "boundary_face_areas": jnp.asarray(self.boundary_face_areas),
             "boundary_face_normals": jnp.asarray(self.boundary_face_normals),
+            "boundary_face_geometry_nodes": jnp.asarray(
+                self.boundary_face_geometry_nodes
+            ),
             "boundary_tags": jnp.asarray(self.boundary_tags),
         }
 
@@ -462,6 +677,7 @@ class MeshLoader:
         print(f"Mesh: {self.mesh_path}")
         print(f"Points: {len(self.points)}")
         print(f"Tetrahedral cells: {self.number_of_cells}")
+        print(f"Geometry order: {self.geometry_order}")
         print(f"Internal faces: {self.number_of_internal_faces}")
         if self.number_of_periodic_faces:
             print(f"  Periodic face pairs: {self.number_of_periodic_faces}")

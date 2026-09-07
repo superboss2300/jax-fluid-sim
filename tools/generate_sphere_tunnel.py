@@ -1,12 +1,12 @@
-"""Generate a tagged tetrahedral wind-tunnel mesh around a sphere."""
+"""Generate a tagged, locally refined tetrahedral sphere wind tunnel."""
 
+import argparse
 from pathlib import Path
 
 import gmsh
 
 
 OUTPUT_DIR = Path(__file__).resolve().parents[1] / "mesh"
-MESH_PATH = OUTPUT_DIR / "sphere_tunnel.msh"
 
 # Tunnel dimensions. The sphere is centered at the origin.
 X_MIN = -2.0
@@ -17,9 +17,18 @@ Z_MIN = -2.0
 Z_MAX = 2.0
 SPHERE_RADIUS = 0.5
 
-# Mesh sizes. Keep this first mesh modest enough for rapid iteration.
-SIZE_NEAR_SPHERE = 0.10
-SIZE_FAR_FIELD = 0.40
+MESH_PRESETS = {
+    # Useful for debugging solver changes.
+    "coarse": dict(near=0.10, shock=0.14, wake=0.16, far=0.40),
+    # Sized for P2 DG on a 6 GB GPU. It retains a substantially smoother
+    # curved sphere but avoids the very large face tensors of `refined`.
+    "gpu6gb": dict(near=0.070, shock=0.18, wake=0.20, far=0.40),
+    # Default production-development mesh: substantially finer than the old
+    # 0.10/0.40 mesh without making every far-field tetrahedron expensive.
+    "refined": dict(near=0.050, shock=0.070, wake=0.085, far=0.30),
+    # Expensive visualization/convergence mesh.
+    "fine": dict(near=0.032, shock=0.045, wake=0.055, far=0.22),
+}
 
 
 def _surface_groups(volume_tag: int) -> dict[str, list[int]]:
@@ -81,7 +90,12 @@ def _add_physical_group(
     )
 
 
-def generate() -> None:
+def generate(preset: str = "refined", output_path: Path | None = None) -> None:
+    sizes = MESH_PRESETS[preset]
+    if output_path is None:
+        output_path = OUTPUT_DIR / f"sphere_tunnel_{preset}.msh"
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
     gmsh.initialize()
 
     try:
@@ -129,7 +143,7 @@ def generate() -> None:
         _add_physical_group(2, surfaces["walls"], 13, "walls")
         _add_physical_group(2, surfaces["sphere_wall"], 14, "sphere_wall")
 
-        # Refine near the sphere and smoothly transition to the far-field size.
+        # Refine near the sphere and smoothly transition to the far field.
         distance_field = gmsh.model.mesh.field.add("Distance")
         gmsh.model.mesh.field.setNumbers(
             distance_field,
@@ -146,29 +160,64 @@ def generate() -> None:
         gmsh.model.mesh.field.setNumber(
             threshold_field,
             "SizeMin",
-            SIZE_NEAR_SPHERE,
+            sizes["near"],
         )
         gmsh.model.mesh.field.setNumber(
             threshold_field,
             "SizeMax",
-            SIZE_FAR_FIELD,
+            sizes["far"],
         )
-        gmsh.model.mesh.field.setNumber(threshold_field, "DistMin", 0.15)
-        gmsh.model.mesh.field.setNumber(threshold_field, "DistMax", 1.25)
-        gmsh.model.mesh.field.setAsBackgroundMesh(threshold_field)
+        gmsh.model.mesh.field.setNumber(threshold_field, "DistMin", 0.10)
+        gmsh.model.mesh.field.setNumber(threshold_field, "DistMax", 1.10)
+
+        # Expected bow-shock region ahead of the sphere.
+        shock_field = gmsh.model.mesh.field.add("Box")
+        for name, value in (
+            ("XMin", -1.35), ("XMax", 0.15),
+            ("YMin", -1.15), ("YMax", 1.15),
+            ("ZMin", -1.15), ("ZMax", 1.15),
+            ("VIn", sizes["shock"]), ("VOut", sizes["far"]),
+            ("Thickness", 0.35),
+        ):
+            gmsh.model.mesh.field.setNumber(shock_field, name, value)
+
+        # Long downstream region where shear layers and the wake develop.
+        wake_field = gmsh.model.mesh.field.add("Box")
+        for name, value in (
+            ("XMin", -0.15), ("XMax", 4.0),
+            ("YMin", -0.85), ("YMax", 0.85),
+            ("ZMin", -0.85), ("ZMax", 0.85),
+            ("VIn", sizes["wake"]), ("VOut", sizes["far"]),
+            ("Thickness", 0.40),
+        ):
+            gmsh.model.mesh.field.setNumber(wake_field, name, value)
+
+        combined_field = gmsh.model.mesh.field.add("Min")
+        gmsh.model.mesh.field.setNumbers(
+            combined_field,
+            "FieldsList",
+            [threshold_field, shock_field, wake_field],
+        )
+        gmsh.model.mesh.field.setAsBackgroundMesh(combined_field)
 
         gmsh.option.setNumber("Mesh.Algorithm3D", 10)  # HXT tetrahedra
-        gmsh.option.setNumber("Mesh.ElementOrder", 1)
+        # Create complete quadratic elements and curve boundary nodes onto
+        # the OpenCASCADE sphere instead of leaving them at linear midpoints.
+        gmsh.option.setNumber("Mesh.SecondOrderIncomplete", 0)
+        gmsh.option.setNumber("Mesh.SecondOrderLinear", 0)
         gmsh.option.setNumber("Mesh.MshFileVersion", 4.1)
 
         gmsh.model.mesh.generate(3)
-        gmsh.write(str(MESH_PATH))
+        gmsh.model.mesh.setOrder(2)
+        gmsh.model.mesh.optimize("HighOrder")
+        gmsh.write(str(output_path))
 
         node_tags, _, _ = gmsh.model.mesh.getNodes()
         element_types, element_tags, _ = gmsh.model.mesh.getElements(3)
         element_count = sum(len(tags) for tags in element_tags)
 
-        print(f"Wrote: {MESH_PATH}")
+        print(f"Preset: {preset} ({sizes})")
+        print(f"Wrote: {output_path}")
         print(f"Nodes: {len(node_tags)}")
         print(f"Volume elements: {element_count}")
         print(f"Gmsh element types: {list(element_types)}")
@@ -181,4 +230,8 @@ def generate() -> None:
 
 
 if __name__ == "__main__":
-    generate()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--preset", choices=MESH_PRESETS, default="refined")
+    parser.add_argument("--output", type=Path)
+    arguments = parser.parse_args()
+    generate(arguments.preset, arguments.output)
