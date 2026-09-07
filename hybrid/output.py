@@ -621,8 +621,8 @@ def save_reacting_heatmap(
 
     rho = grid_W[:, :, 0]
     p = grid_W[:, :, 4]
-    R_air = 287.05
-    T = p / np.maximum(rho * R_air, 1.0e-6)
+    T_ref = 300.0
+    T = (p / np.maximum(rho, 1.0e-6)) * T_ref
 
     layout = operator.solver.layout
     idx_O = layout.index("O") if "O" in layout.species_names else None

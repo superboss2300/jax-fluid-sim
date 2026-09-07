@@ -136,12 +136,12 @@ class HybridCompressibleSolver:
         velocity_right = W_right[..., 1:4]
         normal_velocity_left = jnp.sum(velocity_left * normal, axis=-1)
         normal_velocity_right = jnp.sum(velocity_right * normal, axis=-1)
-        sound_left = jnp.sqrt(
-            self.gamma * W_left[..., 4] / W_left[..., 0]
-        )
-        sound_right = jnp.sqrt(
-            self.gamma * W_right[..., 4] / W_right[..., 0]
-        )
+        rho_left = jnp.maximum(W_left[..., 0], 1.0e-14)
+        rho_right = jnp.maximum(W_right[..., 0], 1.0e-14)
+        pressure_left = jnp.maximum(W_left[..., 4], 0.0)
+        pressure_right = jnp.maximum(W_right[..., 4], 0.0)
+        sound_left = jnp.sqrt(self.gamma * pressure_left / rho_left)
+        sound_right = jnp.sqrt(self.gamma * pressure_right / rho_right)
         maximum_speed = jnp.maximum(
             jnp.abs(normal_velocity_left) + sound_left,
             jnp.abs(normal_velocity_right) + sound_right,
@@ -173,11 +173,13 @@ class HybridCompressibleSolver:
         pressure_right = W_right[..., 4]
         normal_velocity_left = jnp.sum(velocity_left * normal, axis=-1)
         normal_velocity_right = jnp.sum(velocity_right * normal, axis=-1)
+        rho_left_safe = jnp.maximum(rho_left, 1.0e-14)
+        rho_right_safe = jnp.maximum(rho_right, 1.0e-14)
         sound_left = jnp.sqrt(
-            jnp.maximum(self.gamma * pressure_left / rho_left, 0.0)
+            jnp.maximum(self.gamma * pressure_left / rho_left_safe, 0.0)
         )
         sound_right = jnp.sqrt(
-            jnp.maximum(self.gamma * pressure_right / rho_right, 0.0)
+            jnp.maximum(self.gamma * pressure_right / rho_right_safe, 0.0)
         )
 
         speed_left = jnp.minimum(

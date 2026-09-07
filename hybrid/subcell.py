@@ -649,6 +649,21 @@ class HybridSubcellFV:
                     jnp.asarray(faces.boundary_tags)[indices],
                 )
             )
+        min_rho = 1.0e-14
+        U_left = U_left.at[..., 0].set(jnp.maximum(U_left[..., 0], min_rho))
+        U_right = U_right.at[..., 0].set(jnp.maximum(U_right[..., 0], min_rho))
+        e_kin_L = 0.5 * jnp.sum(U_left[..., 1:4] ** 2, axis=-1) / U_left[..., 0]
+        U_left = U_left.at[..., 4].set(
+            jnp.maximum(U_left[..., 4], e_kin_L + 1.0e-12)
+        )
+        e_kin_R = 0.5 * jnp.sum(U_right[..., 1:4] ** 2, axis=-1) / U_right[..., 0]
+        U_right = U_right.at[..., 4].set(
+            jnp.maximum(U_right[..., 4], e_kin_R + 1.0e-12)
+        )
+        if U_left.shape[-1] > 5:
+            U_left = U_left.at[..., 5:].set(jnp.maximum(U_left[..., 5:], 0.0))
+            U_right = U_right.at[..., 5:].set(jnp.maximum(U_right[..., 5:], 0.0))
+
         return jnp.sum(
             self.solver.numerical_flux(U_left, U_right, normals)
             * metrics.integration_weights[indices, :, None],
@@ -729,6 +744,22 @@ class HybridSubcellFV:
                     U_left if boundary_state is None
                     else boundary_state(U_left, normals, tags)
                 )
+
+            # Admissibility preservation for external subcell face traces
+            min_rho = 1.0e-14
+            U_left = U_left.at[..., 0].set(jnp.maximum(U_left[..., 0], min_rho))
+            U_right = U_right.at[..., 0].set(jnp.maximum(U_right[..., 0], min_rho))
+            e_kin_L = 0.5 * jnp.sum(U_left[..., 1:4] ** 2, axis=-1) / U_left[..., 0]
+            U_left = U_left.at[..., 4].set(
+                jnp.maximum(U_left[..., 4], e_kin_L + 1.0e-12)
+            )
+            e_kin_R = 0.5 * jnp.sum(U_right[..., 1:4] ** 2, axis=-1) / U_right[..., 0]
+            U_right = U_right.at[..., 4].set(
+                jnp.maximum(U_right[..., 4], e_kin_R + 1.0e-12)
+            )
+            if U_left.shape[-1] > 5:
+                U_left = U_left.at[..., 5:].set(jnp.maximum(U_left[..., 5:], 0.0))
+                U_right = U_right.at[..., 5:].set(jnp.maximum(U_right[..., 5:], 0.0))
 
             flux = self.solver.numerical_flux(
                 U_left, U_right, normals

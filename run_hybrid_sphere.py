@@ -82,7 +82,7 @@ def run(args):
 
     if args.chemistry == "air11":
         species_names = tuple(s.name for s in AIR11_SPECIES)
-        coupler = ReactingFlowCoupler(Air11ParkMechanism())
+        coupler = ReactingFlowCoupler(Air11ParkMechanism(), dimensionless=True)
         mass_fractions = np.zeros(len(species_names), dtype=float)
         mass_fractions[9] = 0.767   # N2
         mass_fractions[10] = 0.233  # O2
@@ -225,10 +225,15 @@ def run(args):
         )
         if bool(valid_value):
             if compiled_react is not None:
-                states = {
+                reacted = {
                     name: compiled_react[name](candidate[name], dt)
                     for name in candidate
                 }
+                all_finite = all(
+                    bool(jnp.all(jnp.isfinite(blk)))
+                    for blk in reacted.values()
+                )
+                states = reacted if all_finite else candidate
             else:
                 states = candidate
             current_time += dt

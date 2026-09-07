@@ -8,6 +8,7 @@ with the stiff PointImplicitIntegrator thermochemical kinetics.
 from typing import Sequence
 import jax
 import jax.numpy as jnp
+import numpy as np
 
 from .mechanism import ReactionMechanism
 from .air11_park import Air11ParkMechanism, AIR11_SPECIES
@@ -28,6 +29,11 @@ class ReactingFlowCoupler:
         relaxation: LandauTellerRelaxation | None = None,
         max_newton_iters: int = 12,
         tolerance: float = 1.0e-7,
+        dimensionless: bool = False,
+        reference_temperature: float = 300.0,
+        reference_pressure: float = 101325.0,
+        reference_length: float = 1.0,
+        gamma: float = 1.4,
     ):
         if mechanism is None:
             self.mechanism = Air11ParkMechanism()
@@ -43,6 +49,22 @@ class ReactingFlowCoupler:
         )
         self.num_species = self.mechanism.num_species
         self.species_names = self.mechanism.species_names
+        self.dimensionless = bool(dimensionless)
+        self.gamma = float(gamma)
+
+        # Physical aerothermodynamic reference scales for non-dimensional flow
+        self.T_ref = float(reference_temperature)
+        self.p_ref = float(reference_pressure)
+        self.L_ref = float(reference_length)
+        R_univ = 8.31446261815324
+        mw_n2 = 2.0 * 0.0140067
+        mw_o2 = 2.0 * 0.015999
+        mean_mw = 1.0 / (0.767 / mw_n2 + 0.233 / mw_o2)
+        self.R_ref = R_univ / mean_mw
+        self.rho_ref = self.p_ref / (self.R_ref * self.T_ref)
+        self.u_ref = float(np.sqrt(self.R_ref * self.T_ref))
+        self.e_ref = float(self.u_ref**2)
+        self.t_ref = float(self.L_ref / self.u_ref)
 
         # Vectorize single-cell reaction over (elements, nodes)
         self._vmapped_cell_step = jax.vmap(
@@ -109,23 +131,41 @@ class ReactingFlowCoupler:
 
         # Kinetic energy and specific thermal internal energy
         e_kin = 0.5 * jnp.sum(momentum**2) / (rho_total**2)
-        e_thermal = jnp.maximum(
-            (total_energy / rho_total) - e_kin,
-            1.0e3,
-        )
 
-        # Recover initial temperature
-        T_init = self.mechanism.recover_temperature_from_energy(
-            rho_species, e_thermal, T_init=1000.0, num_iters=8
-        )
+        if self.dimensionless:
+            e_thermal_star = jnp.maximum((total_energy / rho_total) - e_kin, 1.0e-4)
+            e_thermal = e_thermal_star * self.e_ref
+            rho_species_phys = rho_species * self.rho_ref
+            T_guess = jnp.maximum((self.gamma - 1.0) * e_thermal_star * self.T_ref, 200.0)
+            dt_phys = dt * self.t_ref
 
-        # Implicit chemical kinetics advance with coupled temperature recovery
-        rho_new, _, _ = self.integrator.step(
-            rho_species,
-            T_init,
-            dt,
-            constant_temperature=False,
-        )
+            # Recover physical temperature
+            T_init = self.mechanism.recover_temperature_from_energy(
+                rho_species_phys, e_thermal, T_init=T_guess, num_iters=8
+            )
+
+            # Implicit chemical kinetics advance with coupled temperature recovery
+            rho_new_phys, _, _ = self.integrator.step(
+                rho_species_phys,
+                T_init,
+                dt_phys,
+                constant_temperature=False,
+            )
+            rho_new = rho_new_phys / self.rho_ref
+        else:
+            e_thermal = jnp.maximum(
+                (total_energy / rho_total) - e_kin,
+                1.0e3,
+            )
+            T_init = self.mechanism.recover_temperature_from_energy(
+                rho_species, e_thermal, T_init=1000.0, num_iters=8
+            )
+            rho_new, _, _ = self.integrator.step(
+                rho_species,
+                T_init,
+                dt,
+                constant_temperature=False,
+            )
 
         # Strictly enforce mass conservation and non-negativity
         rho_new = jnp.maximum(rho_new, 0.0)
