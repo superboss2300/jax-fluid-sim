@@ -52,7 +52,8 @@ class PointImplicitIntegrator:
         if Tv is None:
             Tv = T
 
-        dt = jnp.asarray(dt, dtype=jnp.float64)
+        dtype = jnp.float64 if jax.config.x64_enabled else jnp.float32
+        dt = jnp.asarray(dt, dtype=dtype)
         rho_0 = jnp.maximum(rho_species, 1.0e-20)
         total_mass = jnp.sum(rho_0)
 

@@ -73,9 +73,12 @@ class ReactionMechanism:
         self.num_reactions = len(self.reactions)
         self.species_names = tuple(s.name for s in self.species)
 
+        # Precision-adaptive floating-point type
+        dtype = jnp.float64 if jax.config.x64_enabled else jnp.float32
+
         # Build stoichiometric matrices: nu_prime, nu_double_prime, delta_nu
-        nu_prime = jnp.zeros((self.num_reactions, self.num_species), dtype=jnp.float64)
-        nu_double_prime = jnp.zeros((self.num_reactions, self.num_species), dtype=jnp.float64)
+        nu_prime = jnp.zeros((self.num_reactions, self.num_species), dtype=dtype)
+        nu_double_prime = jnp.zeros((self.num_reactions, self.num_species), dtype=dtype)
 
         for r_idx, rxn in enumerate(self.reactions):
             for s_idx, coeff in rxn.reactants:
@@ -89,16 +92,16 @@ class ReactionMechanism:
         self.delta_n = jnp.sum(self.delta_nu, axis=1)
 
         # Molar masses and charges
-        self.molar_masses = jnp.array([s.molar_mass for s in self.species], dtype=jnp.float64)
-        self.charges = jnp.array([s.charge for s in self.species], dtype=jnp.float64)
+        self.molar_masses = jnp.array([s.molar_mass for s in self.species], dtype=dtype)
+        self.charges = jnp.array([s.charge for s in self.species], dtype=dtype)
 
         # Arrhenius constants
-        self.A = jnp.array([r.A for r in self.reactions], dtype=jnp.float64)
-        self.b = jnp.array([r.b for r in self.reactions], dtype=jnp.float64)
-        self.theta = jnp.array([r.theta for r in self.reactions], dtype=jnp.float64)
+        self.A = jnp.array([r.A for r in self.reactions], dtype=dtype)
+        self.b = jnp.array([r.b for r in self.reactions], dtype=dtype)
+        self.theta = jnp.array([r.theta for r in self.reactions], dtype=dtype)
 
         # Third body efficiency matrix: shape (num_reactions, num_species)
-        alpha_M = jnp.zeros((self.num_reactions, self.num_species), dtype=jnp.float64)
+        alpha_M = jnp.zeros((self.num_reactions, self.num_species), dtype=dtype)
         for r_idx, rxn in enumerate(self.reactions):
             if rxn.third_body:
                 # Default efficiency 1.0 for all species except electrons (index 0 if named 'e-')
@@ -279,5 +282,6 @@ class ReactionMechanism:
             T_next = jnp.clip(T_curr + jnp.clip(dT, -0.5 * T_curr, 0.5 * T_curr), 100.0, 50000.0)
             return T_next, None
 
-        T_final, _ = jax.lax.scan(step, jnp.asarray(T_init, dtype=jnp.float64), None, length=num_iters)
+        dtype = jnp.float64 if jax.config.x64_enabled else jnp.float32
+        T_final, _ = jax.lax.scan(step, jnp.asarray(T_init, dtype=dtype), None, length=num_iters)
         return T_final

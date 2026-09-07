@@ -53,7 +53,7 @@ def select_coeffs(poly: NASAPolynomial, T: float | jax.Array) -> jax.Array:
 @jax.jit
 def cp_over_R(poly: NASAPolynomial, T: float | jax.Array) -> jax.Array:
     """Dimensionless molar heat capacity at constant pressure cp° / R."""
-    T = jnp.asarray(T, dtype=jnp.float64)
+    T = jnp.asarray(T)
     T_clamped = jnp.clip(T, poly.t_low, poly.t_high)
     a = select_coeffs(poly, T_clamped)
     # a0 + a1*T + a2*T^2 + a3*T^3 + a4*T^4
@@ -69,7 +69,7 @@ def cp_over_R(poly: NASAPolynomial, T: float | jax.Array) -> jax.Array:
 @jax.jit
 def h_over_RT(poly: NASAPolynomial, T: float | jax.Array) -> jax.Array:
     """Dimensionless molar enthalpy h° / (R * T)."""
-    T = jnp.asarray(T, dtype=jnp.float64)
+    T = jnp.asarray(T)
     T_clamped = jnp.clip(T, poly.t_low, poly.t_high)
     a = select_coeffs(poly, T_clamped)
     # a0 + a1*T/2 + a2*T^2/3 + a3*T^3/4 + a4*T^4/5 + a5/T
@@ -86,7 +86,7 @@ def h_over_RT(poly: NASAPolynomial, T: float | jax.Array) -> jax.Array:
 @jax.jit
 def s_over_R(poly: NASAPolynomial, T: float | jax.Array) -> jax.Array:
     """Dimensionless molar entropy s° / R."""
-    T = jnp.asarray(T, dtype=jnp.float64)
+    T = jnp.asarray(T)
     T_clamped = jnp.clip(T, poly.t_low, poly.t_high)
     a = select_coeffs(poly, T_clamped)
     # a0*ln(T) + a1*T + a2*T^2/2 + a3*T^3/3 + a4*T^4/4 + a6

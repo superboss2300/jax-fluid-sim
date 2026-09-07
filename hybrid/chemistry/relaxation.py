@@ -33,11 +33,12 @@ class LandauTellerRelaxation:
                 theta_v_list.append(s.theta_v)
                 mw_list.append(s.molar_mass)
 
+        dtype = jnp.float64 if jax.config.x64_enabled else jnp.float32
         self.diatomic_indices = jnp.array(diatomic_indices, dtype=jnp.int32)
-        self.theta_v = jnp.array(theta_v_list, dtype=jnp.float64)
-        self.mw_diatomic = jnp.array(mw_list, dtype=jnp.float64)
+        self.theta_v = jnp.array(theta_v_list, dtype=dtype)
+        self.mw_diatomic = jnp.array(mw_list, dtype=dtype)
         self.num_diatomics = len(diatomic_indices)
-        self.molar_masses = jnp.array([s.molar_mass for s in species], dtype=jnp.float64)
+        self.molar_masses = jnp.array([s.molar_mass for s in species], dtype=dtype)
 
     def specific_vibrational_energy(self, Tv: jax.Array) -> jax.Array:
         """Specific vibrational energy e_v,m(Tv) [J / kg] for all diatomic species."""
@@ -84,7 +85,8 @@ class LandauTellerRelaxation:
             Tv_next = jnp.clip(Tv_curr + jnp.clip(dTv, -0.5 * Tv_curr, 0.5 * Tv_curr), 50.0, 50000.0)
             return Tv_next, None
 
-        Tv_final, _ = jax.lax.scan(step, jnp.asarray(Tv_init, dtype=jnp.float64), None, length=num_iters)
+        dtype = jnp.float64 if jax.config.x64_enabled else jnp.float32
+        Tv_final, _ = jax.lax.scan(step, jnp.asarray(Tv_init, dtype=dtype), None, length=num_iters)
         return Tv_final
 
     def relaxation_times(self, rho_species: jax.Array, T: jax.Array, p: jax.Array) -> jax.Array:
