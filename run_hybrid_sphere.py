@@ -74,7 +74,7 @@ def run(args):
     solver = HybridCompressibleSolver(
         args.mesh,
         gamma=gamma,
-        polynomial_degree=2,
+        polynomial_degree=args.polynomial_degree,
         inviscid_flux=args.inviscid_flux,
         dynamic_viscosity=viscosity,
         use_wale=args.wale,
@@ -273,6 +273,13 @@ def run(args):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--mesh", default="mesh/sphere_tunnel_hybrid.msh")
+    parser.add_argument(
+        "-p", "--polynomial-degree",
+        type=int,
+        default=2,
+        choices=(1, 2, 3),
+        help="Polynomial approximation degree (default: 2)",
+    )
     parser.add_argument("--target-time", type=float, default=0.002)
     parser.add_argument("--mach", type=float, default=2.0)
     parser.add_argument("--reynolds", type=float, default=100000.0)
