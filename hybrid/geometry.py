@@ -58,7 +58,8 @@ def face_quadrature(face_type, polynomial_degree=1):
         return barycentric, jnp.full(3, 1.0 / 3.0)
 
     if face_type == "triangle":
-        raw, raw_weights = np.polynomial.legendre.leggauss(4)
+        order = 4 if polynomial_degree <= 2 else 5
+        raw, raw_weights = np.polynomial.legendre.leggauss(order)
         line = 0.5 * (raw + 1.0)
         weights_1d = 0.5 * raw_weights
         shapes = []
@@ -71,7 +72,7 @@ def face_quadrature(face_type, polynomial_degree=1):
         return jnp.asarray(shapes), jnp.asarray(weights)
 
     if face_type == "quad":
-        order = 2 if polynomial_degree == 1 else 3
+        order = 2 if polynomial_degree == 1 else (3 if polynomial_degree == 2 else 4)
         raw, raw_weights = np.polynomial.legendre.leggauss(order)
         line = 0.5 * (raw + 1.0)
         line_weights = 0.5 * raw_weights
