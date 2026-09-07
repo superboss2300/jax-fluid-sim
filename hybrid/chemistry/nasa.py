@@ -34,12 +34,13 @@ def make_nasa7(
     high: list[float] | tuple[float, ...],
 ) -> NASAPolynomial:
     """Construct a NASAPolynomial with jnp array coefficients."""
+    dtype = jnp.float64 if jax.config.x64_enabled else jnp.float32
     return NASAPolynomial(
         t_low=float(t_low),
         t_mid=float(t_mid),
         t_high=float(t_high),
-        coeffs_low=jnp.asarray(low, dtype=jnp.float64),
-        coeffs_high=jnp.asarray(high, dtype=jnp.float64),
+        coeffs_low=jnp.asarray(low, dtype=dtype),
+        coeffs_high=jnp.asarray(high, dtype=dtype),
     )
 
 
@@ -115,3 +116,4 @@ def e_over_RT(poly: NASAPolynomial, T: float | jax.Array) -> jax.Array:
 def cv_over_R(poly: NASAPolynomial, T: float | jax.Array) -> jax.Array:
     """Dimensionless molar heat capacity at constant volume cv° / R = cp/R - 1."""
     return cp_over_R(poly, T) - 1.0
+

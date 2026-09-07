@@ -1,5 +1,7 @@
 """Verification of higher-order P=3 DG reference elements and spatial operators."""
 
+import jax
+jax.config.update("jax_enable_x64", True)
 import jax.numpy as jnp
 import numpy as np
 

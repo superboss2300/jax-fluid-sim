@@ -150,3 +150,4 @@ class LandauTellerRelaxation:
         rho_diatomic = rho_species[self.diatomic_indices]
         q_m = rho_diatomic * (e_v_star - e_v) / jnp.maximum(tau, 1.0e-12)
         return jnp.sum(q_m)
+

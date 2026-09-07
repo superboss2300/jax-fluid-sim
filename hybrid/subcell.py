@@ -369,10 +369,12 @@ def subcells_to_dg(subcell_averages, projection):
 class HybridSubcellFV:
     """Conservative MOOD recomputation operator for P2 tetra/wedge blocks."""
 
-    def __init__(self, operator, division_count=4):
+    def __init__(self, operator, division_count=4, reconstruction="tvd"):
         self.operator = operator
         self.solver = operator.solver
         self.mesh = operator.mesh
+        self.division_count = division_count
+        self.reconstruction = reconstruction
         self.references = {}
         self.projections = {}
         for block_id, block in enumerate(self.mesh.element_blocks):
@@ -463,6 +465,81 @@ class HybridSubcellFV:
             for name, U in states.items()
         }
 
+    def _reconstruct_internal_states(self, name, U):
+        reference = self.references[name]
+        owner = jnp.asarray(reference.internal_owner)
+        neighbor = jnp.asarray(reference.internal_neighbor)
+
+        if self.reconstruction == "constant":
+            return U[:, owner], U[:, neighbor]
+
+        projection = self.projections[name]
+        normals = projection.internal_normals
+        areas = projection.internal_areas
+        volumes = projection.volumes
+        centers = projection.physical_centers
+
+        num_cells = reference.count
+        # Face difference vector across internal faces
+        delta_U = U[:, neighbor] - U[:, owner]
+
+        # 1. Green-Gauss gradient on subcells
+        flux_geom = 0.5 * normals * areas[:, :, None]
+        face_contrib = delta_U[:, :, None, :] * flux_geom[:, :, :, None]
+
+        grad_U = jnp.zeros((U.shape[0], num_cells, 3, U.shape[-1]), dtype=U.dtype)
+        grad_U = grad_U.at[:, owner].add(face_contrib)
+        grad_U = grad_U.at[:, neighbor].add(face_contrib)
+        grad_U = grad_U / jnp.maximum(volumes[:, :, None, None], 1.0e-14)
+
+        # 2. Reconstruct states at internal face centers
+        d_center = centers[:, neighbor] - centers[:, owner]
+        du_owner = jnp.sum(grad_U[:, owner] * d_center[:, :, :, None], axis=2)
+        du_neighbor = jnp.sum(grad_U[:, neighbor] * (-d_center[:, :, :, None]), axis=2)
+
+        # 3. Slope limiters (smooth Venkatakrishnan TVD)
+        eps = 1.0e-12
+        r_owner = delta_U / (du_owner + jnp.sign(du_owner) * eps)
+        r_neighbor = (-delta_U) / (du_neighbor + jnp.sign(du_neighbor) * eps)
+
+        phi_owner = jnp.clip(
+            jnp.where(
+                r_owner > 0.0,
+                (r_owner**2 + 2.0 * r_owner) / (r_owner**2 + r_owner + 2.0),
+                0.0,
+            ),
+            0.0,
+            1.0,
+        )
+        phi_neighbor = jnp.clip(
+            jnp.where(
+                r_neighbor > 0.0,
+                (r_neighbor**2 + 2.0 * r_neighbor) / (r_neighbor**2 + r_neighbor + 2.0),
+                0.0,
+            ),
+            0.0,
+            1.0,
+        )
+
+        U_left = U[:, owner] + 0.5 * phi_owner * du_owner
+        U_right = U[:, neighbor] + 0.5 * phi_neighbor * du_neighbor
+
+        # Admissibility preservation (positive density and internal energy)
+        min_rho = 1.0e-14
+        U_left = U_left.at[..., 0].set(jnp.maximum(U_left[..., 0], min_rho))
+        U_right = U_right.at[..., 0].set(jnp.maximum(U_right[..., 0], min_rho))
+
+        e_kin_L = 0.5 * jnp.sum(U_left[..., 1:4] ** 2, axis=-1) / U_left[..., 0]
+        U_left = U_left.at[..., 4].set(
+            jnp.maximum(U_left[..., 4], e_kin_L + 1.0e-12)
+        )
+        e_kin_R = 0.5 * jnp.sum(U_right[..., 1:4] ** 2, axis=-1) / U_right[..., 0]
+        U_right = U_right.at[..., 4].set(
+            jnp.maximum(U_right[..., 4], e_kin_R + 1.0e-12)
+        )
+
+        return U_left, U_right
+
     def _internal_residual(self, subcell_states):
         residual = {}
         for block in self.mesh.element_blocks:
@@ -474,8 +551,11 @@ class HybridSubcellFV:
             neighbor = jnp.asarray(reference.internal_neighbor)
             normals = projection.internal_normals
             areas = projection.internal_areas
+
+            U_left, U_right = self._reconstruct_internal_states(name, U)
+
             flux = self.solver.numerical_flux(
-                U[:, owner], U[:, neighbor], normals
+                U_left, U_right, normals
             ) * areas[..., None]
             block_residual = jnp.zeros_like(U)
             block_residual = block_residual.at[:, owner, :].add(-flux)

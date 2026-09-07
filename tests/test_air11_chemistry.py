@@ -1,5 +1,7 @@
 """Unit tests for modular thermochemistry framework and Air-11 Park model."""
 
+import jax
+jax.config.update("jax_enable_x64", True)
 import numpy as np
 import jax.numpy as jnp
 

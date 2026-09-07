@@ -48,7 +48,6 @@ def test_conservation():
     mesh_path = "mesh/sphere_tunnel_hybrid.msh"
     solver = HybridCompressibleSolver(mesh_path, polynomial_degree=2, dynamic_viscosity=0.0)
     operator = HybridNavierStokesOperator(solver)
-    subcell = HybridSubcellFV(operator)
     farfield = jnp.asarray([1.0, 2.0, 0.0, 0.0, 1.0])
     boundary = FarfieldWallBoundary(solver, farfield)
 
@@ -66,19 +65,18 @@ def test_conservation():
         "wedge": jnp.zeros(len(states["wedge"]), dtype=bool).at[jnp.asarray([5, 12])].set(True),
     }
 
-    # Run subcell recompute
-    corrected = subcell.recompute(states, dg_candidate, dt, troubled, boundary_state=boundary)
+    for recon in ["constant", "tvd"]:
+        subcell = HybridSubcellFV(operator, reconstruction=recon)
+        corrected = subcell.recompute(states, dg_candidate, dt, troubled, boundary_state=boundary)
 
-    # Calculate total conserved change under DG candidate vs corrected
-    total_dg = total_domain_conserved(dg_candidate, operator)
-    total_subcell = total_domain_conserved(corrected, operator)
+        total_dg = total_domain_conserved(dg_candidate, operator)
+        total_subcell = total_domain_conserved(corrected, operator)
 
-    # The difference between total domain integral of DG candidate and subcell-corrected state
-    # must be essentially zero because internal DG/FV fluxes cancel and boundary flux corrections match!
-    diff = jnp.max(jnp.abs(total_subcell - total_dg))
-    print(f"Max absolute discrepancy in total domain conserved quantities: {float(diff):.6e}")
-    assert float(diff) < 1.0e-3, f"Conservation violation: {float(diff)}"
-    print("Discrete conservation verified successfully!")
+        diff = jnp.max(jnp.abs(total_subcell - total_dg))
+        print(f"[{recon.upper()}] Max discrepancy in total conserved quantities: {float(diff):.6e}")
+        assert float(diff) < 1.0e-3, f"Conservation violation ({recon}): {float(diff)}"
+
+    print("All discrete conservation tests (constant & TVD) verified successfully!")
 
 
 if __name__ == "__main__":

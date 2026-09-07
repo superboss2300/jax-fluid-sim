@@ -143,10 +143,11 @@ class ReactionMechanism:
         # Evaluate g°/(RT) at each reaction's effective reverse temperature
         # Use vmap to evaluate g_over_RT across reaction temperatures
         def eval_rxn_Kc(r_idx):
+            clip_exp = 700.0 if jax.config.x64_enabled else 85.0
             tr = T_safe[r_idx]
             g_s = jnp.stack([g_over_RT(p, tr) for p in self.polys], axis=0)
             delta_G_over_RT = jnp.dot(self.delta_nu[r_idx], g_s)
-            Kp = jnp.exp(-jnp.clip(delta_G_over_RT, -500.0, 500.0))
+            Kp = jnp.exp(-jnp.clip(delta_G_over_RT, -clip_exp, clip_exp))
             conv = (P_STD / (R_UNIV * tr)) ** self.delta_n[r_idx]
             return Kp * conv
 
@@ -171,6 +172,10 @@ class ReactionMechanism:
         if Tv is None:
             Tv = T
 
+        clip_exp = 700.0 if jax.config.x64_enabled else 85.0
+        min_kc = 1.0e-300 if jax.config.x64_enabled else 1.0e-30
+        min_c = 1.0e-100 if jax.config.x64_enabled else 1.0e-30
+
         # Safe molar concentrations C_s = rho_s / M_s in mol / m^3
         C = jnp.maximum(rho_species / self.molar_masses, 0.0)
 
@@ -178,17 +183,17 @@ class ReactionMechanism:
         kf = self.forward_rate_constants(T, Tv)
         Kc = self.equilibrium_constants(T, Tv)
         # Reverse rate constants kr = kf / Kc
-        kr = kf / jnp.maximum(Kc, 1.0e-300)
+        kr = kf / jnp.maximum(Kc, min_kc)
 
         # Forward and backward concentration products:
         # qf_r = kf_r * prod_s (C_s ^ nu'_rs)
         # qr_r = kr_r * prod_s (C_s ^ nu''_rs)
-        log_C = jnp.log(jnp.maximum(C, 1.0e-100))
+        log_C = jnp.log(jnp.maximum(C, min_c))
         log_fwd_prod = jnp.dot(self.nu_prime, log_C)
         log_rev_prod = jnp.dot(self.nu_double_prime, log_C)
 
-        fwd_reactants = jnp.exp(jnp.clip(log_fwd_prod, -500.0, 500.0))
-        rev_products = jnp.exp(jnp.clip(log_rev_prod, -500.0, 500.0))
+        fwd_reactants = jnp.exp(jnp.clip(log_fwd_prod, -clip_exp, clip_exp))
+        rev_products = jnp.exp(jnp.clip(log_rev_prod, -clip_exp, clip_exp))
 
         # Third-body concentrations [M]_r
         M_eff = jnp.dot(self.alpha_M, C)
