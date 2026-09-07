@@ -144,8 +144,86 @@ class HybridSSPRK3:
             maximum_rates.append(jnp.max(rate))
         return self.cfl / jnp.max(jnp.stack(maximum_rates))
 
+    def local_dt(self, states, cfl=None, boundary_state=None):
+        """Compute element-wise local stable time step field for rapid steady-state convergence."""
+        cfl_val = self.cfl if cfl is None else cfl
+        degree_factor = 2 * self.solver.polynomial_degree + 1
+        dts = {}
+        for block_id, block in enumerate(self.solver.mesh.element_blocks):
+            element_type = block.element_type
+            U = states[element_type]
+            W = self.solver.conserved_to_primitive(U)
+            density = jnp.maximum(W[..., 0], 1.0e-14)
+            pressure = jnp.maximum(W[..., 4], 1.0e-14)
+            speed = (
+                jnp.linalg.norm(W[..., 1:4], axis=-1)
+                + jnp.sqrt(self.solver.gamma * pressure / density)
+            )
+            element_speed = jnp.max(speed, axis=1)
+            length = self.characteristic_lengths[element_type]
+            rate = degree_factor * element_speed / length
+
+            if self.solver.dynamic_viscosity > 0.0 or self.solver.use_wale:
+                minimum_density = jnp.min(density, axis=1)
+                effective_viscosity = jnp.full_like(
+                    minimum_density, self.solver.dynamic_viscosity
+                )
+                effective_conductivity = jnp.full_like(
+                    minimum_density, self.solver.thermal_conductivity
+                )
+                if self.solver.use_wale:
+                    reference = self.operator.geometry.reference_elements[
+                        element_type
+                    ]
+                    metrics = self.operator.geometry.element_metrics[block_id]
+                    variables = self.solver.viscous_variables(U)
+                    gradient = jnp.einsum(
+                        "eim,eqid->eqmd",
+                        variables,
+                        metrics.physical_basis_gradients,
+                    )
+                    U_quadrature = jnp.einsum(
+                        "qi,eiv->eqv",
+                        reference.basis(reference.volume_points),
+                        U,
+                    )
+                    width = (
+                        jnp.sum(metrics.integration_weights, axis=1)
+                        ** (1.0/3.0)
+                        / (self.solver.polynomial_degree + 1)
+                    )
+                    turbulent = self.solver.wale_dynamic_viscosity(
+                        U_quadrature, gradient, width[:, None]
+                    )
+                    turbulent = jnp.max(turbulent, axis=1)
+                    effective_viscosity = effective_viscosity + turbulent
+                    effective_conductivity = (
+                        effective_conductivity
+                        + turbulent
+                        * self.solver.specific_heat_cp
+                        / self.solver.turbulent_prandtl
+                    )
+                diffusivity = jnp.maximum(
+                    (4.0/3.0) * effective_viscosity / minimum_density,
+                    effective_conductivity
+                    / (minimum_density * self.solver.specific_heat_cp),
+                )
+                penalty = float(getattr(self.operator, "br2_stabilization", 1.0))
+                rate = rate + (
+                    2.0 * penalty * degree_factor**2
+                    * diffusivity / length**2
+                )
+            dt_elem = cfl_val / jnp.maximum(rate, 1.0e-12)
+            dts[element_type] = dt_elem[:, None, None]
+        return dts
+
     @staticmethod
     def _add_scaled(left, scale, right):
+        if isinstance(scale, dict):
+            return {
+                name: left[name] + scale[name] * right[name]
+                for name in left
+            }
         return {
             name: left[name] + scale * right[name]
             for name in left
@@ -327,7 +405,10 @@ class HybridSSPRK3:
         """
         mood = self.limiter is not None and hasattr(self.limiter, "recompute")
         dtype = next(iter(states.values())).dtype
-        step_dt = jnp.asarray(dt, dtype=dtype)
+        if isinstance(dt, dict):
+            step_dt = {k: jnp.asarray(v, dtype=dtype) for k, v in dt.items()}
+        else:
+            step_dt = jnp.asarray(dt, dtype=dtype)
         zero = jnp.asarray(0.0, dtype=dtype)
         one = jnp.asarray(1.0, dtype=dtype)
         three_quarters = jnp.asarray(0.75, dtype=dtype)

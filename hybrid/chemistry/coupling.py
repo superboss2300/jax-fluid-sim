@@ -187,6 +187,13 @@ class ReactingFlowCoupler:
                 f"State has {U_block.shape[-1]} variables; expected at least "
                 f"{5 + self.num_species} for reacting mixture."
             )
+        if isinstance(dt, (jax.Array, np.ndarray)) and dt.ndim > 0:
+            flat_dt = jnp.squeeze(dt)
+            vmap_elem = jax.vmap(
+                jax.vmap(self._react_single_cell, in_axes=(0, None)),
+                in_axes=(0, 0),
+            )
+            return vmap_elem(U_block, flat_dt)
         return self._vmapped_cell_step(U_block, dt)
 
     def advance(

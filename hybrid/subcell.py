@@ -792,15 +792,21 @@ class HybridSubcellFV:
         new_fluxes, old_fluxes = self._external_fluxes(
             states, subcell_states, troubled, residual, boundary_state
         )
+        def _get_dt(n):
+            if isinstance(dt, dict):
+                v = dt[n]
+                return v if v.ndim == 3 else v[..., None]
+            return dt
+
         fv_candidate = {
             name: subcell_states[name]
-            + dt * residual[name] / self.projections[name].volumes[..., None]
+            + _get_dt(name) * residual[name] / self.projections[name].volumes[..., None]
             for name in subcell_states
         }
         if additional_rhs is not None:
             fv_candidate = {
                 name: value
-                + dt * dg_to_subcells(additional_rhs[name], self.projections[name])
+                + _get_dt(name) * dg_to_subcells(additional_rhs[name], self.projections[name])
                 for name, value in fv_candidate.items()
             }
         reconstructed = {
@@ -830,10 +836,18 @@ class HybridSubcellFV:
             difference = jnp.where(
                 active[:, None], new_flux - old_flux, 0.0
             )
+            def _get_face_dt(dt_val, b_name, cells):
+                if isinstance(dt_val, dict):
+                    v = dt_val[b_name]
+                    v_elem = v[cells]
+                    return v_elem.reshape(v_elem.shape[0], 1)
+                return dt_val
+
             owner_volume = jnp.sum(
                 self.projections[owner_name].volumes[owner_cells], axis=1
             )
-            owner_correction = -dt * difference / owner_volume[:, None]
+            dt_own = _get_face_dt(dt, owner_name, owner_cells)
+            owner_correction = -dt_own * difference / owner_volume[:, None]
             owner_correction = jnp.where(
                 (active & ~owner_flag)[:, None], owner_correction, 0.0
             )
@@ -844,7 +858,8 @@ class HybridSubcellFV:
                 neighbor_volume = jnp.sum(
                     self.projections[neighbor_name].volumes[neighbor_cells], axis=1
                 )
-                neighbor_correction = dt * difference / neighbor_volume[:, None]
+                dt_nbr = _get_face_dt(dt, neighbor_name, neighbor_cells)
+                neighbor_correction = dt_nbr * difference / neighbor_volume[:, None]
                 neighbor_correction = jnp.where(
                     (active & ~neighbor_flag)[:, None], neighbor_correction, 0.0
                 )

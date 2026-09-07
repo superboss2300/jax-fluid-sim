@@ -287,9 +287,14 @@ class HybridMOODSubcellLimiter:
         boundary_state=None,
         additional_rhs=None,
         detection_state=None,
+        troubled_mask=None,
     ):
-        troubled = self.troubled(
-            dg_candidate if detection_state is None else detection_state
+        troubled = (
+            troubled_mask
+            if troubled_mask is not None
+            else self.troubled(
+                dg_candidate if detection_state is None else detection_state
+            )
         )
         any_troubled = jnp.asarray(False)
         for flag in troubled.values():

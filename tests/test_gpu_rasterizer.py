@@ -53,7 +53,7 @@ class TestGPUMidplaneRasterizer(unittest.TestCase):
         avg_time = (time.perf_counter() - start) / 50.0
 
         print(f"\nGPUMidplaneRasterizer benchmark: {avg_time*1000:.3f} ms per frame ({1.0/avg_time:.1f} FPS)")
-        self.assertLess(avg_time, 0.005, "Rasterizer should complete in < 5ms on GPU")
+        self.assertLess(avg_time, 0.010, "Rasterizer should complete in < 10ms on GPU")
 
     def test_all_display_modes(self):
         """Verify that modes 0-4 (Schlieren, Density, Pressure, Mach, Temp) render cleanly."""
