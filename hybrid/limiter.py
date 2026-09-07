@@ -262,13 +262,13 @@ class HybridMOODSubcellLimiter:
     recomputation.
     """
 
-    def __init__(self, operator, threshold=2.0e-2, positivity=None):
+    def __init__(self, operator, threshold=2.0e-2, positivity=None, reconstruction="weno"):
         self.operator = operator
         self.sensor = HybridTroubledCellSensor(operator, threshold)
         self.positivity = (
             HybridPositivityLimiter(operator) if positivity is None else positivity
         )
-        self.subcell = HybridSubcellFV(operator)
+        self.subcell = HybridSubcellFV(operator, reconstruction=reconstruction)
 
     def troubled(self, candidate):
         _, flags = self.sensor(candidate)

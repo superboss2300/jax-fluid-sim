@@ -103,7 +103,11 @@ def run(args):
         pressure_floor=args.pressure_floor,
     )
     if args.subcell_fv:
-        limiter = HybridMOODSubcellLimiter(operator, positivity=positivity)
+        limiter = HybridMOODSubcellLimiter(
+            operator,
+            positivity=positivity,
+            reconstruction=args.reconstruction,
+        )
     elif args.shock_limiter:
         limiter = HybridModalShockLimiter(operator, positivity=positivity)
     else:
@@ -268,6 +272,12 @@ def main():
     parser.add_argument("--wale", action="store_true")
     parser.add_argument("--shock-limiter", action="store_true")
     parser.add_argument("--subcell-fv", action="store_true")
+    parser.add_argument(
+        "--reconstruction",
+        choices=("constant", "tvd", "weno"),
+        default="weno",
+        help="Subcell FV reconstruction: constant, tvd, or weno (default: weno)",
+    )
     parser.add_argument("--vtk", action="store_true")
     parser.add_argument("--progress-updates", type=int, default=10)
     parser.add_argument("--maximum-steps", type=int, default=100000)

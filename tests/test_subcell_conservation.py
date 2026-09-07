@@ -65,7 +65,7 @@ def test_conservation():
         "wedge": jnp.zeros(len(states["wedge"]), dtype=bool).at[jnp.asarray([5, 12])].set(True),
     }
 
-    for recon in ["constant", "tvd"]:
+    for recon in ["constant", "tvd", "weno"]:
         subcell = HybridSubcellFV(operator, reconstruction=recon)
         corrected = subcell.recompute(states, dg_candidate, dt, troubled, boundary_state=boundary)
 
@@ -76,7 +76,7 @@ def test_conservation():
         print(f"[{recon.upper()}] Max discrepancy in total conserved quantities: {float(diff):.6e}")
         assert float(diff) < 1.0e-3, f"Conservation violation ({recon}): {float(diff)}"
 
-    print("All discrete conservation tests (constant & TVD) verified successfully!")
+    print("All discrete conservation tests (constant, TVD & WENO) verified successfully!")
 
 
 if __name__ == "__main__":

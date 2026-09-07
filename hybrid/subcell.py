@@ -369,7 +369,7 @@ def subcells_to_dg(subcell_averages, projection):
 class HybridSubcellFV:
     """Conservative MOOD recomputation operator for P2 tetra/wedge blocks."""
 
-    def __init__(self, operator, division_count=4, reconstruction="tvd"):
+    def __init__(self, operator, division_count=4, reconstruction="weno"):
         self.operator = operator
         self.solver = operator.solver
         self.mesh = operator.mesh
@@ -492,37 +492,82 @@ class HybridSubcellFV:
         grad_U = grad_U.at[:, neighbor].add(face_contrib)
         grad_U = grad_U / jnp.maximum(volumes[:, :, None, None], 1.0e-14)
 
-        # 2. Reconstruct states at internal face centers
+        # 2. Directional derivatives along centerline d_center = x_N - x_O
         d_center = centers[:, neighbor] - centers[:, owner]
         du_owner = jnp.sum(grad_U[:, owner] * d_center[:, :, :, None], axis=2)
         du_neighbor = jnp.sum(grad_U[:, neighbor] * (-d_center[:, :, :, None]), axis=2)
 
-        # 3. Slope limiters (smooth Venkatakrishnan TVD)
-        eps = 1.0e-12
-        r_owner = delta_U / (du_owner + jnp.sign(du_owner) * eps)
-        r_neighbor = (-delta_U) / (du_neighbor + jnp.sign(du_neighbor) * eps)
+        if self.reconstruction == "tvd":
+            # 3. Slope limiters (smooth Venkatakrishnan TVD)
+            eps = 1.0e-12
+            r_owner = delta_U / (du_owner + jnp.sign(du_owner) * eps)
+            r_neighbor = (-delta_U) / (du_neighbor + jnp.sign(du_neighbor) * eps)
 
-        phi_owner = jnp.clip(
-            jnp.where(
-                r_owner > 0.0,
-                (r_owner**2 + 2.0 * r_owner) / (r_owner**2 + r_owner + 2.0),
+            phi_owner = jnp.clip(
+                jnp.where(
+                    r_owner > 0.0,
+                    (r_owner**2 + 2.0 * r_owner) / (r_owner**2 + r_owner + 2.0),
+                    0.0,
+                ),
                 0.0,
-            ),
-            0.0,
-            1.0,
-        )
-        phi_neighbor = jnp.clip(
-            jnp.where(
-                r_neighbor > 0.0,
-                (r_neighbor**2 + 2.0 * r_neighbor) / (r_neighbor**2 + r_neighbor + 2.0),
+                1.0,
+            )
+            phi_neighbor = jnp.clip(
+                jnp.where(
+                    r_neighbor > 0.0,
+                    (r_neighbor**2 + 2.0 * r_neighbor) / (r_neighbor**2 + r_neighbor + 2.0),
+                    0.0,
+                ),
                 0.0,
-            ),
-            0.0,
-            1.0,
-        )
+                1.0,
+            )
 
-        U_left = U[:, owner] + 0.5 * phi_owner * du_owner
-        U_right = U[:, neighbor] + 0.5 * phi_neighbor * du_neighbor
+            U_left = U[:, owner] + 0.5 * phi_owner * du_owner
+            U_right = U[:, neighbor] + 0.5 * phi_neighbor * du_neighbor
+
+        elif self.reconstruction == "weno":
+            # 3. Third-order Central WENO (CWENO-Z)
+            # Candidate 0: High-order central cubic Hermite interpolant at face midpoint
+            s_owner = du_owner
+            s_neighbor = -du_neighbor
+            P_high = 0.5 * (U[:, owner] + U[:, neighbor]) + 0.125 * (s_owner - s_neighbor)
+            P_owner = U[:, owner] + 0.5 * s_owner
+            P_neighbor = U[:, neighbor] - 0.5 * s_neighbor
+            P_const_owner = U[:, owner]
+            P_const_neighbor = U[:, neighbor]
+
+            # Smoothness indicators
+            eps_s = 1.0e-12
+            s_secant = delta_U
+            beta_high = (s_neighbor - s_owner) ** 2 + 0.1 * s_secant ** 2
+            beta_owner = (s_secant - s_owner) ** 2 + 0.1 * s_secant ** 2
+            beta_neighbor = (s_secant - s_neighbor) ** 2 + 0.1 * s_secant ** 2
+            beta_const = s_secant ** 2
+
+            # WENO-Z global oscillation indicator tau
+            tau = jnp.abs(beta_const - beta_high)
+
+            # Linear optimal weights: 70% central high-order, 28% directional, 2% constant
+            d0, d1, d2 = 0.70, 0.28, 0.02
+
+            # Left state weights (owner side)
+            a0_L = d0 * (1.0 + (tau / (beta_high + eps_s)) ** 2)
+            a1_L = d1 * (1.0 + (tau / (beta_owner + eps_s)) ** 2)
+            a2_L = d2 * (1.0 + (tau / (beta_const + eps_s)) ** 2)
+            sum_a_L = a0_L + a1_L + a2_L
+            w0_L, w1_L, w2_L = a0_L / sum_a_L, a1_L / sum_a_L, a2_L / sum_a_L
+            U_left = w0_L * P_high + w1_L * P_owner + w2_L * P_const_owner
+
+            # Right state weights (neighbor side)
+            a0_R = d0 * (1.0 + (tau / (beta_high + eps_s)) ** 2)
+            a1_R = d1 * (1.0 + (tau / (beta_neighbor + eps_s)) ** 2)
+            a2_R = d2 * (1.0 + (tau / (beta_const + eps_s)) ** 2)
+            sum_a_R = a0_R + a1_R + a2_R
+            w0_R, w1_R, w2_R = a0_R / sum_a_R, a1_R / sum_a_R, a2_R / sum_a_R
+            U_right = w0_R * P_high + w1_R * P_neighbor + w2_R * P_const_neighbor
+
+        else:
+            raise ValueError(f"Unknown subcell reconstruction mode: {self.reconstruction!r}")
 
         # Admissibility preservation (positive density and internal energy)
         min_rho = 1.0e-14
