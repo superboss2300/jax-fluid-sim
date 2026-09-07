@@ -11,8 +11,8 @@ class HybridSSPRK3:
         operator,
         cfl=0.15,
         limiter=None,
-        density_floor=1.0e-6,
-        pressure_floor=1.0e-6,
+        density_floor=1.0e-7,
+        pressure_floor=1.0e-7,
         maximum_rejections=16,
     ):
         self.operator = operator

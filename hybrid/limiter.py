@@ -11,11 +11,18 @@ from .subcell import HybridSubcellFV
 class HybridPositivityLimiter:
     """Zhang--Shu-style scaling toward each physical cell average."""
 
-    def __init__(self, operator, density_floor=1.0e-10, pressure_floor=1.0e-10):
+    def __init__(
+        self,
+        operator,
+        density_floor=1.0e-10,
+        pressure_floor=1.0e-10,
+        relative_floor=0.05,
+    ):
         self.operator = operator
         self.solver = operator.solver
         self.density_floor = float(density_floor)
         self.pressure_floor = float(pressure_floor)
+        self.relative_floor = float(relative_floor)
         self.face_sample_basis = self._build_face_sample_basis()
 
     def _build_face_sample_basis(self):
@@ -84,21 +91,32 @@ class HybridPositivityLimiter:
         )
         return jnp.concatenate([U, Uq, Uf], axis=1)
 
-    def _pressure_ok(self, mean, deviations, theta):
+    def _pressure_ok(self, mean, deviations, theta, floor=None):
         samples = mean[:, None, :] + theta[:, None, None] * deviations
         pressure = self.solver.conserved_to_primitive(samples)[..., 4]
-        return jnp.min(pressure, axis=1) >= self.pressure_floor
+        target = self.pressure_floor if floor is None else floor
+        return jnp.min(pressure, axis=1) >= target
 
     def limit_block(self, block_id, U):
         block = self.solver.mesh.element_blocks[block_id]
         mean = self._mean(block_id, U)
+        mean_primitive = self.solver.conserved_to_primitive(mean)
+        mean_rho = mean_primitive[..., 0]
+        mean_p = mean_primitive[..., 4]
+        effective_density_floor = jnp.maximum(
+            self.density_floor, self.relative_floor * mean_rho
+        )
+        effective_pressure_floor = jnp.maximum(
+            self.pressure_floor, self.relative_floor * mean_p
+        )
+
         samples = self._sample(block.element_type, U)
         deviations = samples - mean[:, None, :]
         minimum_density = jnp.min(samples[..., 0], axis=1)
         density_denominator = mean[:, 0] - minimum_density
         density_theta = jnp.where(
-            minimum_density < self.density_floor,
-            (mean[:, 0] - self.density_floor)
+            minimum_density < effective_density_floor,
+            (mean[:, 0] - effective_density_floor)
             / jnp.maximum(density_denominator, 1.0e-30),
             1.0,
         )
@@ -108,11 +126,13 @@ class HybridPositivityLimiter:
         def bisect(_, interval):
             low, high = interval
             middle = 0.5 * (low + high)
-            valid = self._pressure_ok(mean, deviations, middle)
+            valid = self._pressure_ok(mean, deviations, middle, effective_pressure_floor)
             return jnp.where(valid, middle, low), jnp.where(valid, high, middle)
 
         lower, _ = jax.lax.fori_loop(0, 30, bisect, (lower, upper))
-        pressure_at_upper_ok = self._pressure_ok(mean, deviations, upper)
+        pressure_at_upper_ok = self._pressure_ok(
+            mean, deviations, upper, effective_pressure_floor
+        )
         theta = jnp.where(pressure_at_upper_ok, upper, lower)
         return mean[:, None, :] + theta[:, None, None] * (
             U - mean[:, None, :]

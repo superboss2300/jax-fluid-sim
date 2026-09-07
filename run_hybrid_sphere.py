@@ -131,6 +131,7 @@ def run(args):
         operator,
         density_floor=args.density_floor,
         pressure_floor=args.pressure_floor,
+        relative_floor=args.relative_floor,
     )
     if args.subcell_fv:
         limiter = HybridMOODSubcellLimiter(
@@ -469,8 +470,14 @@ def main():
     parser.add_argument("--progress-updates", type=int, default=10)
     parser.add_argument("--maximum-steps", type=int, default=100000)
     parser.add_argument("--maximum-rejections", type=int, default=16)
-    parser.add_argument("--density-floor", type=float, default=1.0e-5)
-    parser.add_argument("--pressure-floor", type=float, default=1.0e-5)
+    parser.add_argument("--density-floor", type=float, default=1.0e-7)
+    parser.add_argument("--pressure-floor", type=float, default=1.0e-7)
+    parser.add_argument(
+        "--relative-floor",
+        type=float,
+        default=0.05,
+        help="Positivity limiter relative floor as a fraction of cell average (default: 0.05).",
+    )
     parser.add_argument("--output-directory", default="outputs/hybrid_sphere")
     parser.add_argument(
         "--compilation-cache",
