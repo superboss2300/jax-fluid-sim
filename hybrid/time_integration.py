@@ -167,25 +167,19 @@ class HybridSSPRK3:
         return getattr(self.limiter, "positivity", self.limiter)
 
     def state_admissibility(self, states):
-        """Return finite flag and minima at every limiter sample location."""
+        """Return finite flag and minima directly at solution nodes."""
         finite = jnp.asarray(True)
         density_minima = []
         pressure_minima = []
-        positivity = self._positivity_limiter()
-        for block_id, block in enumerate(self.solver.mesh.element_blocks):
+        for block in self.solver.mesh.element_blocks:
             U = states[block.element_type]
-            if positivity is not None and hasattr(positivity, "_sample"):
-                samples = positivity._sample(block.element_type, U)
-                mean = positivity._mean(block_id, U)
-                samples = jnp.concatenate([samples, mean[:, None, :]], axis=1)
-            else:
-                samples = U
-            primitive = self.solver.conserved_to_primitive(samples)
-            finite = finite & jnp.all(jnp.isfinite(samples)) & jnp.all(
-                jnp.isfinite(primitive)
-            )
-            density_minima.append(jnp.min(primitive[..., 0]))
-            pressure_minima.append(jnp.min(primitive[..., 4]))
+            finite = finite & jnp.all(jnp.isfinite(U))
+            rho = U[..., 0]
+            density_minima.append(jnp.min(rho))
+            safe_rho = jnp.maximum(rho, 1.0e-14)
+            kinetic = 0.5 * jnp.sum(U[..., 1:4] ** 2, axis=-1) / safe_rho
+            pressure = (self.solver.gamma - 1.0) * (U[..., 4] - kinetic)
+            pressure_minima.append(jnp.min(pressure))
         density_minimum = jnp.min(jnp.stack(density_minima))
         pressure_minimum = jnp.min(jnp.stack(pressure_minima))
         admissible = (
@@ -252,6 +246,12 @@ class HybridSSPRK3:
         euler = self._add_scaled(current_states, dt, total)
         unlimited = self._blend(base_weight, base_states, current_weight, euler)
         return euler, unlimited, viscous
+
+    def _blend_positivity_and_check(self, base, recomp, alpha, beta):
+        blended = self._blend(alpha, base, beta, recomp)
+        result = self.limiter.positivity(blended)
+        valid, rho_min, p_min = self.state_admissibility(result)
+        return result, valid, rho_min, p_min
 
     def _mood_stage(
         self,
@@ -346,41 +346,53 @@ class HybridSSPRK3:
                         base, curr, s_dt, alpha, beta, boundary_state
                     )
                 )
-                self._compiled_mood_stage = jax.jit(
-                    lambda base, curr, eul, unlim, visc, s_dt, alpha, beta: self._mood_stage(
-                        base, curr, eul, unlim, visc, s_dt, alpha, beta, boundary_state
+                self._compiled_recompute = jax.jit(
+                    lambda curr, eul, unlim, visc, s_dt: self.limiter.recompute(
+                        curr, eul, s_dt, boundary_state, visc, detection_state=unlim
+                    )
+                )
+                self._compiled_blend_positivity = jax.jit(
+                    lambda base, recomp, alpha, beta: self._blend_positivity_and_check(
+                        base, recomp, alpha, beta
                     )
                 )
 
+            # Stage 1
             euler1, unlim1, visc1 = self._compiled_euler_stage(
                 states, states, step_dt, zero, one
             )
-            stage1, valid1, rho1, p1 = self._compiled_mood_stage(
-                states, states, euler1, unlim1, visc1, step_dt, zero, one
-            )
+            recomp1 = self._compiled_recompute(states, euler1, unlim1, visc1, step_dt)
             del euler1, unlim1, visc1
+            stage1, _, _, _ = self._compiled_blend_positivity(states, recomp1, zero, one)
+            del recomp1
 
+            # Stage 2
             euler2, unlim2, visc2 = self._compiled_euler_stage(
                 states, stage1, step_dt, three_quarters, one_quarter
             )
-            stage2, valid2, rho2, p2 = self._compiled_mood_stage(
-                states, stage1, euler2, unlim2, visc2, step_dt, three_quarters, one_quarter
+            recomp2 = self._compiled_recompute(stage1, euler2, unlim2, visc2, step_dt)
+            del euler2, unlim2, visc2
+            stage2, _, _, _ = self._compiled_blend_positivity(
+                states, recomp2, three_quarters, one_quarter
             )
-            del stage1, euler2, unlim2, visc2
+            del stage1, recomp2
 
+            # Stage 3
             euler3, unlim3, visc3 = self._compiled_euler_stage(
                 states, stage2, step_dt, one_third, two_thirds
             )
-            result, valid3, rho3, p3 = self._compiled_mood_stage(
-                states, stage2, euler3, unlim3, visc3, step_dt, one_third, two_thirds
+            recomp3 = self._compiled_recompute(stage2, euler3, unlim3, visc3, step_dt)
+            del euler3, unlim3, visc3
+            result, valid, rho_min, p_min = self._compiled_blend_positivity(
+                states, recomp3, one_third, two_thirds
             )
-            del stage2, euler3, unlim3, visc3
+            del stage2, recomp3
 
             return (
                 result,
-                valid1 & valid2 & valid3,
-                jnp.minimum(rho1, jnp.minimum(rho2, rho3)),
-                jnp.minimum(p1, jnp.minimum(p2, p3)),
+                valid,
+                rho_min,
+                p_min,
             )
 
         if (

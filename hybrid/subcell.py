@@ -483,19 +483,20 @@ class HybridSubcellFV:
         # Face difference vector across internal faces
         delta_U = U[:, neighbor] - U[:, owner]
 
-        # 1. Green-Gauss gradient on subcells
-        flux_geom = 0.5 * normals * areas[:, :, None]
-        face_contrib = delta_U[:, :, None, :] * flux_geom[:, :, :, None]
-
-        grad_U = jnp.zeros((U.shape[0], num_cells, 3, U.shape[-1]), dtype=U.dtype)
-        grad_U = grad_U.at[:, owner].add(face_contrib)
-        grad_U = grad_U.at[:, neighbor].add(face_contrib)
-        grad_U = grad_U / jnp.maximum(volumes[:, :, None, None], 1.0e-14)
-
-        # 2. Directional derivatives along centerline d_center = x_N - x_O
+        # 1. Green-Gauss gradient directional derivatives on subcells (component-wise to eliminate 4D tensor explosion)
         d_center = centers[:, neighbor] - centers[:, owner]
-        du_owner = jnp.sum(grad_U[:, owner] * d_center[:, :, :, None], axis=2)
-        du_neighbor = jnp.sum(grad_U[:, neighbor] * (-d_center[:, :, :, None]), axis=2)
+        du_owner = jnp.zeros_like(delta_U)
+        du_neighbor = jnp.zeros_like(delta_U)
+
+        for dim in range(3):
+            flux_dim = 0.5 * normals[:, :, dim] * areas
+            contrib_dim = flux_dim[:, :, None] * delta_U
+            grad_dim = jnp.zeros((U.shape[0], num_cells, U.shape[-1]), dtype=U.dtype)
+            grad_dim = grad_dim.at[:, owner].add(contrib_dim)
+            grad_dim = grad_dim.at[:, neighbor].add(contrib_dim)
+            grad_dim = grad_dim / jnp.maximum(volumes[:, :, None], 1.0e-14)
+            du_owner = du_owner + grad_dim[:, owner] * d_center[:, :, dim, None]
+            du_neighbor = du_neighbor - grad_dim[:, neighbor] * d_center[:, :, dim, None]
 
         if self.reconstruction == "tvd":
             # 3. Slope limiters (smooth Venkatakrishnan TVD)

@@ -33,7 +33,7 @@ class GPUMidplaneRasterizer:
         self.sphere_radius = float(sphere_radius)
         self.sphere_center = sphere_center
         self.layout = self.solver.layout
-        self.num_vars = self.layout.number_of_variables
+        self.num_vars = 5  # rho, u, v, w, p (species not needed for midplane field visualization)
 
         # 1. Precompute cut geometry and node indexing on CPU once at startup
         self._build_slice_tables()
@@ -268,11 +268,21 @@ class GPUMidplaneRasterizer:
         Returns:
             (rgba, vmin, vmax): (ny, nx, 4) uint8 image and actual field limits.
         """
-        # Convert conserved blocks to primitives and flatten
+        # Convert conserved blocks to 5-variable primitives (rho, u, v, w, p) and flatten
         primitives = []
         for block in self.operator.mesh.element_blocks:
-            W = self.solver.conserved_to_primitive(states[block.element_type])
-            primitives.append(W.reshape(-1, self.num_vars))
+            U = states[block.element_type]
+            density = U[..., 0]
+            momentum = U[..., 1:4]
+            total_energy = U[..., 4]
+            safe_density = jnp.maximum(density, 1.0e-14)
+            velocity = momentum / safe_density[..., None]
+            kinetic_energy = 0.5 * jnp.sum(momentum ** 2, axis=-1) / safe_density
+            pressure = (self.solver.gamma - 1.0) * (total_energy - kinetic_energy)
+            W_5 = jnp.concatenate(
+                [density[..., None], velocity, pressure[..., None]], axis=-1
+            )
+            primitives.append(W_5.reshape(-1, 5))
 
         W_flat = jnp.concatenate(primitives, axis=0)
 

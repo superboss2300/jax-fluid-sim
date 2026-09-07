@@ -1,168 +1,22 @@
 """Asynchronous native desktop GUI window for real-time JAX simulation monitoring.
 
-Runs an independent Tkinter process to display GPU-rasterized RGBA frames,
-eliminating GIL contention and ensuring the solver thread never stalls.
+Runs an independent, isolated subprocess to display GPU-rasterized RGBA frames
+via POSIX shared memory, ensuring 0 bytes of GPU memory overhead and zero
+solver thread contention.
 """
 
-import multiprocessing as mp
-from queue import Empty, Full
-import time
+import json
+from multiprocessing.shared_memory import SharedMemory
+import os
+import queue
+import subprocess
+import sys
+import threading
 from typing import Any
 import numpy as np
 
 from .gpu_rasterizer import GPUMidplaneRasterizer
-
-
-MODE_NAMES = {
-    0: "Numerical Schlieren log10(1 + 15*|∇ρ|/ρ_ref)",
-    1: "Density ρ [kg/m³]",
-    2: "Pressure p [Pa]",
-    3: "Mach Number",
-    4: "Temperature T [K]",
-}
-
-
-def _gui_worker_process(
-    frame_queue: mp.Queue,
-    cmd_queue: mp.Queue,
-    resolution: tuple[int, int],
-    title: str = "JAX-Fluid-Sim: Live GPU Monitor",
-):
-    """Independent desktop window process running on the native display server."""
-    try:
-        import tkinter as tk
-        from PIL import Image, ImageTk
-    except ImportError as exc:
-        print(f"[LiveGUI] Could not import Tkinter or PIL: {exc}")
-        return
-
-    nx, ny = resolution
-
-    root = tk.Tk()
-    root.title(title)
-    root.configure(bg="#01051f")
-    root.resizable(False, False)
-
-    # Top telemetry header
-    header_frame = tk.Frame(root, bg="#01051f", padx=12, pady=6)
-    header_frame.pack(fill=tk.X)
-
-    title_label = tk.Label(
-        header_frame,
-        text="JAX-Fluid-Sim | Hypersonic DG/FV Monitor",
-        font=("Helvetica", 12, "bold"),
-        fg="#ffffff",
-        bg="#01051f",
-    )
-    title_label.pack(side=tk.LEFT)
-
-    telemetry_label = tk.Label(
-        header_frame,
-        text="Initializing GPU pipeline...",
-        font=("Monospace", 10),
-        fg="#00a9cf",
-        bg="#01051f",
-    )
-    telemetry_label.pack(side=tk.RIGHT)
-
-    # Canvas for RGBA image
-    canvas = tk.Canvas(
-        root,
-        width=nx,
-        height=ny,
-        bg="#01051f",
-        highlightthickness=1,
-        highlightbackground="#20d49a",
-    )
-    canvas.pack()
-
-    # Initial placeholder image
-    blank = Image.new("RGBA", (nx, ny), (1, 5, 31, 255))
-    current_photo = ImageTk.PhotoImage(blank)
-    img_item = canvas.create_image(0, 0, anchor="nw", image=current_photo)
-
-    # Bottom hotkeys bar
-    footer_frame = tk.Frame(root, bg="#01051f", padx=12, pady=4)
-    footer_frame.pack(fill=tk.X)
-
-    mode_label = tk.Label(
-        footer_frame,
-        text="Mode: [1] Schlieren",
-        font=("Helvetica", 10, "bold"),
-        fg="#20d49a",
-        bg="#01051f",
-    )
-    mode_label.pack(side=tk.LEFT)
-
-    help_label = tk.Label(
-        footer_frame,
-        text="[1] Schlieren  [2] Density  [3] Pressure  [4] Mach  [5] Temp  |  [Q] Close",
-        font=("Helvetica", 9),
-        fg="#888888",
-        bg="#01051f",
-    )
-    help_label.pack(side=tk.RIGHT)
-
-    # Keyboard hotkey bindings
-    def set_mode(mode_id: int):
-        try:
-            cmd_queue.put_nowait({"cmd": "set_mode", "mode": mode_id})
-            mode_label.configure(text=f"Mode: [{mode_id+1}] {MODE_NAMES.get(mode_id, '')[:16]}")
-        except Exception:
-            pass
-
-    root.bind("<Key-1>", lambda e: set_mode(0))
-    root.bind("<Key-2>", lambda e: set_mode(1))
-    root.bind("<Key-3>", lambda e: set_mode(2))
-    root.bind("<Key-4>", lambda e: set_mode(3))
-    root.bind("<Key-5>", lambda e: set_mode(4))
-    root.bind("<Key-q>", lambda e: root.destroy())
-    root.bind("<Escape>", lambda e: root.destroy())
-
-    # Poll frame queue smoothly at ~60 Hz
-    nonlocal_holder = {"photo": current_photo, "last_frame_time": time.perf_counter()}
-
-    def poll_queue():
-        latest_packet = None
-        while True:
-            try:
-                packet = frame_queue.get_nowait()
-                if packet is None or packet[0] == "STOP":
-                    root.destroy()
-                    return
-                latest_packet = packet
-            except Empty:
-                break
-
-        if latest_packet is not None:
-            cmd, rgba_bytes, telemetry = latest_packet
-            if cmd == "FRAME":
-                now = time.perf_counter()
-                fps = 1.0 / max(now - nonlocal_holder["last_frame_time"], 1.0e-5)
-                nonlocal_holder["last_frame_time"] = now
-
-                img = Image.fromarray(rgba_bytes)
-                nonlocal_holder["photo"] = ImageTk.PhotoImage(img)
-                canvas.itemconfig(img_item, image=nonlocal_holder["photo"])
-
-                # Update telemetry text
-                t = telemetry.get("time", 0.0)
-                step = telemetry.get("step", 0)
-                mach = telemetry.get("mach", 0.0)
-                cfl_dt = telemetry.get("dt", 0.0)
-                troubled = telemetry.get("troubled", 0)
-                chem = telemetry.get("chem", "")
-
-                telem_text = (
-                    f"Mach {mach:.1f} | t = {t*1e3:.3f} ms | Step {step} | "
-                    f"CFL dt = {cfl_dt:.2e} | Trb: {troubled} | GUI: {fps:.0f} FPS {chem}"
-                )
-                telemetry_label.configure(text=telem_text)
-
-        root.after(16, poll_queue)
-
-    root.after(16, poll_queue)
-    root.mainloop()
+from .viewer import MODE_NAMES
 
 
 class LiveGUIController:
@@ -179,23 +33,60 @@ class LiveGUIController:
         self.resolution = resolution
         self.interval = max(1, int(update_interval))
         self.title = title
-
-        # Build ultra-fast GPU rasterizer
-        self.rasterizer = GPUMidplaneRasterizer(operator, resolution=resolution)
-
-        # Inter-process queues using spawn context to avoid fork deadlocks with multithreaded JAX/CUDA
-        ctx = mp.get_context("spawn")
-        self.frame_queue = ctx.Queue(maxsize=2)
-        self.cmd_queue = ctx.Queue(maxsize=4)
         self.current_mode = 0
 
-        # Launch background GUI process
-        self.process = ctx.Process(
-            target=_gui_worker_process,
-            args=(self.frame_queue, self.cmd_queue, self.resolution, self.title),
-            daemon=True,
+        # Ultra-fast GPU rasterizer initialized lazily to conserve VRAM during step 1 compilation
+        self.rasterizer = None
+
+        # POSIX Shared Memory for 0-copy frame transfer between processes
+        nx, ny = self.resolution
+        self.shm_size = nx * ny * 4
+        self.shm = SharedMemory(create=True, size=self.shm_size)
+        self.shm_arr = np.ndarray((ny, nx, 4), dtype=np.uint8, buffer=self.shm.buf)
+        self.shm_arr[:] = 0
+
+        # Isolated environment completely hiding GPU devices from the GUI process
+        gui_env = os.environ.copy()
+        gui_env["CUDA_VISIBLE_DEVICES"] = ""
+        gui_env["LIBGL_ALWAYS_SOFTWARE"] = "1"
+        gui_env["__GLX_VENDOR_LIBRARY_NAME"] = "mesa"
+        gui_env["MESA_LOADER_DRIVER_OVERRIDE"] = "llvmpipe"
+        gui_env["JAX_PLATFORMS"] = "cpu"
+        gui_env["JAX_PLATFORM_NAME"] = "cpu"
+
+        # Launch standalone GUI subprocess using direct script path
+        viewer_script = os.path.abspath(os.path.join(os.path.dirname(__file__), "viewer.py"))
+        cmd = [
+            sys.executable,
+            viewer_script,
+            self.shm.name,
+            str(nx),
+            str(ny),
+            self.title,
+        ]
+        self.process = subprocess.Popen(
+            cmd,
+            env=gui_env,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            text=True,
+            bufsize=1,
         )
-        self.process.start()
+
+        # Non-blocking stdout reader thread for receiving GUI hotkey commands
+        self.cmd_queue = queue.Queue()
+        self._reader_thread = threading.Thread(target=self._read_stdout, daemon=True)
+        self._reader_thread.start()
+
+    def _read_stdout(self):
+        """Background thread reading lines from the GUI process stdout."""
+        try:
+            for line in self.process.stdout:
+                cleaned = line.strip()
+                if cleaned:
+                    self.cmd_queue.put(cleaned)
+        except Exception:
+            pass
 
     def update(
         self,
@@ -207,29 +98,37 @@ class LiveGUIController:
         troubled_count: int = 0,
         chem_diags: str = "",
     ):
-        """Render on GPU in 0.2ms and non-blockingly dispatch frame to GUI."""
-        if not self.process.is_alive():
+        """Render on GPU in 0.2ms and dispatch frame via shared memory to GUI."""
+        if self.process.poll() is not None:
             return
 
         # Check for mode change commands from GUI
         while not self.cmd_queue.empty():
             try:
                 cmd_data = self.cmd_queue.get_nowait()
-                if cmd_data.get("cmd") == "set_mode":
-                    self.current_mode = int(cmd_data.get("mode", 0))
-            except Empty:
+                if cmd_data.startswith("mode "):
+                    self.current_mode = int(cmd_data.split()[1])
+            except queue.Empty:
                 break
 
         if step % self.interval != 0:
             return
 
+        # Lazy initialize rasterizer on the first rendered frame
+        if self.rasterizer is None:
+            self.rasterizer = GPUMidplaneRasterizer(
+                self.operator, resolution=self.resolution
+            )
+
         # 1. Ultra-fast GPU rasterization directly from VRAM (~0.2 ms)
         rgba_gpu, _, _ = self.rasterizer.render(states, mode=self.current_mode)
 
-        # 2. Asynchronously copy small 1.4 MB image buffer to CPU (~0.08 ms)
+        # 2. Copy 1.4 MB image buffer directly into shared memory (< 0.05 ms)
         rgba_cpu = np.asarray(rgba_gpu)
+        self.shm_arr[:] = rgba_cpu
 
         telemetry = {
+            "cmd": "FRAME",
             "time": float(sim_time),
             "step": int(step),
             "mach": float(mach),
@@ -239,19 +138,27 @@ class LiveGUIController:
             "mode": self.current_mode,
         }
 
-        # 3. Non-blocking queue put: drop frame if GUI is currently busy, solver NEVER stalls
+        # 3. Send lightweight JSON notification to GUI process
         try:
-            self.frame_queue.put_nowait(("FRAME", rgba_cpu, telemetry))
-        except Full:
+            self.process.stdin.write(json.dumps(telemetry) + "\n")
+            self.process.stdin.flush()
+        except (BrokenPipeError, OSError):
             pass
 
     def close(self):
-        """Cleanly terminate the GUI worker process."""
-        if self.process.is_alive():
+        """Cleanly terminate the GUI subprocess and free shared memory."""
+        if self.process.poll() is None:
             try:
-                self.frame_queue.put_nowait(("STOP", None, None))
-                self.process.join(timeout=1.0)
+                self.process.stdin.write(json.dumps({"cmd": "STOP"}) + "\n")
+                self.process.stdin.flush()
+                self.process.wait(timeout=1.0)
             except Exception:
                 pass
-            if self.process.is_alive():
+            if self.process.poll() is None:
                 self.process.terminate()
+
+        try:
+            self.shm.close()
+            self.shm.unlink()
+        except Exception:
+            pass
