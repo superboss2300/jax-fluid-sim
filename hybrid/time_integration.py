@@ -337,13 +337,39 @@ class HybridSSPRK3:
 
         if mood:
             if (
-                not hasattr(self, "_compiled_euler_stage")
+                not hasattr(self, "_compiled_inviscid")
                 or getattr(self, "_compiled_stage_boundary", None) is not boundary_state
             ):
                 self._compiled_stage_boundary = boundary_state
-                self._compiled_euler_stage = jax.jit(
-                    lambda base, curr, s_dt, alpha, beta: self._euler_stage(
-                        base, curr, s_dt, alpha, beta, boundary_state
+                self._compiled_inviscid = jax.jit(
+                    lambda curr: (
+                        self.operator.inviscid_rhs(curr, boundary_state)
+                        if hasattr(self.operator, "inviscid_rhs")
+                        else self.operator.rhs(curr, boundary_state)
+                    )
+                )
+                self._compiled_viscous = (
+                    jax.jit(lambda curr: self.operator.viscous_rhs(curr, boundary_state))
+                    if hasattr(self.operator, "viscous_rhs")
+                    else None
+                )
+                self._compiled_advance = jax.jit(
+                    lambda curr, base, inv, visc, s_dt, alpha, beta: (
+                        self._add_scaled(
+                            curr,
+                            s_dt,
+                            inv if visc is None else {k: inv[k] + visc[k] for k in inv},
+                        ),
+                        self._blend(
+                            alpha,
+                            base,
+                            beta,
+                            self._add_scaled(
+                                curr,
+                                s_dt,
+                                inv if visc is None else {k: inv[k] + visc[k] for k in inv},
+                            ),
+                        ),
                     )
                 )
                 self._compiled_recompute = jax.jit(
@@ -358,18 +384,22 @@ class HybridSSPRK3:
                 )
 
             # Stage 1
-            euler1, unlim1, visc1 = self._compiled_euler_stage(
-                states, states, step_dt, zero, one
-            )
+            inv1 = self._compiled_inviscid(states)
+            visc1 = self._compiled_viscous(states) if self._compiled_viscous is not None else None
+            euler1, unlim1 = self._compiled_advance(states, states, inv1, visc1, step_dt, zero, one)
+            del inv1
             recomp1 = self._compiled_recompute(states, euler1, unlim1, visc1, step_dt)
             del euler1, unlim1, visc1
             stage1, _, _, _ = self._compiled_blend_positivity(states, recomp1, zero, one)
             del recomp1
 
             # Stage 2
-            euler2, unlim2, visc2 = self._compiled_euler_stage(
-                states, stage1, step_dt, three_quarters, one_quarter
+            inv2 = self._compiled_inviscid(stage1)
+            visc2 = self._compiled_viscous(stage1) if self._compiled_viscous is not None else None
+            euler2, unlim2 = self._compiled_advance(
+                stage1, states, inv2, visc2, step_dt, three_quarters, one_quarter
             )
+            del inv2
             recomp2 = self._compiled_recompute(stage1, euler2, unlim2, visc2, step_dt)
             del euler2, unlim2, visc2
             stage2, _, _, _ = self._compiled_blend_positivity(
@@ -378,9 +408,12 @@ class HybridSSPRK3:
             del stage1, recomp2
 
             # Stage 3
-            euler3, unlim3, visc3 = self._compiled_euler_stage(
-                states, stage2, step_dt, one_third, two_thirds
+            inv3 = self._compiled_inviscid(stage2)
+            visc3 = self._compiled_viscous(stage2) if self._compiled_viscous is not None else None
+            euler3, unlim3 = self._compiled_advance(
+                stage2, states, inv3, visc3, step_dt, one_third, two_thirds
             )
+            del inv3
             recomp3 = self._compiled_recompute(stage2, euler3, unlim3, visc3, step_dt)
             del euler3, unlim3, visc3
             result, valid, rho_min, p_min = self._compiled_blend_positivity(
