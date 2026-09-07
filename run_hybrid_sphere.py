@@ -82,6 +82,8 @@ def run(args):
     operator = HybridNavierStokesOperator(solver)
     farfield = jnp.asarray([density, velocity, 0.0, 0.0, pressure])
     boundary = FarfieldWallBoundary(solver, farfield)
+    if args.soft_start is None:
+        args.soft_start = (args.mach >= 3.0)
     if args.resume:
         restart = np.load(args.resume)
         states = {
@@ -135,9 +137,10 @@ def run(args):
         for block in solver.mesh.element_blocks
     )
     print(
-        f"mesh={args.mesh} p=2 {counts} Mach={args.mach} "
+        f"mesh={args.mesh} p={args.polynomial_degree} {counts} Mach={args.mach} "
         f"Re_D={args.reynolds:g} mu={viscosity:.6e} WALE={args.wale} "
-        f"flux={args.inviscid_flux} subcell_FV={args.subcell_fv}"
+        f"flux={args.inviscid_flux} subcell_FV={args.subcell_fv} "
+        f"soft_start={args.soft_start}"
     )
     print("Compiling on the first step...", flush=True)
 
@@ -161,7 +164,11 @@ def run(args):
             next_progress * args.target_time / args.progress_updates,
         )
         cfl_dt = float(compiled_dt(states))
-        dt = min(retry_scale * cfl_dt, output_time - current_time)
+        if args.soft_start and step < args.soft_start_steps and not args.resume:
+            soft_scale = 0.1 + 0.9 * (step / max(args.soft_start_steps, 1))
+        else:
+            soft_scale = 1.0
+        dt = min(retry_scale * soft_scale * cfl_dt, output_time - current_time)
         if not np.isfinite(dt) or dt <= 0.0:
             raise FloatingPointError(f"invalid timestep at step {step}: {dt}")
         candidate, valid, attempted_rho, attempted_pressure = compiled_step(
@@ -297,6 +304,18 @@ def main():
         choices=("constant", "tvd", "weno"),
         default="weno",
         help="Subcell FV reconstruction: constant, tvd, or weno (default: weno)",
+    )
+    parser.add_argument(
+        "--soft-start",
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help="Enable startup CFL ramp-up (default: auto-enabled for Mach >= 3.0)",
+    )
+    parser.add_argument(
+        "--soft-start-steps",
+        type=int,
+        default=100,
+        help="Number of steps for startup CFL ramp (default: 100)",
     )
     parser.add_argument("--vtk", action="store_true")
     parser.add_argument("--progress-updates", type=int, default=10)

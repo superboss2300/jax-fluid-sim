@@ -233,6 +233,52 @@ class HybridSSPRK3:
             stage1,
         )
 
+    def _euler_stage(
+        self,
+        base_states,
+        current_states,
+        dt,
+        base_weight,
+        current_weight,
+        boundary_state=None,
+    ):
+        if hasattr(self.operator, "inviscid_rhs"):
+            inviscid = self.operator.inviscid_rhs(current_states, boundary_state)
+            viscous = self.operator.viscous_rhs(current_states, boundary_state)
+            total = {name: inviscid[name] + viscous[name] for name in inviscid}
+        else:
+            total = self.operator.rhs(current_states, boundary_state)
+            viscous = None
+        euler = self._add_scaled(current_states, dt, total)
+        unlimited = self._blend(base_weight, base_states, current_weight, euler)
+        return euler, unlimited, viscous
+
+    def _mood_stage(
+        self,
+        base_states,
+        current_states,
+        euler,
+        unlimited,
+        viscous,
+        dt,
+        base_weight,
+        current_weight,
+        boundary_state=None,
+    ):
+        euler_recomputed = self.limiter.recompute(
+            current_states,
+            euler,
+            dt,
+            boundary_state,
+            viscous,
+            detection_state=unlimited,
+        )
+        result = self.limiter.positivity(
+            self._blend(base_weight, base_states, current_weight, euler_recomputed)
+        )
+        valid, rho_min, p_min = self.state_admissibility(result)
+        return result, valid, rho_min, p_min
+
     def rk_stage(
         self,
         base_states,
@@ -262,7 +308,7 @@ class HybridSSPRK3:
                 viscous,
                 detection_state=unlimited,
             )
-            result = self.positivity_or_limit(
+            result = self.limiter.positivity(
                 self._blend(base_weight, base_states, current_weight, euler_recomputed)
             )
         else:
@@ -274,9 +320,69 @@ class HybridSSPRK3:
         """SSP-RK3 plus admissibility diagnostics for memory-limited GPUs.
 
         Instead of unrolling all three stages into one monolithic kernel,
-        each stage is executed through a single JIT-compiled stage kernel.
-        This keeps the CUDA module compact enough to load reliably on 6 GiB GPUs.
+        each stage is executed through modular JIT-compiled kernels.
+        When subcell MOOD limiting is active, the spatial operator and the
+        subcell recompute are compiled into decoupled kernels to prevent
+        XLA compiler memory explosions on large meshes.
         """
+        mood = self.limiter is not None and hasattr(self.limiter, "recompute")
+        dtype = next(iter(states.values())).dtype
+        step_dt = jnp.asarray(dt, dtype=dtype)
+        zero = jnp.asarray(0.0, dtype=dtype)
+        one = jnp.asarray(1.0, dtype=dtype)
+        three_quarters = jnp.asarray(0.75, dtype=dtype)
+        one_quarter = jnp.asarray(0.25, dtype=dtype)
+        one_third = jnp.asarray(1.0 / 3.0, dtype=dtype)
+        two_thirds = jnp.asarray(2.0 / 3.0, dtype=dtype)
+
+        if mood:
+            if (
+                not hasattr(self, "_compiled_euler_stage")
+                or getattr(self, "_compiled_stage_boundary", None) is not boundary_state
+            ):
+                self._compiled_stage_boundary = boundary_state
+                self._compiled_euler_stage = jax.jit(
+                    lambda base, curr, s_dt, alpha, beta: self._euler_stage(
+                        base, curr, s_dt, alpha, beta, boundary_state
+                    )
+                )
+                self._compiled_mood_stage = jax.jit(
+                    lambda base, curr, eul, unlim, visc, s_dt, alpha, beta: self._mood_stage(
+                        base, curr, eul, unlim, visc, s_dt, alpha, beta, boundary_state
+                    )
+                )
+
+            euler1, unlim1, visc1 = self._compiled_euler_stage(
+                states, states, step_dt, zero, one
+            )
+            stage1, valid1, rho1, p1 = self._compiled_mood_stage(
+                states, states, euler1, unlim1, visc1, step_dt, zero, one
+            )
+            del euler1, unlim1, visc1
+
+            euler2, unlim2, visc2 = self._compiled_euler_stage(
+                states, stage1, step_dt, three_quarters, one_quarter
+            )
+            stage2, valid2, rho2, p2 = self._compiled_mood_stage(
+                states, stage1, euler2, unlim2, visc2, step_dt, three_quarters, one_quarter
+            )
+            del stage1, euler2, unlim2, visc2
+
+            euler3, unlim3, visc3 = self._compiled_euler_stage(
+                states, stage2, step_dt, one_third, two_thirds
+            )
+            result, valid3, rho3, p3 = self._compiled_mood_stage(
+                states, stage2, euler3, unlim3, visc3, step_dt, one_third, two_thirds
+            )
+            del stage2, euler3, unlim3, visc3
+
+            return (
+                result,
+                valid1 & valid2 & valid3,
+                jnp.minimum(rho1, jnp.minimum(rho2, rho3)),
+                jnp.minimum(p1, jnp.minimum(p2, p3)),
+            )
+
         if (
             not hasattr(self, "_compiled_stage")
             or getattr(self, "_compiled_stage_boundary", None) is not boundary_state
@@ -287,15 +393,6 @@ class HybridSSPRK3:
                     base, curr, step_dt, alpha, beta, boundary_state
                 )
             )
-
-        dtype = next(iter(states.values())).dtype
-        step_dt = jnp.asarray(dt, dtype=dtype)
-        zero = jnp.asarray(0.0, dtype=dtype)
-        one = jnp.asarray(1.0, dtype=dtype)
-        three_quarters = jnp.asarray(0.75, dtype=dtype)
-        one_quarter = jnp.asarray(0.25, dtype=dtype)
-        one_third = jnp.asarray(1.0 / 3.0, dtype=dtype)
-        two_thirds = jnp.asarray(2.0 / 3.0, dtype=dtype)
 
         stage1, valid1, rho1, p1 = self._compiled_stage(
             states, states, step_dt, zero, one
