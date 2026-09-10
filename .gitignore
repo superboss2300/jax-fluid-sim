@@ -8,10 +8,15 @@ log.txt
 
 # Simulation output directories and large binary data
 outputs/
+output/
+scratch/
 *.vtu
 *.pvd
 *.npz
 *.png
+*.geo_unrolled*
+*.temp.*
+tetgen-*
 
 # Temporary or large test meshes
 mesh/*gpu6gb*

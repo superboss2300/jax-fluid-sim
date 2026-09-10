@@ -16,8 +16,11 @@ class CompressibleStateLayout:
     species_names: tuple[str, ...] = ()
 
     density: int = 0
-    momentum: slice = slice(1, 4)
     total_energy: int = 4
+
+    @property
+    def momentum(self) -> slice:
+        return slice(1, 4)
 
     @property
     def species(self) -> slice:

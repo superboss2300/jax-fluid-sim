@@ -113,30 +113,61 @@ class GPUMidplaneRasterizer:
 
         # 2D Delaunay triangulation for Cartesian grid sampling
         delaunay = Delaunay(unique_xy)
-        self.xmin, self.xmax = float(np.min(unique_xy[:, 0])), float(np.max(unique_xy[:, 0]))
-        self.ymin, self.ymax = float(np.min(unique_xy[:, 1])), float(np.max(unique_xy[:, 1]))
+        # Check if mesh is an axisymmetric sector (upper half-plane only)
+        raw_ymin = float(np.min(unique_xy[:, 1]))
+        raw_ymax = float(np.max(unique_xy[:, 1]))
+        raw_xmin = float(np.min(unique_xy[:, 0]))
+        raw_xmax = float(np.max(unique_xy[:, 0]))
+        is_axisymmetric = raw_ymin >= -1.0e-3
+
+        if is_axisymmetric:
+            # Symmetrically frame the sphere with 1:1 pixel aspect ratio
+            aspect = self.nx / self.ny
+            half_height = 1.35
+            total_height = 2.0 * half_height
+            total_width = total_height * aspect
+            center_x = 0.55
+            self.xmin = center_x - total_width * 0.42
+            self.xmax = self.xmin + total_width
+            self.ymin = -half_height
+            self.ymax = half_height
+        else:
+            self.xmin, self.xmax = raw_xmin, raw_xmax
+            self.ymin, self.ymax = raw_ymin, raw_ymax
+
         self.extent = (self.xmin, self.xmax, self.ymin, self.ymax)
 
         gx = np.linspace(self.xmin, self.xmax, self.nx)
-        gy = np.linspace(self.ymin, self.ymax, self.ny)
+        # In image pixel buffer, row 0 is top (+ymax), last row is bottom (-ymax)
+        gy = np.linspace(self.ymax, self.ymin, self.ny)
         GX, GY = np.meshgrid(gx, gy)
         points = np.column_stack([GX.ravel(), GY.ravel()])
 
-        simplices = delaunay.find_simplex(points)
+        if is_axisymmetric:
+            eval_points = np.column_stack([points[:, 0], np.abs(points[:, 1])])
+        else:
+            eval_points = points
+
+        simplices = delaunay.find_simplex(eval_points)
         valid = simplices >= 0
         safe_simplices = np.where(valid, simplices, 0)
 
         tri_vertices = delaunay.simplices[safe_simplices]
         transform = delaunay.transform[safe_simplices]
-        diff = points - transform[:, 2]
+        diff = eval_points - transform[:, 2]
         b0 = np.einsum('pi,pi->p', transform[:, 0], diff)
         b1 = np.einsum('pi,pi->p', transform[:, 1], diff)
         b2 = 1.0 - b0 - b1
         weights = np.column_stack([b0, b1, b2]).astype(np.float32)
 
-        # Obstacle mask
+        # Obstacle mask: full physical sphere
+        self.dx = abs(float(gx[1] - gx[0]))
+        self.dy = abs(float(gy[1] - gy[0]))
         r_sq = (points[:, 0] - self.sphere_center[0])**2 + (points[:, 1] - self.sphere_center[1])**2
         self.sphere_mask = (r_sq < (self.sphere_radius + 1.0e-4)**2).reshape((self.ny, self.nx))
+        # Mask out boundary ring pixels where centered difference crosses into masked obstacle
+        pixel_pad = 1.5 * max(self.dx, self.dy)
+        self.grad_mask = (r_sq < (self.sphere_radius + pixel_pad)**2).reshape((self.ny, self.nx))
         weights[~valid | self.sphere_mask.ravel()] = 0.0
 
         # Upload static geometry tables to GPU
@@ -150,8 +181,7 @@ class GPUMidplaneRasterizer:
         self.gpu_tri_vertices = jnp.asarray(tri_vertices, dtype=jnp.int32)
         self.gpu_weights = jnp.asarray(weights)
         self.gpu_sphere_mask = jnp.asarray(self.sphere_mask)
-        self.dx = float(gx[1] - gx[0])
-        self.dy = float(gy[1] - gy[0])
+        self.gpu_grad_mask = jnp.asarray(self.grad_mask)
 
     def _build_gpu_colormaps(self):
         """Precompute 256-entry RGBA LUTs on GPU."""
@@ -179,6 +209,7 @@ class GPUMidplaneRasterizer:
         gpu_counts = self.gpu_counts
         num_unique = self.num_unique_slice
         gpu_sphere_mask = self.gpu_sphere_mask
+        gpu_grad_mask = self.gpu_grad_mask
         gpu_shock_lut = self.gpu_shock_lut
         gpu_inferno_lut = self.gpu_inferno_lut
 
@@ -205,8 +236,9 @@ class GPUMidplaneRasterizer:
             # Mode 0: Numerical Schlieren
             gy, gx = jnp.gradient(rho, dy, dx)
             grad_mag = jnp.sqrt(gx**2 + gy**2)
-            med_rho = jnp.maximum(jnp.median(rho), 0.1)
-            schlieren = jnp.log10(1.0 + 15.0 * grad_mag / med_rho)
+            # Suppress artificial gradient jump at the masked obstacle boundary
+            grad_mag = jnp.where(gpu_grad_mask, 0.0, grad_mag)
+            schlieren = 1.0 - jnp.exp(-0.08 * grad_mag / jnp.maximum(rho, 0.1))
 
             # Mode 1: Density
             # Mode 2: Pressure
@@ -215,8 +247,8 @@ class GPUMidplaneRasterizer:
             sound = jnp.sqrt(jnp.maximum(gamma * p / jnp.maximum(rho, 1.0e-12), 0.0))
             mach = speed / jnp.maximum(sound, 1.0e-12)
 
-            # Mode 4: Temperature T = p / (rho * R)
-            temp = p / jnp.maximum(rho * 287.05, 1.0e-6)
+            # Mode 4: Temperature T [K] = (p / rho) * T_ref (T_ref = 300.0 K)
+            temp = (p / jnp.maximum(rho, 1.0e-6)) * 300.0
 
             # Select scalar field based on mode
             scalar = jnp.where(
@@ -289,7 +321,7 @@ class GPUMidplaneRasterizer:
         # Dynamic auto-range if not provided
         if vmin is None or vmax is None:
             if mode == 0:
-                vmin_val, vmax_val = 0.0, 1.5
+                vmin_val, vmax_val = 0.0, 1.0
             elif mode == 1:
                 vmin_val, vmax_val = 0.5, 5.0
             elif mode == 2:
@@ -297,7 +329,7 @@ class GPUMidplaneRasterizer:
             elif mode == 3:
                 vmin_val, vmax_val = 0.0, 6.0
             else:
-                vmin_val, vmax_val = 250.0, 3500.0
+                vmin_val, vmax_val = 250.0, 3800.0
         else:
             vmin_val, vmax_val = float(vmin), float(vmax)
 

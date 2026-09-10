@@ -132,15 +132,46 @@ def _wedge_subdivision(division_count):
     return vertices, np.asarray(cells, dtype=np.int32)
 
 
+def _hexahedron_subdivision(division_count):
+    n = division_count
+    vertices = np.asarray(
+        [
+            (i / n, j / n, k / n)
+            for k in range(n + 1)
+            for j in range(n + 1)
+            for i in range(n + 1)
+        ],
+        dtype=np.float64,
+    )
+
+    def idx(i, j, k):
+        return k * (n + 1) * (n + 1) + j * (n + 1) + i
+
+    cells = []
+    for k in range(n):
+        for j in range(n):
+            for i in range(n):
+                cells.append([
+                    idx(i, j, k),
+                    idx(i + 1, j, k),
+                    idx(i + 1, j + 1, k),
+                    idx(i, j + 1, k),
+                    idx(i, j, k + 1),
+                    idx(i + 1, j, k + 1),
+                    idx(i + 1, j + 1, k + 1),
+                    idx(i, j + 1, k + 1),
+                ])
+    return vertices, np.asarray(cells, dtype=np.int32)
+
+
 def _parent_face_id(element_type, coordinates, tolerance=1.0e-10):
     x, y, z = coordinates[:, 0], coordinates[:, 1], coordinates[:, 2]
-    tests = (
-        (z,) if element_type == "tetra" else (z, z - 1.0)
-    )
     if element_type == "tetra":
         tests = (z, y, x + y + z - 1.0, x)
     elif element_type == "wedge":
         tests = (z, z - 1.0, y, x + y - 1.0, x)
+    elif element_type == "hexahedron":
+        tests = (z, z - 1.0, y, x - 1.0, y - 1.0, x)
     else:
         raise ValueError(element_type)
     for face, value in enumerate(tests):
@@ -189,6 +220,8 @@ def make_reference_subcells(element_type, division_count=4):
         vertices, cells = _tetra_subdivision(division_count)
     elif element_type == "wedge":
         vertices, cells = _wedge_subdivision(division_count)
+    elif element_type == "hexahedron":
+        vertices, cells = _hexahedron_subdivision(division_count)
     else:
         raise ValueError(f"Unsupported subcell parent {element_type!r}")
     return ReferenceSubcells(
@@ -217,7 +250,7 @@ def _mapped_quadrature(reference_subcells):
             ],
             axis=-1,
         )
-    else:
+    elif element_type == "wedge":
         matrices = np.stack(
             [
                 cell_vertices[:, 1] - cell_vertices[:, 0],
@@ -226,6 +259,17 @@ def _mapped_quadrature(reference_subcells):
             ],
             axis=-1,
         )
+    elif element_type == "hexahedron":
+        matrices = np.stack(
+            [
+                cell_vertices[:, 1] - cell_vertices[:, 0],
+                cell_vertices[:, 3] - cell_vertices[:, 0],
+                cell_vertices[:, 4] - cell_vertices[:, 0],
+            ],
+            axis=-1,
+        )
+    else:
+        raise ValueError(element_type)
     local_scale = np.abs(np.linalg.det(matrices))
     return jnp.asarray(mapped), jnp.asarray(weights[None, :] * local_scale[:, None])
 
@@ -359,11 +403,40 @@ def dg_to_subcells(U, projection):
     )
 
 
-def subcells_to_dg(subcell_averages, projection):
-    return jnp.einsum(
+def subcells_to_dg(subcell_averages, projection, bound_limit=True):
+    raw_dg = jnp.einsum(
         "eis,esv->eiv", projection.reconstruction, subcell_averages,
         precision=jax.lax.Precision.HIGHEST,
     )
+    if not bound_limit or projection.volumes is None:
+        return raw_dg
+
+    # Zhang-Shu bound-preserving limiter: strictly eliminates Gibbs overshoot
+    # and undershoot on reconstructed high-order polynomials across shocks,
+    # ensuring nodal values remain within physical subcell bounds while
+    # preserving the cell-mean conservation identically.
+    vols = projection.volumes
+    elem_vol = jnp.sum(vols, axis=1, keepdims=True)
+    elem_mean = jnp.sum(subcell_averages * vols[..., None], axis=1) / jnp.maximum(elem_vol, 1.0e-14)
+
+    sub_min = jnp.min(subcell_averages, axis=1)
+    sub_max = jnp.max(subcell_averages, axis=1)
+    dg_min = jnp.min(raw_dg, axis=1)
+    dg_max = jnp.max(raw_dg, axis=1)
+
+    eps = 1.0e-12
+    theta_max = jnp.where(
+        dg_max > elem_mean + eps,
+        (sub_max - elem_mean) / (dg_max - elem_mean + eps),
+        1.0,
+    )
+    theta_min = jnp.where(
+        dg_min < elem_mean - eps,
+        (elem_mean - sub_min) / (elem_mean - dg_min + eps),
+        1.0,
+    )
+    theta = jnp.clip(jnp.minimum(theta_max, theta_min), 0.0, 1.0)
+    return elem_mean[:, None, :] + theta[:, None, :] * (raw_dg - elem_mean[:, None, :])
 
 
 class HybridSubcellFV:
@@ -378,9 +451,9 @@ class HybridSubcellFV:
         self.references = {}
         self.projections = {}
         for block_id, block in enumerate(self.mesh.element_blocks):
-            if block.element_type not in {"tetra", "wedge"}:
+            if block.element_type not in {"tetra", "wedge", "hexahedron"}:
                 raise ValueError(
-                    "Subcell FV currently supports tetrahedron and wedge blocks"
+                    "Subcell FV currently supports tetrahedron, wedge, and hexahedron blocks"
                 )
             reference = make_reference_subcells(
                 block.element_type, division_count
@@ -501,8 +574,10 @@ class HybridSubcellFV:
         if self.reconstruction == "tvd":
             # 3. Slope limiters (smooth Venkatakrishnan TVD)
             eps = 1.0e-12
-            r_owner = delta_U / (du_owner + jnp.sign(du_owner) * eps)
-            r_neighbor = (-delta_U) / (du_neighbor + jnp.sign(du_neighbor) * eps)
+            denom_owner = du_owner + jnp.where(du_owner >= 0.0, eps, -eps)
+            denom_neighbor = du_neighbor + jnp.where(du_neighbor >= 0.0, eps, -eps)
+            r_owner = delta_U / denom_owner
+            r_neighbor = (-delta_U) / denom_neighbor
 
             phi_owner = jnp.clip(
                 jnp.where(

@@ -333,12 +333,25 @@ class HybridCompressibleSolver:
             - trace_squared[..., None, None] * identity / 3.0
         )
         strain_norm = jnp.sum(strain**2, axis=(-2, -1))
+        # Ducros shock sensor: vanishes in irrotational shock compression, active in turbulent shear/vortices
+        div = velocity_gradient[..., 0, 0] + velocity_gradient[..., 1, 1] + velocity_gradient[..., 2, 2]
+        div_sq = div**2
+        curl_x = velocity_gradient[..., 2, 1] - velocity_gradient[..., 1, 2]
+        curl_y = velocity_gradient[..., 0, 2] - velocity_gradient[..., 2, 0]
+        curl_z = velocity_gradient[..., 1, 0] - velocity_gradient[..., 0, 1]
+        vort_sq = curl_x**2 + curl_y**2 + curl_z**2
+        ducros = vort_sq / (vort_sq + div_sq + 1.0e-12)
+
         traceless_norm = jnp.sum(traceless_squared**2, axis=(-2, -1))
+        # Guard against float32 overflow (X^2.5 and X^1.5) at sharp supersonic shock fronts
+        safe_strain = jnp.clip(strain_norm, 0.0, 1.0e8)
+        safe_trace = jnp.clip(traceless_norm, 0.0, 1.0e10)
         kinematic = (
             (self.wale_constant * filter_width) ** 2
-            * traceless_norm**1.5
-            / (strain_norm**2.5 + traceless_norm**1.25 + 1.0e-30)
-        )
+            * safe_trace**1.5
+            / (safe_strain**2.5 + safe_trace**1.25 + 1.0e-30)
+        ) * ducros
+        kinematic = jnp.nan_to_num(jnp.clip(kinematic, 0.0, 50.0), nan=0.0, posinf=50.0)
         return jnp.maximum(U[..., 0], 0.0) * kinematic
 
     def viscous_physical_flux(

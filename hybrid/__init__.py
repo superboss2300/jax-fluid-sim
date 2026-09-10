@@ -15,6 +15,7 @@ from .output import (
     save_cinematic_schlieren,
     save_midplane_heatmap,
     save_reacting_heatmap,
+    write_midplane_slice_vtu,
     write_pvd,
     write_tessellated_vtu,
 )
@@ -32,8 +33,14 @@ from .state import CompressibleStateLayout
 from .time_integration import HybridSSPRK3
 from .chemistry import ReactingFlowCoupler
 from .gui import GPUMidplaneRasterizer, LiveGUIController
+from .aerodynamics import (
+    AerodynamicForceCalculator,
+    AerodynamicHistoryTracker,
+    AerodynamicResult,
+)
 from . import chemistry
 from . import gui
+from . import aerodynamics
 
 __all__ = [
     "CompressibleStateLayout",
@@ -58,12 +65,17 @@ __all__ = [
     "save_midplane_heatmap",
     "save_reacting_heatmap",
     "write_tessellated_vtu",
+    "write_midplane_slice_vtu",
     "write_pvd",
     "ReferenceElement",
     "make_reference_element",
     "ReactingFlowCoupler",
     "GPUMidplaneRasterizer",
     "LiveGUIController",
+    "AerodynamicForceCalculator",
+    "AerodynamicHistoryTracker",
+    "AerodynamicResult",
     "chemistry",
     "gui",
+    "aerodynamics",
 ]

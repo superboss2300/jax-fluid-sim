@@ -21,8 +21,30 @@ class HybridSSPRK3:
         self.limiter = limiter
         self.density_floor = float(density_floor)
         self.pressure_floor = float(pressure_floor)
-        self.maximum_rejections = int(maximum_rejections)
         self.characteristic_lengths = self._characteristic_lengths()
+        self.internal_connections = self._build_internal_connections()
+
+    def _build_internal_connections(self):
+        """Precompute face neighbor indices for fast JIT LTS timestep smoothing."""
+        connections = []
+        for face_type, faces in self.solver.mesh.face_blocks.items():
+            internal_idx = np.flatnonzero(faces.neighbor_block >= 0)
+            if not len(internal_idx):
+                continue
+            ob_ids = faces.owner_block[internal_idx]
+            nb_ids = faces.neighbor_block[internal_idx]
+            for ob_id in np.unique(ob_ids):
+                for nb_id in np.unique(nb_ids):
+                    mask = (ob_ids == ob_id) & (nb_ids == nb_id)
+                    if np.any(mask):
+                        sub_idx = internal_idx[mask]
+                        connections.append((
+                            self.solver.mesh.element_blocks[ob_id].element_type,
+                            jnp.asarray(faces.owner_local[sub_idx]),
+                            self.solver.mesh.element_blocks[nb_id].element_type,
+                            jnp.asarray(faces.neighbor_local[sub_idx]),
+                        ))
+        return tuple(connections)
 
     def _characteristic_lengths(self):
         """Use 2V / total face area for each physical element."""
@@ -63,9 +85,9 @@ class HybridSSPRK3:
                 ].integration_weights,
                 axis=1,
             )
-            lengths[block.element_type] = (
-                2.0 * volumes / area_sums[block.element_type]
-            )
+            h_ratio = 2.0 * volumes / area_sums[block.element_type]
+            h_vol = (volumes ** (1.0 / 3.0)) / (self.solver.polynomial_degree + 1)
+            lengths[block.element_type] = jnp.maximum(h_ratio, 0.25 * h_vol)
         return lengths
 
     def stable_dt(self, states, boundary_state=None):
@@ -92,7 +114,7 @@ class HybridSSPRK3:
             rate = degree_factor * element_speed / length
 
             if self.solver.dynamic_viscosity > 0.0 or self.solver.use_wale:
-                minimum_density = jnp.min(density, axis=1)
+                minimum_density = jnp.maximum(jnp.mean(density, axis=1), 0.1)
                 effective_viscosity = jnp.full_like(
                     minimum_density, self.solver.dynamic_viscosity
                 )
@@ -137,12 +159,14 @@ class HybridSSPRK3:
                     / (minimum_density * self.solver.specific_heat_cp),
                 )
                 penalty = float(getattr(self.operator, "br2_stabilization", 1.0))
+                viscous_len = jnp.maximum(length, 0.01)
                 rate = rate + (
                     2.0 * penalty * degree_factor**2
-                    * diffusivity / length**2
+                    * diffusivity / viscous_len**2
                 )
-            maximum_rates.append(jnp.max(rate))
-        return self.cfl / jnp.max(jnp.stack(maximum_rates))
+            maximum_rates.append(jnp.max(jnp.nan_to_num(rate, nan=1.0e7, posinf=1.0e7)))
+        max_rate = jnp.max(jnp.stack(maximum_rates))
+        return jnp.clip(self.cfl / jnp.maximum(max_rate, 1.0e-12), 1.0e-7, 1.0e-3)
 
     def local_dt(self, states, cfl=None, boundary_state=None):
         """Compute element-wise local stable time step field for rapid steady-state convergence."""
@@ -164,7 +188,7 @@ class HybridSSPRK3:
             rate = degree_factor * element_speed / length
 
             if self.solver.dynamic_viscosity > 0.0 or self.solver.use_wale:
-                minimum_density = jnp.min(density, axis=1)
+                minimum_density = jnp.maximum(jnp.mean(density, axis=1), 0.1)
                 effective_viscosity = jnp.full_like(
                     minimum_density, self.solver.dynamic_viscosity
                 )
@@ -209,12 +233,32 @@ class HybridSSPRK3:
                     / (minimum_density * self.solver.specific_heat_cp),
                 )
                 penalty = float(getattr(self.operator, "br2_stabilization", 1.0))
+                viscous_len = jnp.maximum(length, 0.01)
                 rate = rate + (
                     2.0 * penalty * degree_factor**2
-                    * diffusivity / length**2
+                    * diffusivity / viscous_len**2
                 )
             dt_elem = cfl_val / jnp.maximum(rate, 1.0e-12)
             dts[element_type] = dt_elem[:, None, None]
+
+        # Neighbor smoothing for LTS: limit adjacent cell timestep ratio to alpha=1.3
+        alpha = 1.3
+        for _ in range(2):
+            for owner_type, owner_cells, nbr_type, nbr_cells in self.internal_connections:
+                dt_own = dts[owner_type][owner_cells, 0, 0]
+                dt_nbr = dts[nbr_type][nbr_cells, 0, 0]
+                dts[owner_type] = dts[owner_type].at[owner_cells, 0, 0].min(alpha * dt_nbr)
+                dts[nbr_type] = dts[nbr_type].at[nbr_cells, 0, 0].min(alpha * dt_own)
+
+        # Scale sliver cells by volume ratio after neighbor smoothing so they never over-drain
+        for block_id, block in enumerate(self.solver.mesh.element_blocks):
+            element_type = block.element_type
+            volumes = jnp.sum(
+                self.operator.geometry.element_metrics[block_id].integration_weights, axis=1
+            )
+            sliver_scale = jnp.minimum(1.0, volumes / 1.0e-4)[:, None, None]
+            dts[element_type] = dts[element_type] * sliver_scale
+
         return dts
 
     @staticmethod

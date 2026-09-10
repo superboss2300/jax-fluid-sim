@@ -12,12 +12,16 @@ def shock_colormap():
     from matplotlib.colors import LinearSegmentedColormap
 
     color_map = LinearSegmentedColormap.from_list(
-        "shock_dark",
+        "reddit_cfd",
         [
-            (0.00, "#01051f"), (0.16, "#031448"),
-            (0.34, "#07549a"), (0.52, "#00a9cf"),
-            (0.68, "#20d49a"), (0.82, "#d9ef38"),
-            (0.93, "#ff8b1e"), (1.00, "#ff2915"),
+            (0.00, "#01051f"),
+            (0.18, "#031b5c"),
+            (0.38, "#054e99"),
+            (0.55, "#00a3d9"),
+            (0.70, "#1ec98b"),
+            (0.82, "#e0d825"),
+            (0.92, "#ff6a14"),
+            (1.00, "#ff1a10"),
         ],
     )
     color_map.set_bad("#01051f")
@@ -36,17 +40,23 @@ def _robust_limits(values, lower=0.5, upper=99.5):
 
 
 def _field_limits(values, minimum_relative_span):
-    """Do not turn roundoff in a nearly uniform field into full color range."""
-    low, high = _robust_limits(values)
+    """Do not turn roundoff in a nearly uniform field into full color range, while preserving shocks."""
     finite = np.asarray(values)[np.isfinite(values)]
     if not len(finite):
-        return low, high
+        return 0.0, 1.0
     center = float(np.median(finite))
     scale = max(abs(center), 1.0)
     minimum_span = minimum_relative_span * scale
-    if high - low < minimum_span:
+
+    f_min = float(np.min(finite))
+    f_max = float(np.max(finite))
+    if f_max - f_min < minimum_span:
         return center - 0.5 * minimum_span, center + 0.5 * minimum_span
-    return low, high
+
+    p_low, p_high = np.percentile(finite, [0.01, 99.99])
+    if p_high - p_low < minimum_span:
+        return f_min, f_max
+    return float(p_low), float(p_high)
 
 
 _P1_SUBCELLS = {
@@ -171,10 +181,11 @@ _LINEAR_CELL_EDGES = {
 }
 
 
-def _midplane_triangles(operator, states, plane_z=0.0):
-    """Intersect visualization subcells with z=plane_z without slab projection."""
+def _midplane_cells(operator, states, plane_z=0.0):
+    """Intersect visualization subcells with z=plane_z preserving native 2D quads."""
     vertices = []
     values = []
+    quads = []
     triangles = []
     tolerance = 1.0e-10
 
@@ -232,16 +243,32 @@ def _midplane_triangles(operator, states, plane_z=0.0):
                 offset = len(vertices)
                 vertices.extend(xy)
                 values.extend(primitive_values)
-                for index in range(1, len(xy) - 1):
-                    triangles.append((offset, offset + index, offset + index + 1))
+                if len(xy) == 4:
+                    quads.append((offset, offset + 1, offset + 2, offset + 3))
+                elif len(xy) == 3:
+                    triangles.append((offset, offset + 1, offset + 2))
+                else:
+                    for index in range(1, len(xy) - 1):
+                        triangles.append((offset, offset + index, offset + index + 1))
 
-    if not triangles:
+    if not quads and not triangles:
         raise ValueError(f"The mesh does not intersect z={plane_z}")
     return (
         np.asarray(vertices),
-        np.asarray(triangles, dtype=np.int32),
+        np.asarray(quads, dtype=np.int32) if quads else np.empty((0, 4), dtype=np.int32),
+        np.asarray(triangles, dtype=np.int32) if triangles else np.empty((0, 3), dtype=np.int32),
         np.asarray(values),
     )
+
+
+def _midplane_triangles(operator, states, plane_z=0.0):
+    """Legacy helper returning triangulated slice for routines expecting triangles."""
+    vertices, quads, triangles, values = _midplane_cells(operator, states, plane_z=plane_z)
+    all_tri = list(triangles)
+    for q in quads:
+        all_tri.append((q[0], q[1], q[2]))
+        all_tri.append((q[0], q[2], q[3]))
+    return vertices, np.asarray(all_tri, dtype=np.int32), values
 
 
 def write_tessellated_vtu(path, operator, states):
@@ -249,10 +276,11 @@ def write_tessellated_vtu(path, operator, states):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     points, primitives, cells = [], [], []
+    grad_rhos = []
     point_offset = 0
     p_degree = operator.solver.polynomial_degree
 
-    for block in operator.mesh.element_blocks:
+    for block_id, block in enumerate(operator.mesh.element_blocks):
         element_type = block.element_type
         coordinates = np.asarray(
             operator.geometry.solution_node_coordinates[element_type]
@@ -261,6 +289,18 @@ def write_tessellated_vtu(path, operator, states):
         points.append(coordinates.reshape(-1, 3))
         primitives.append(W.reshape(-1, W.shape[-1]))
         nodes_per_element = coordinates.shape[1]
+
+        # Basis gradients for density (exact DG polynomial derivatives)
+        m = (
+            operator.geometry.element_metrics.get(block_id)
+            if hasattr(operator.geometry, "element_metrics")
+            else None
+        )
+        if m is not None and m.physical_basis_gradients.shape[1] == W.shape[1]:
+            g_rho = np.einsum("ei,eqid->eqd", W[..., 0], np.asarray(m.physical_basis_gradients))
+        else:
+            g_rho = np.zeros((W.shape[0], W.shape[1], 3), dtype=np.float32)
+        grad_rhos.append(g_rho.reshape(-1, 3))
 
         output_type, local_subcells = get_element_subcells(element_type, p_degree)
 
@@ -276,22 +316,126 @@ def write_tessellated_vtu(path, operator, states):
 
     points = np.concatenate(points, axis=0)
     W = np.concatenate(primitives, axis=0)
+    grad_rho = np.concatenate(grad_rhos, axis=0)
+    grad_rho_mag = np.linalg.norm(grad_rho, axis=-1)
+
+    gamma = float(operator.solver.gamma)
+    rho = W[:, 0]
+    pressure = W[:, 4]
     sound_speed = np.sqrt(
-        np.maximum(operator.solver.gamma * W[:, 4] / np.maximum(W[:, 0], 1.0e-12), 0.0)
+        np.maximum(gamma * pressure / np.maximum(rho, 1.0e-12), 0.0)
     )
-    speed = np.linalg.norm(W[:, 1:4], axis=-1)
+    velocity = W[:, 1:4]
+    speed = np.linalg.norm(velocity, axis=-1)
+    mach = speed / np.maximum(sound_speed, 1.0e-30)
+
+    T_ref = 300.0  # Kelvin (nondimensional T = p / rho)
+    temperature = (pressure / np.maximum(rho, 1.0e-6)) * T_ref
+    tau = 1.0 + 0.5 * (gamma - 1.0) * mach**2
+    t_total = temperature * tau
+    p_total = pressure * (tau ** (gamma / (gamma - 1.0)))
+    schlieren = 1.0 - np.exp(-0.08 * grad_rho_mag / np.maximum(rho, 0.1))
+
     point_data = {
-        "density": W[:, 0],
-        "velocity": W[:, 1:4],
-        "pressure": W[:, 4],
+        "density": rho,
+        "velocity": velocity,
+        "pressure": pressure,
+        "temperature": temperature,
+        "total_temperature": t_total,
+        "total_pressure": p_total,
         "speed": speed,
-        "mach": speed / np.maximum(sound_speed, 1.0e-30),
+        "mach": mach,
+        "grad_density": grad_rho,
+        "grad_density_mag": grad_rho_mag,
+        "schlieren": schlieren,
     }
     if operator.solver.layout.species_names:
         for s_idx, s_name in enumerate(operator.solver.layout.species_names):
-            clean_name = s_name.replace("+", "_plus").replace("-", "_minus")
+            name_str = s_name.name if hasattr(s_name, "name") else str(s_name)
+            clean_name = name_str.replace("+", "_plus").replace("-", "_minus")
             point_data[f"Y_{clean_name}"] = W[:, 5 + s_idx]
     meshio.write(path, meshio.Mesh(points, cells, point_data=point_data))
+    return path
+
+
+def write_midplane_slice_vtu(path, operator, states, plane_z=0.0):
+    """Write an exact 2D planar cut mirrored across y=0 preserving native VTK quads.
+
+    This produces a clean, high-fidelity cross-section for ParaView with zero diagonal wireframe crossbars.
+    """
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    xy, quads, triangles, W = _midplane_cells(operator, states, plane_z=plane_z)
+
+    # If upper half-plane sector, mirror across y=0 to display full symmetric body
+    ymin = float(np.min(xy[:, 1]))
+    if ymin >= -1.0e-3:
+        num_v = len(xy)
+        xy_mirror = xy.copy()
+        xy_mirror[:, 1] = -xy_mirror[:, 1]
+        W_mirror = W.copy()
+        if W_mirror.shape[1] > 2:
+            W_mirror[:, 2] = -W_mirror[:, 2]  # Invert v_y
+
+        quads_mirror = quads + num_v
+        if len(quads_mirror) > 0:
+            quads_mirror = quads_mirror[:, [0, 3, 2, 1]]  # preserve outward normal
+        triangles_mirror = triangles + num_v
+        if len(triangles_mirror) > 0:
+            triangles_mirror = triangles_mirror[:, [0, 2, 1]]  # preserve outward normal
+
+        all_xy = np.concatenate([xy, xy_mirror], axis=0)
+        all_quads = np.concatenate([quads, quads_mirror], axis=0) if len(quads) > 0 else quads
+        all_triangles = np.concatenate([triangles, triangles_mirror], axis=0) if len(triangles) > 0 else triangles
+        all_W = np.concatenate([W, W_mirror], axis=0)
+    else:
+        all_xy = xy
+        all_quads = quads
+        all_triangles = triangles
+        all_W = W
+
+    points_3d = np.column_stack([all_xy, np.zeros(len(all_xy), dtype=all_xy.dtype)])
+
+    gamma = float(operator.solver.gamma)
+    rho = all_W[:, 0]
+    pressure = all_W[:, 4]
+    sound_speed = np.sqrt(
+        np.maximum(gamma * pressure / np.maximum(rho, 1.0e-12), 0.0)
+    )
+    velocity = all_W[:, 1:4]
+    speed = np.linalg.norm(velocity, axis=-1)
+    mach = speed / np.maximum(sound_speed, 1.0e-30)
+
+    T_ref = 300.0
+    temperature = (pressure / np.maximum(rho, 1.0e-6)) * T_ref
+    tau = 1.0 + 0.5 * (gamma - 1.0) * mach**2
+    t_total = temperature * tau
+    p_total = pressure * (tau ** (gamma / (gamma - 1.0)))
+
+    point_data = {
+        "density": rho,
+        "velocity": velocity,
+        "pressure": pressure,
+        "temperature": temperature,
+        "total_temperature": t_total,
+        "total_pressure": p_total,
+        "speed": speed,
+        "mach": mach,
+    }
+
+    if operator.solver.layout.species_names:
+        for s_idx, s_name in enumerate(operator.solver.layout.species_names):
+            name_str = s_name.name if hasattr(s_name, "name") else str(s_name)
+            clean_name = name_str.replace("+", "_plus").replace("-", "_minus")
+            point_data[f"Y_{clean_name}"] = all_W[:, 5 + s_idx]
+
+    cells_to_write = []
+    if len(all_quads) > 0:
+        cells_to_write.append(("quad", all_quads))
+    if len(all_triangles) > 0:
+        cells_to_write.append(("triangle", all_triangles))
+
+    meshio.write(path, meshio.Mesh(points_3d, cells_to_write, point_data=point_data))
     return path
 
 
@@ -328,11 +472,29 @@ def _resample_to_cartesian_grid(
     return gx, gy, GX, GY, resampled, sphere_mask
 
 
-def compute_schlieren(grid_rho, dx, dy, sphere_mask, noise_floor=0.02, contrast=15.0):
-    """Compute physical, noise-gated numerical Schlieren log10(1 + k*|grad rho|/rho_ref)."""
+def _mirror_axisymmetric_if_needed(unique_xy, unique_fields):
+    """If the mesh slice is an axisymmetric upper half-plane sector, mirror across y=0."""
+    ymin = float(np.min(unique_xy[:, 1]))
+    if ymin >= -1.0e-3:
+        mask = unique_xy[:, 1] > 1.0e-6
+        xy_mirror = unique_xy[mask].copy()
+        xy_mirror[:, 1] = -xy_mirror[:, 1]
+        fields_mirror = unique_fields[mask].copy()
+        if fields_mirror.shape[1] > 2:
+            fields_mirror[:, 2] = -fields_mirror[:, 2]
+        unique_xy = np.concatenate([unique_xy, xy_mirror], axis=0)
+        unique_fields = np.concatenate([unique_fields, fields_mirror], axis=0)
+    return unique_xy, unique_fields
+
+
+def compute_schlieren(grid_rho, dx, dy, sphere_mask, noise_floor=0.01, beta=0.08, sigma=3.5):
+    """Compute normalized exponential numerical Schlieren S = 1 - exp(-beta * |grad rho| / rho)."""
+    from scipy.ndimage import gaussian_filter
     med_rho = max(abs(float(np.nanmedian(grid_rho))), 1.0)
     rho_clean = np.nan_to_num(grid_rho, nan=med_rho)
-    grad_y, grad_x = np.gradient(rho_clean, dy, dx)
+    # Filter scaled to subcell grid resolution to eliminate facet noise
+    rho_filtered = gaussian_filter(rho_clean, sigma=sigma)
+    grad_y, grad_x = np.gradient(rho_filtered, dy, dx)
     grad_mag = np.sqrt(grad_x**2 + grad_y**2)
     grad_mag[sphere_mask] = np.nan
 
@@ -341,10 +503,12 @@ def compute_schlieren(grid_rho, dx, dy, sphere_mask, noise_floor=0.02, contrast=
     max_g = float(np.max(finite_valid)) if len(finite_valid) else 0.0
 
     if max_g < noise_floor:
-        # Uniform or early startup: zero out so colormap doesn't stretch micro noise
         return np.zeros_like(grad_mag)
 
-    return np.log10(1.0 + contrast * grad_mag / med_rho)
+    # Normalized exponential Schlieren: S in [0.0, 1.0]
+    schlieren = 1.0 - np.exp(-beta * grad_mag / np.maximum(rho_filtered, 0.1))
+    schlieren[sphere_mask] = np.nan
+    return schlieren
 
 
 def save_midplane_heatmap(path, operator, states, title="Hybrid P2 DG", resolution=(900, 450)):
@@ -363,12 +527,14 @@ def save_midplane_heatmap(path, operator, states, title="Hybrid P2 DG", resoluti
     for var in range(W.shape[1]):
         unique_W[:, var] = np.bincount(inverse, weights=W[:, var]) / counts
 
+    unique_xy, unique_W = _mirror_axisymmetric_if_needed(unique_xy, unique_W)
+
     xmin, xmax = float(np.min(unique_xy[:, 0])), float(np.max(unique_xy[:, 0]))
     ymin, ymax = float(np.min(unique_xy[:, 1])), float(np.max(unique_xy[:, 1]))
     extent = (xmin, xmax, ymin, ymax)
 
     gx, gy, GX, GY, grid_W, sphere_mask = _resample_to_cartesian_grid(
-        unique_xy, unique_W, extent, resolution
+        unique_xy, unique_W[:, :5], extent, resolution
     )
 
     speed = np.linalg.norm(grid_W[:, :, 1:4], axis=-1)
@@ -467,6 +633,7 @@ def save_cinematic_schlieren(
     plane_z=0.0,
     sphere_radius=0.5,
     sphere_center=(0.0, 0.0),
+    view_extent=(-1.833, 3.5, -1.5, 1.5),
 ):
     """Render a full-bleed 1080p cinematic numerical Schlieren image."""
     import matplotlib.pyplot as plt
@@ -482,12 +649,17 @@ def save_cinematic_schlieren(
     counts = np.bincount(inverse)
     unique_rho = np.bincount(inverse, weights=W[:, 0]) / counts
 
+    unique_xy, unique_rho_2d = _mirror_axisymmetric_if_needed(unique_xy, unique_rho[:, None])
+    unique_rho = unique_rho_2d[:, 0]
+
     xmin, xmax = float(np.min(unique_xy[:, 0])), float(np.max(unique_xy[:, 0]))
     ymin, ymax = float(np.min(unique_xy[:, 1])), float(np.max(unique_xy[:, 1]))
     extent = (xmin, xmax, ymin, ymax)
+    # Focused 16:9 framing on sphere and wake (Reddit reference aesthetic)
+    target_extent = view_extent if view_extent is not None else (-1.2, 2.8, -1.125, 1.125)
 
     gx, gy, GX, GY, resampled, sphere_mask = _resample_to_cartesian_grid(
-        unique_xy, unique_rho[:, None], extent, resolution, sphere_radius, sphere_center
+        unique_xy, unique_rho[:, None], target_extent, resolution, sphere_radius, sphere_center
     )
     grid_rho = resampled[:, :, 0]
 
@@ -495,30 +667,19 @@ def save_cinematic_schlieren(
     dy = float(gy[1] - gy[0])
     schlieren = compute_schlieren(grid_rho, dx, dy, sphere_mask)
 
-    # Color limits
-    valid = schlieren[~sphere_mask]
-    finite_valid = valid[np.isfinite(valid)]
-    if len(finite_valid) and np.max(finite_valid) > 0.0:
-        s_min = float(np.percentile(finite_valid, 2))
-        s_max = float(np.percentile(finite_valid, 99.5))
-        if s_max <= s_min:
-            s_max = s_min + 1.0
-    else:
-        s_min, s_max = 0.0, 1.0
-
     fig = plt.figure(figsize=(16, 9), facecolor="#01051f", dpi=120)
     ax = fig.add_axes([0, 0, 1, 1], facecolor="#01051f")
 
     color_map = shock_colormap()
-    ax.imshow(
+    im = ax.imshow(
         np.ma.masked_invalid(schlieren),
         origin="lower",
-        extent=extent,
+        extent=target_extent,
         cmap=color_map,
-        interpolation="bilinear",
-        vmin=s_min,
-        vmax=s_max,
-        aspect="auto",
+        interpolation="bicubic",
+        vmin=0.0,
+        vmax=1.0,
+        aspect="equal",
     )
 
     # Draw physical obstacle body with glowing boundary
@@ -526,14 +687,22 @@ def save_cinematic_schlieren(
         sphere_center,
         sphere_radius,
         facecolor="#000000",
-        edgecolor="#20d49a",
+        edgecolor="#00a3d9",
         linewidth=2.0,
         zorder=10,
     )
     ax.add_patch(sphere)
 
-    ax.set_xlim(xmin, xmax)
-    ax.set_ylim(ymin, ymax)
+    # Reddit-style vertical colorbar on right
+    cax = fig.add_axes([0.94, 0.15, 0.012, 0.7])
+    cb = fig.colorbar(im, cax=cax)
+    cb.set_ticks([0.0, 0.5, 1.0])
+    cb.ax.tick_params(colors="white", labelsize=10)
+    for s in cb.ax.spines.values():
+        s.set_color("#00a3d9")
+
+    ax.set_xlim(target_extent[0], target_extent[1])
+    ax.set_ylim(target_extent[2], target_extent[3])
     ax.set_aspect("equal")
     ax.axis("off")
 
@@ -592,13 +761,15 @@ def save_reacting_heatmap(
     operator,
     states,
     title="Air-11 Reacting Hypersonic Flow",
-    resolution=(900, 450),
+    resolution=(800, 640),
     plane_z=0.0,
     sphere_radius=0.5,
     sphere_center=(0.0, 0.0),
+    crop_extent=(-1.0, 2.0, -1.2, 1.2),
 ):
     """Render a 4-panel diagnostic plot of T, Y_O, Y_NO, and Y_N at midplane."""
     import matplotlib.pyplot as plt
+    import matplotlib.ticker as ticker
 
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -611,8 +782,20 @@ def save_reacting_heatmap(
     for var in range(W.shape[1]):
         unique_W[:, var] = np.bincount(inverse, weights=W[:, var]) / counts
 
-    xmin, xmax = float(np.min(unique_xy[:, 0])), float(np.max(unique_xy[:, 0]))
-    ymin, ymax = float(np.min(unique_xy[:, 1])), float(np.max(unique_xy[:, 1]))
+    unique_xy, unique_W = _mirror_axisymmetric_if_needed(unique_xy, unique_W)
+
+    if crop_extent is not None:
+        mesh_xmin = float(np.min(unique_xy[:, 0]))
+        mesh_xmax = float(np.max(unique_xy[:, 0]))
+        mesh_ymin = float(np.min(unique_xy[:, 1]))
+        mesh_ymax = float(np.max(unique_xy[:, 1]))
+        xmin = max(mesh_xmin, crop_extent[0])
+        xmax = min(mesh_xmax, crop_extent[1])
+        ymin = max(mesh_ymin, crop_extent[2])
+        ymax = min(mesh_ymax, crop_extent[3])
+    else:
+        xmin, xmax = float(np.min(unique_xy[:, 0])), float(np.max(unique_xy[:, 0]))
+        ymin, ymax = float(np.min(unique_xy[:, 1])), float(np.max(unique_xy[:, 1]))
     extent = (xmin, xmax, ymin, ymax)
 
     gx, gy, GX, GY, grid_W, sphere_mask = _resample_to_cartesian_grid(
@@ -654,8 +837,12 @@ def save_reacting_heatmap(
         valid_field = field[~sphere_mask]
         finite = valid_field[np.isfinite(valid_field)]
         if len(finite) and np.max(finite) > np.min(finite):
-            vmin = float(np.min(finite))
-            vmax = float(np.max(finite))
+            if field_index == 0:
+                vmin = float(np.min(finite))
+                vmax = float(np.max(finite))
+            else:
+                vmin = 0.0
+                vmax = max(float(np.max(finite)), 1.0e-5)
         else:
             vmin, vmax = 0.0, 1.0
 
@@ -691,9 +878,13 @@ def save_reacting_heatmap(
         colorbar = figure.colorbar(shown, ax=axis, shrink=0.84)
         colorbar.ax.tick_params(colors="white")
         colorbar.outline.set_edgecolor("#4cc9f0")
+        if field_index > 0 and vmax < 0.05:
+            colorbar.formatter = ticker.FormatStrFormatter("%.1e")
+            colorbar.update_ticks()
 
     figure.suptitle(title, color="white", fontsize=15)
     figure.savefig(path, dpi=180)
     plt.close(figure)
     return path
+
 

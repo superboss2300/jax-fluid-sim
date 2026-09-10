@@ -12,6 +12,8 @@ import jax.numpy as jnp
 import numpy as np
 
 from hybrid import (
+    AerodynamicForceCalculator,
+    AerodynamicHistoryTracker,
     FarfieldWallBoundary,
     HybridCompressibleSolver,
     HybridModalShockLimiter,
@@ -23,6 +25,7 @@ from hybrid import (
     save_cinematic_schlieren,
     save_midplane_heatmap,
     save_reacting_heatmap,
+    write_midplane_slice_vtu,
     write_tessellated_vtu,
 )
 from hybrid.chemistry import Air11ParkMechanism, AIR11_SPECIES, ReactingFlowCoupler
@@ -106,6 +109,15 @@ def run(args):
     else:
         farfield = jnp.asarray([density, velocity, 0.0, 0.0, pressure])
     boundary = FarfieldWallBoundary(solver, farfield)
+    q_inf = 0.5 * density * velocity**2
+    aero_calc = AerodynamicForceCalculator(
+        operator,
+        boundary_state=boundary,
+        reference_area=args.reference_area,
+        reference_length=args.reference_length,
+        moment_center=tuple(args.moment_center),
+    )
+    aero_tracker = AerodynamicHistoryTracker(output / "aerodynamics.csv")
     if args.soft_start is None:
         args.soft_start = (args.mach >= 3.0)
     if args.resume:
@@ -118,15 +130,44 @@ def run(args):
         step = int(restart["step"]) if "step" in restart else 0
         print(f"Resuming {args.resume} from t={current_time:.8f}, step={step}")
     else:
-        states = solver.uniform_state_blocks(
-            density,
-            jnp.asarray([velocity, 0.0, 0.0]),
-            pressure,
-            mass_fractions=mass_fractions,
-        )
+        if args.inflow_mode == "ambient":
+            states = solver.uniform_state_blocks(
+                density,
+                jnp.asarray([0.0, 0.0, 0.0]),
+                pressure,
+                mass_fractions=mass_fractions,
+            )
+        elif args.inflow_mode == "moving-shock":
+            states = {}
+            for block in solver.mesh.element_blocks:
+                centers = solver.mesh.points[block.connectivity].mean(axis=1)
+                is_behind = jnp.asarray(centers[:, 0] < args.shock_x)
+                U_post = solver.uniform_state_blocks(
+                    density,
+                    jnp.asarray([velocity, 0.0, 0.0]),
+                    pressure,
+                    mass_fractions=mass_fractions,
+                )[block.element_type]
+                U_pre = solver.uniform_state_blocks(
+                    density,
+                    jnp.asarray([0.0, 0.0, 0.0]),
+                    pressure,
+                    mass_fractions=mass_fractions,
+                )[block.element_type]
+                states[block.element_type] = jnp.where(
+                    is_behind[:, None, None], U_post, U_pre
+                )
+        else:
+            states = solver.uniform_state_blocks(
+                density,
+                jnp.asarray([velocity, 0.0, 0.0]),
+                pressure,
+                mass_fractions=mass_fractions,
+            )
         current_time = 0.0
         step = 0
     run_start_time = current_time
+    run_start_step = step
     positivity = HybridPositivityLimiter(
         operator,
         density_floor=args.density_floor,
@@ -184,6 +225,11 @@ def run(args):
         f"flux={args.inviscid_flux} subcell_FV={args.subcell_fv} "
         f"soft_start={args.soft_start} LTS={args.lts} chemistry={args.chemistry}"
     )
+    print(
+        f"Aerodynamics: A_ref={aero_calc.reference_area:.6f} m^2 "
+        f"L_ref={aero_calc.reference_length:.4f} m q_inf={q_inf:.4f} Pa "
+        f"wall_tags={aero_calc.wall_tags}"
+    )
     if args.gui:
         gui_res = tuple(args.gui_resolution)
         gui_controller = LiveGUIController(
@@ -198,10 +244,13 @@ def run(args):
     print("Compiling on the first step...", flush=True)
 
     frames = []
+    slice_frames = []
     assert_physical_state(states, solver, "initial/restart state")
     if args.vtk:
         frame = write_tessellated_vtu(output / "sphere_0000.vtu", operator, states)
         frames.append((current_time, frame))
+        slice_frame = write_midplane_slice_vtu(output / "sphere_slice_0000.vtu", operator, states)
+        slice_frames.append((current_time, slice_frame))
     start = time.perf_counter()
     next_progress = int(
         current_time / args.target_time * args.progress_updates
@@ -296,11 +345,14 @@ def run(args):
                 )
             continue
         fraction = current_time / args.target_time
-        run_fraction = (
-            (current_time - run_start_time)
-            / max(args.target_time - run_start_time, 1.0e-30)
-        )
-        if fraction * args.progress_updates >= next_progress or current_time >= args.target_time:
+        step_fraction = (step - run_start_step) / max(args.maximum_steps - run_start_step, 1)
+        effective_fraction = max(fraction, step_fraction) if not args.lts else step_fraction
+        run_fraction = effective_fraction
+        if (
+            effective_fraction * args.progress_updates >= next_progress
+            or current_time >= args.target_time
+            or step >= args.maximum_steps
+        ):
             W = {
                 name: solver.conserved_to_primitive(value)
                 for name, value in states.items()
@@ -323,12 +375,17 @@ def run(args):
                 chem_diag = f" Y_O={YO_max:.2e} Y_N={YN_max:.2e} Y_NO={YNO_max:.2e}"
             else:
                 chem_diag = ""
+            aero_res = aero_calc.compute(
+                states, q_inf, step=step, current_time=current_time
+            )
+            aero_tracker.record(aero_res)
+            aero_diag = f" {aero_res.summary_line()}"
             print(
-                f"progress={100*fraction:6.2f}% time={current_time:.6f} "
+                f"progress={100*effective_fraction:6.2f}% time={current_time:.6f} "
                 f"steps={step} rho=[{rho_min:.6g},{rho_max:.6g}] "
                 f"p=[{p_min:.6g},{p_max:.6g}] troubled={troubled} "
                 f"rejected={total_rejections} dt_min={minimum_dt_value:.3e} "
-                f"elapsed={elapsed:.1f}s eta={eta:.1f}s{chem_diag}"
+                f"elapsed={elapsed:.1f}s eta={eta:.1f}s{chem_diag}{aero_diag}"
                 , flush=True
             )
             save_restart(
@@ -341,6 +398,12 @@ def run(args):
                 )
                 frames.append((current_time, frame))
                 write_pvd(output / "sphere_animation.pvd", frames)
+
+                slice_frame = write_midplane_slice_vtu(
+                    output / f"sphere_slice_{index:04d}.vtu", operator, states
+                )
+                slice_frames.append((current_time, slice_frame))
+                write_pvd(output / "sphere_slice_animation.pvd", slice_frames)
             next_progress += 1
 
     assert_physical_state(states, solver, "final state")
@@ -354,6 +417,12 @@ def run(args):
         )
         frames.append((current_time, frame))
         write_pvd(output / "sphere_animation.pvd", frames)
+
+        slice_frame = write_midplane_slice_vtu(
+            output / f"sphere_slice_{index:04d}.vtu", operator, states
+        )
+        slice_frames.append((current_time, slice_frame))
+        write_pvd(output / "sphere_slice_animation.pvd", slice_frames)
     save_restart(output / "final_state.npz", states, current_time, step)
     image = save_midplane_heatmap(
         output / "sphere_final.png",
@@ -380,14 +449,24 @@ def run(args):
         print(f"Saved reacting heatmap: {reacting_image}")
     if args.vtk:
         write_pvd(output / "sphere_animation.pvd", frames)
-    if gui_controller is not None:
-        gui_controller.close()
+        write_pvd(output / "sphere_slice_animation.pvd", slice_frames)
+    if not aero_tracker.history or aero_tracker.history[-1].step != step:
+        final_aero = aero_calc.compute(states, q_inf, step=step, current_time=current_time)
+        aero_tracker.record(final_aero)
+    aero_plot = output / "drag_lift_history.png"
+    aero_tracker.save_plot(aero_plot, mach=args.mach, title_suffix=f"Mach {args.mach}")
     print(f"Completed {step} steps at t={current_time:.8f}")
     print(f"Saved state: {output / 'final_state.npz'}")
     print(f"Saved heatmap: {image}")
     print(f"Saved cinematic Schlieren: {cinematic_image}")
+    print(f"Saved aerodynamics CSV: {output / 'aerodynamics.csv'}")
+    print(f"Saved drag & lift history plot: {aero_plot}")
+    if aero_tracker.history:
+        latest = aero_tracker.history[-1]
+        print(f"Final Aerodynamics: {latest.summary_line()}")
     if args.vtk:
-        print(f"Open {output / 'sphere_animation.pvd'} in ParaView")
+        print(f"Open 3D Volume: {output / 'sphere_animation.pvd'} in ParaView")
+        print(f"Open 2D Slice:  {output / 'sphere_slice_animation.pvd'} in ParaView")
 
 
 def main():
@@ -425,7 +504,19 @@ def main():
         metavar=("WIDTH", "HEIGHT"),
         help="Live GUI display resolution (default: 800 450).",
     )
-    parser.add_argument("--target-time", type=float, default=0.002)
+    parser.add_argument("--target-time", type=float, default=1.0)
+    parser.add_argument(
+        "--inflow-mode",
+        choices=("moving-shock", "ambient", "pre-initialized"),
+        default="moving-shock",
+        help="Inflow setup: 'moving-shock' (sweeping planar shock wave hitting sphere), 'ambient' (inflow entering quiescent domain), or 'pre-initialized' (traditional steady uniform flow).",
+    )
+    parser.add_argument(
+        "--shock-x",
+        type=float,
+        default=-0.8,
+        help="Initial X position for moving-shock mode (default: -0.8, just ahead of sphere nose at x=-0.5).",
+    )
     parser.add_argument("--mach", type=float, default=2.0)
     parser.add_argument("--reynolds", type=float, default=100000.0)
     parser.add_argument("--cfl", type=float, default=0.08)
@@ -483,6 +574,26 @@ def main():
         "--compilation-cache",
         default=".jax_cache",
         help="Persistent XLA cache reused by later runs with the same mesh/shapes.",
+    )
+    parser.add_argument(
+        "--reference-area",
+        type=float,
+        default=None,
+        help="Reference area for aerodynamic coefficients (default: auto-detected from wall geometry)",
+    )
+    parser.add_argument(
+        "--reference-length",
+        type=float,
+        default=None,
+        help="Reference length/diameter for moments (default: auto-detected)",
+    )
+    parser.add_argument(
+        "--moment-center",
+        type=float,
+        nargs=3,
+        default=(0.0, 0.0, 0.0),
+        metavar=("X", "Y", "Z"),
+        help="Reference center point for aerodynamic moment calculations (default: 0 0 0)",
     )
     parser.add_argument(
         "--resume", type=Path,
