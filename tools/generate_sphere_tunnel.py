@@ -28,6 +28,12 @@ MESH_PRESETS = {
     "refined": dict(near=0.050, shock=0.070, wake=0.085, far=0.30),
     # Expensive visualization/convergence mesh.
     "fine": dict(near=0.032, shock=0.045, wake=0.055, far=0.22),
+    # Targets ~150k-200k tetra10 elements for P2 DG on 24 GB VRAM (RTX 3090 / 4090).
+    "gpu24gb": dict(near=0.055, shock=0.075, wake=0.085, far=0.30),
+    # High-resolution mesh for 48+ GB GPUs (A100 40GB/80GB, A6000).
+    "gpu48gb": dict(near=0.036, shock=0.050, wake=0.060, far=0.24),
+    # Maximum-resolution turbulence mesh for 80 GB GPUs (A100 80GB, H100).
+    "ultra": dict(near=0.020, shock=0.030, wake=0.040, far=0.18),
 }
 
 
